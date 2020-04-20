@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp
+        codebase="file:/C:/WorkspaceAplicativo/PruebaFEA/WebContent" href="file:/C:/WorkspaceAplicativo/PruebaFEA/WebContent/_local_firmaavanzada.jnlp">
+        <information>
+                <title>SWT Address Book</title>
+                <vendor>Eclipse</vendor>
+                <homepage href="http://www.eclipse.org"/>
+                <description kind="default">A simple address book</description>
+                <icon kind="default" href="addressbook.jpg"/>
+                <offline-allowed/>
+        </information>
+        <security>
+		   <all-permissions/>
+		 </security>
+        <resources>
+                <jar href="FirmaAvanzada-1.0.jar"/>
+        </resources>
+        <application-desc main-class="scj.firmaavanzada.FirmaAvanzada">
+           <argument>-Djava.security.policy=C:/Program Files/Java/jdk1.7.0_79/jre/lib/security/javafx.policy</argument> 
+         </application-desc>
+</jnlp>
