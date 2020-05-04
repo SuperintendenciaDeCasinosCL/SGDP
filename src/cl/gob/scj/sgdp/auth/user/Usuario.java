@@ -29,6 +29,7 @@ public class Usuario implements Serializable{
 	private boolean fueraDeOficina;	
 	Map<String, String> permisos;
 	private String nombreCompleto;
+	private String rut;
 	
 	private static final Logger log = Logger.getLogger(Usuario.class);
 
@@ -54,6 +55,9 @@ public class Usuario implements Serializable{
 		for (UsuarioRol usuarioRol : usuarioRoles) {
 			if (usuarioRol.getNombreCompleto()!=null && !usuarioRol.getNombreCompleto().isEmpty()) {
 				this.setNombreCompleto(usuarioRol.getNombreCompleto());
+			}
+			if (usuarioRol.getRut()!=null && !usuarioRol.getRut().isEmpty()) {
+				this.setRut(usuarioRol.getRut()); 
 			}
 			todosLosRoles.add(new RolDTO(usuarioRol.getRol().getIdRol(), usuarioRol.getRol().getNombreRol()));
 			if (usuarioRol.getRol().getIdRol()==idRolUsuarioSeleccionado) {
@@ -154,6 +158,14 @@ public class Usuario implements Serializable{
 
 	public void setNombreCompleto(String nombreCompleto) {
 		this.nombreCompleto = nombreCompleto;
+	}	
+
+	public String getRut() {
+		return rut;
+	}
+
+	public void setRut(String rut) {
+		this.rut = rut;
 	}
 
 	@Override
@@ -164,6 +176,7 @@ public class Usuario implements Serializable{
 				+ idArchivoImagenQR 
 				+ ", fueraDeOficina=" + fueraDeOficina
 				+ ", nombreCompleto=" + nombreCompleto
+				+ ", rut=" + rut
 				+ "]";
 	}
 	

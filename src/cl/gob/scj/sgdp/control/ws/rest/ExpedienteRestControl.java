@@ -3,6 +3,8 @@ package cl.gob.scj.sgdp.control.ws.rest;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Properties;
 
@@ -14,6 +16,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import cl.gob.scj.sgdp.auth.user.Usuario;
+import cl.gob.scj.sgdp.dto.ArchivosInstDeTareaDTO;
 import cl.gob.scj.sgdp.dto.DetalleDeArchivoDTO;
 import cl.gob.scj.sgdp.dto.HistoricoFirmaDTO;
 import cl.gob.scj.sgdp.dto.rest.AgregaORemueveTagDeObjetoRequest;
@@ -52,6 +56,7 @@ import cl.gob.scj.sgdp.dto.rest.RespuestaTipoDocumentoPrimeraTareaDTO;
 import cl.gob.scj.sgdp.dto.rest.RetrocedeEstadoDTO;
 import cl.gob.scj.sgdp.dto.rest.SubirArchivoRestDTO;
 import cl.gob.scj.sgdp.exception.SgdpException;
+import cl.gob.scj.sgdp.service.ArchivosInstDeTareaService;
 import cl.gob.scj.sgdp.service.GestorDeDocumentosService;
 import cl.gob.scj.sgdp.service.HistoricoFirmaService;
 import cl.gob.scj.sgdp.service.ObtenerDetalleDeArchivoService;
@@ -79,6 +84,9 @@ public class ExpedienteRestControl {
 	
 	@Autowired
 	private HistoricoFirmaService historicoFirmaService;
+	
+	@Autowired
+	private ArchivosInstDeTareaService archivosInstDeTareaService;
 
 	@Resource(name = "configProps")
 	private Properties configProps;
@@ -521,6 +529,33 @@ public class ExpedienteRestControl {
 			docOficialesDeExpResponse.setGlosa(e.getMessage());
 		}		
 		return docOficialesDeExpResponse;		
+	}
+	
+	@RequestMapping(value="/estaDocumentoFirmado/{idArchivo}/{idInstanciaDeTarea}/{idUsuario}", method=RequestMethod.GET)
+	public @ResponseBody boolean estaDocumentoFirmado(@PathVariable("idArchivo") String idArchivo,	
+										@PathVariable("idInstanciaDeTarea") long idInstanciaDeTarea,
+										@PathVariable("idUsuario") String idUsuario,
+										Model model, 
+										HttpServletRequest request) {
+		logger.debug("Inicio estaDocumentoFirmado");
+		logger.debug("idArchivo: " + idArchivo);
+		logger.debug("idInstanciaDeTarea: " + idInstanciaDeTarea);
+		logger.debug("idUsuario: " + idUsuario);	
+		try {
+			ArchivosInstDeTareaDTO archivosInstDeTareaDTO = archivosInstDeTareaService.getArchivosInstDeTareaPorIdArchivoIdInstanciaDeTareaIdUsuario(idArchivo, idInstanciaDeTarea, idUsuario);
+			if (archivosInstDeTareaDTO!=null && (archivosInstDeTareaDTO.getEstaFirmadoConFEACentralizada()==true || archivosInstDeTareaDTO.getEstaFirmadoConFEAWebStart() == true )) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (Exception e) {
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			String exceptionAsString = sw.toString();
+			logger.error(exceptionAsString);
+			return false;
+		}		
+		
 	}
 	
 }

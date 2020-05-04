@@ -36,7 +36,7 @@
 				$("#cabeceraReabreInstanciaDeSubprocesoModal").empty();
 				$("#idUsuariosPosiblesReabreInstanciaDeSubproceso").empty();				
 				$("#botonReabreInstanciaDeSubproceso").attr("data-idinstanciadetarea", "");	
-				if ($(this).attr("data-element-id").includes("Task_")) {
+				if ($(this).attr("data-element-id").includes("Task_") || $(this).attr("data-element-id").includes("Activity_")) {
 					let idDiagramaTarea = $(this).attr("data-element-id");					
 					$.get("${sessionURL}", function(haySession) {
 						if(haySession) {
@@ -152,6 +152,10 @@
 		        console.log($( this ));      
 		        $( this ).addClass('cursorPuntero');
 		    });
+		    $('[data-element-id^="Activity_"]').each(function() {
+		        console.log($( this ));      
+		        $( this ).addClass('cursorPuntero');
+		    });	    
 		};
 
 		var inicializaBotonReabreInstanciaDeSubproceso = function() {

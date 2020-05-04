@@ -80,6 +80,9 @@ public class UsuarioRol implements Serializable {
 	
 	@Column(name="\"A_NOMBRE_COMPLETO\"")
 	private String nombreCompleto;
+	
+	@Column(name="\"A_RUT\"")
+	private String rut;
 
 	public UsuarioRol() {
 	}
@@ -138,6 +141,14 @@ public class UsuarioRol implements Serializable {
 
 	public void setNombreCompleto(String nombreCompleto) {
 		this.nombreCompleto = nombreCompleto;
+	}	
+
+	public String getRut() {
+		return rut;
+	}
+
+	public void setRut(String rut) {
+		this.rut = rut;
 	}
 
 	@Override
@@ -146,6 +157,7 @@ public class UsuarioRol implements Serializable {
 				+ idUsuario + ", activo=" + activo + ", rol=" + rol.toString() + ", unidad=" + unidad.toString() 
 				 		+ ", fueraDeOficina=" + fueraDeOficina
 				 		+ ", nombreCompleto=" + nombreCompleto
+				 		+ ", rut=" + rut
 						+ "]";
 	}
 		

@@ -515,7 +515,8 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 			log.info("idArchivoDefirma: " + idArchivoDefirma.getIdArchivo());
 			log.info("nombreExpediente: " + nombreExpediente);
 			log.info("colocaImagenFea: " + colocaImagenFea);
-			log.info("textoVerificaValidezFea: " + textoVerificaValidezFea);			
+			log.info("textoVerificaValidezFea: " + textoVerificaValidezFea);
+			log.info("textoVerificaValrutidezFea: " + usuario.getRut());
 			return "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +		       
 		         "<jnlp codebase=" + urlCodeBaseJNLPFea + " >\n" +
 		              "<information>\n"+
@@ -565,6 +566,7 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 							"<argument>"+nombreExpediente+"</argument>\n" +
 							"<argument>"+colocaImagenFea+"</argument>\n" +
 							"<argument>"+textoVerificaValidezFea+"</argument>\n" +
+							"<argument>"+usuario.getRut()+"</argument>\n" +
 		              "</application-desc>" +
 		              "</jnlp>";
 	}

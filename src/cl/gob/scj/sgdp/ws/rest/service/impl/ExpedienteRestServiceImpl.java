@@ -97,8 +97,8 @@ import cl.gob.scj.sgdp.util.FileUtil;
 import cl.gob.scj.sgdp.util.SgdpMultipartFile;
 import cl.gob.scj.sgdp.util.SingleObjectFactory;
 import cl.gob.scj.sgdp.ws.alfresco.rest.client.AutenticacionService;
-import cl.gob.scj.sgdp.ws.alfresco.rest.client.impl.GestorDeTagsCMSServiceImpl;
-import cl.gob.scj.sgdp.ws.alfresco.rest.client.impl.SubirArchivoCMSServiceImpl;
+import cl.gob.scj.sgdp.ws.alfresco.rest.client.GestorDeTagsCMSService;
+import cl.gob.scj.sgdp.ws.alfresco.rest.client.SubirArchivoCMSService;
 import cl.gob.scj.sgdp.ws.alfresco.rest.response.AgregaRemueveTagDeObjetoResponse;
 import cl.gob.scj.sgdp.ws.alfresco.rest.response.SubirArchivoResponse;
 import cl.gob.scj.sgdp.ws.rest.service.ExpedienteRestService;
@@ -136,7 +136,7 @@ public class ExpedienteRestServiceImpl implements ExpedienteRestService {
 	private UsuarioResponsabilidadService usuarioResponsabilidadService;
 	
 	@Autowired
-	private GestorDeTagsCMSServiceImpl gestorDeTagsCMSServiceImpl;
+	private GestorDeTagsCMSService gestorDeTagsCMSService;
 	
 	@Autowired
 	private InstanciaDeTareaService instanciaDeTareaService;
@@ -154,7 +154,7 @@ public class ExpedienteRestServiceImpl implements ExpedienteRestService {
 	private TipoDeDocumentoService tipoDeDocumentoService;
 		
 	@Autowired
-	private SubirArchivoCMSServiceImpl subirArchivoCMSServiceImpl;
+	private SubirArchivoCMSService subirArchivoCMSService;
 	
 	@Autowired
 	private BandejaDeEntradaService bandejaDeEntradaService;
@@ -250,7 +250,7 @@ public class ExpedienteRestServiceImpl implements ExpedienteRestService {
 		}
 	}
 	
-	private void validacionesSubirArchivo(SubirArhivoDTO subirArhivoDTO) throws SgdpException {
+	/*private void validacionesSubirArchivo(SubirArhivoDTO subirArhivoDTO) throws SgdpException {
 		cl.gob.scj.sgdp.dto.TipoDeDocumentoDTO tipoDeDocumentoDTO = tipoDeDocumentoService.getTipoDeDocumentoDTOPorIdTipoDeDocumento(subirArhivoDTO.getIdTipoDeDocumentoSubir());
 		String nombreTipoDoc =  null;
 		if (tipoDeDocumentoDTO == null) {
@@ -262,7 +262,7 @@ public class ExpedienteRestServiceImpl implements ExpedienteRestService {
 			throw new SgdpException("El id del tipo del documento no esta asociado a la id de la tarea: nombreTipoDoc/subirArhivoDTO.getIdInstanciaDeTareaSubirArchivo() " +
 					nombreTipoDoc+ "/" + subirArhivoDTO.getIdInstanciaDeTareaSubirArchivo() );
 		}
-	}
+	}*/
 	
 	@Override
 	public RespuestaSubirArchivoDTO subirArchivoDirectoCMS(SubirArchivoRestDTO subirArchivoRestDTO) {		
@@ -286,7 +286,7 @@ public class ExpedienteRestServiceImpl implements ExpedienteRestService {
 			subirArhivoDTO.setNombreDeArchivo(subirArchivoRestDTO.getName());
 			subirArhivoDTO.setNumeroDocumento(subirArchivoRestDTO.getNumeroDocumento());
 			logger.info(subirArhivoDTO.toString());
-			SubirArchivoResponse subirArchivoResponse = subirArchivoCMSServiceImpl.subirArchivo(usuario, subirArhivoDTO);
+			SubirArchivoResponse subirArchivoResponse = subirArchivoCMSService.subirArchivo(usuario, subirArhivoDTO);
 			respuestaSubirArchivoDTO.setIdArchivo(subirArchivoResponse.getIdArchivo());
 			respuestaSubirArchivoDTO.setMensaje(configProps.getProperty("respuestaOK"));
 			return respuestaSubirArchivoDTO;
@@ -368,8 +368,7 @@ public class ExpedienteRestServiceImpl implements ExpedienteRestService {
 					logger.debug(instanciaDeTarea.toString());
 					subirArhivoDTO.setIdInstanciaDeTareaSubirArchivo(instanciaDeTarea.getIdInstanciaDeTarea());
 					subirArhivoDTO.setIdUsuarioSube(instanciaDeTarea.getUsuariosAsignados().get(0).getId().getIdUsuario());
-					logger.debug(subirArhivoDTO.toString());
-					validacionesSubirArchivo(subirArhivoDTO);
+					logger.debug(subirArhivoDTO.toString());					
 					subirArchivoService.subirArchivo(usuario, subirArhivoDTO);
 				}
 				
@@ -640,7 +639,7 @@ public class ExpedienteRestServiceImpl implements ExpedienteRestService {
 			usuario.setIdUsuario(agregaORemueveTagDeObjetoRequest.getIdUsuario());
 			usuario.setAlfTicket(autenticacionService.login(agregaORemueveTagDeObjetoRequest.getIdUsuario()));	
 			logger.debug("creo el ticket");	
-			AgregaRemueveTagDeObjetoResponse agregaRemueveTagDeObjetoResponse = gestorDeTagsCMSServiceImpl.agregaRemueveTagDeObjeto
+			AgregaRemueveTagDeObjetoResponse agregaRemueveTagDeObjetoResponse = gestorDeTagsCMSService.agregaRemueveTagDeObjeto
 					(usuario, agregaORemueveTagDeObjetoRequest.getIdObjeto(), agregaORemueveTagDeObjetoRequest.getTag(), agregaORemueveTagDeObjetoRequest.getAccion());
 			agregaORemueveTagDeObjetoResponse.setMensajeRespuesta(configProps.getProperty("respuestaOK"));
 			return agregaORemueveTagDeObjetoResponse;

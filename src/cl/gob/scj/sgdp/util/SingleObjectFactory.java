@@ -3,6 +3,7 @@ package cl.gob.scj.sgdp.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -26,7 +27,7 @@ public class SingleObjectFactory {
 		
 		if (restTemplate == null) {	
 		    
-			restTemplate = new RestTemplate(clientHttpRequestFactory());			
+			restTemplate = new RestTemplate(new BufferingClientHttpRequestFactory(clientHttpRequestFactory()));			
 			//restTemplate.setRequestFactory(clientHttpRequestFactory());
 			
 			

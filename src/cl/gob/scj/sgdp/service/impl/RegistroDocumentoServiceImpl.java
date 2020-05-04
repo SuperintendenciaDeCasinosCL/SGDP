@@ -1,6 +1,8 @@
 package cl.gob.scj.sgdp.service.impl;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
@@ -129,7 +131,10 @@ public class RegistroDocumentoServiceImpl implements RegistroDocumentoService {
 		try {
 			emailService.enviarMailNotificacionPorNumeroDeDocumento(generaRegistroDocumentoResponse, usuario, instanciaDeProceso, false);
 		} catch (SgdpException e) {
-			log.error(e);
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			String exceptionAsString = sw.toString(); 
+			log.error(exceptionAsString);
 		}
 		return generaRegistroDocumentoResponseRest;
 	}

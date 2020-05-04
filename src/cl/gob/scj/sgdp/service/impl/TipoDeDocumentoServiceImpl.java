@@ -107,4 +107,15 @@ public class TipoDeDocumentoServiceImpl implements TipoDeDocumentoService {
 		return tiposDeDocumentosDTO;
 	}
 	
+	@Override
+	public List<TipoDeDocumentoDTO> getTiposDeDocumentosPorIdExpediente(String idExpediente) {
+		List<TipoDeDocumentoDTO> tiposDeDocumentosDTO = new ArrayList<TipoDeDocumentoDTO>();
+		List<TipoDeDocumento> tiposDeDocumentos = tipoDeDocumentoDao.getTiposDeDocumentosPorIdExpediente(idExpediente);
+		for(TipoDeDocumento tipoDeDocumento: tiposDeDocumentos) {
+			TipoDeDocumentoDTO tipoDeDocumentoDTO = new TipoDeDocumentoDTO(tipoDeDocumento.getIdTipoDeDocumento(), tipoDeDocumento.getNombreDeTipoDeDocumento());
+			tiposDeDocumentosDTO.add(tipoDeDocumentoDTO);
+		}
+		return tiposDeDocumentosDTO;
+	}
+	
 }

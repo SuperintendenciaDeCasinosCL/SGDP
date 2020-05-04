@@ -37,5 +37,7 @@ public interface TipoDeDocumentoDao {
 	List<TipoDeDocumento> getTiposDeDocumentosPorCodigoProceso(String codigoProceso);
 
 	List<TipoDeDocumento> getTiposDeDocumentosPorNombreExpediente(String nombreExpediente);
+	
+	List<TipoDeDocumento> getTiposDeDocumentosPorIdExpediente(String idExpediente);
 
 }

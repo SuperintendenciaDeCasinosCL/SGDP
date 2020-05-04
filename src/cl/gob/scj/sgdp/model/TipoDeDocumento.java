@@ -129,7 +129,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 			+ "		INNER JOIN t.proceso p "
 			+ "		WHERE ip.proceso.idProceso = p.idProceso "
 			+ "		AND ip.nombreExpediente = :nombreExpediente "
-			//+ "		AND p.vigente = true "
+			+ ")  "
+			),
+	
+	@NamedQuery(name="TipoDeDocumento.getTiposDeDocumentosPorIdExpediente",
+	query="SELECT DISTINCT d FROM TipoDeDocumento d INNER JOIN d.documentosDeSalidasDeTareas s "		
+			+ "WHERE s.id.tarea.idTarea in ("
+			+ "  	SELECT t.idTarea "
+			+ "		FROM Tarea t, InstanciaDeProceso ip "
+			+ "		INNER JOIN t.proceso p "
+			+ "		WHERE ip.proceso.idProceso = p.idProceso "
+			+ "		AND ip.idExpediente = :idExpediente "
 			+ ")  "
 			)
 })

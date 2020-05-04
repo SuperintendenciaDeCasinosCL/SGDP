@@ -613,7 +613,10 @@ public class EmailServiceImpl implements EmailService {
 					asunto, mensaje, parametroMailTipoContenido.getValorParametroChar());
 			
 		} catch (Exception e) {
-			log.error(e);
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			String exceptionAsString = sw.toString(); 
+			log.error(exceptionAsString);
 			throw new SgdpException("Error al enviar email");
 		}
 	}

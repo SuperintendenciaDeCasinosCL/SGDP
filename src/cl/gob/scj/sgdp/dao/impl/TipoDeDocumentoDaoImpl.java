@@ -123,6 +123,13 @@ public class TipoDeDocumentoDaoImpl implements TipoDeDocumentoDao {
 		query.setString("nombreExpediente", nombreExpediente);			
 		return query.list();
 	}
+	
+	@Override
+	public List<TipoDeDocumento> getTiposDeDocumentosPorIdExpediente(String idExpediente) {
+		Query query = getSession().getNamedQuery("TipoDeDocumento.getTiposDeDocumentosPorIdExpediente");	
+		query.setString("idExpediente", idExpediente);			
+		return query.list();
+	}
 
 
 }

@@ -44,6 +44,7 @@ import cl.gob.scj.sgdp.dto.RespuestaAsignarNumeroDocumento;
 import cl.gob.scj.sgdp.dto.RespuestaConversionArchivoDTO;
 import cl.gob.scj.sgdp.dto.RespuestaMailDTO;
 import cl.gob.scj.sgdp.dto.SubirArhivoDTO;
+import cl.gob.scj.sgdp.dto.TipoDeDocumentoDTO;
 import cl.gob.scj.sgdp.dto.rest.AsignacionesNumerosDocDto;
 import cl.gob.scj.sgdp.dto.rest.RespuestaAsignacionesNumerosDocDto;
 import cl.gob.scj.sgdp.dto.rest.TipoDocumentoDTO;
@@ -60,6 +61,7 @@ import cl.gob.scj.sgdp.service.GestorDeDocumentosService;
 import cl.gob.scj.sgdp.service.ObtenerDetalleDeArchivoService;
 import cl.gob.scj.sgdp.service.ParametroService;
 import cl.gob.scj.sgdp.service.SubirArchivoService;
+import cl.gob.scj.sgdp.service.TipoDeDocumentoService;
 import cl.gob.scj.sgdp.tipos.AccionesHistInstDeTareaType;
 import cl.gob.scj.sgdp.util.FechaUtil;
 import cl.gob.scj.sgdp.util.FileUtil;
@@ -131,6 +133,9 @@ public class SubirArchivoServiceImpl implements SubirArchivoService {
 	@Autowired
 	private NumeracionClientRestService numeracionClientRestService;
 	
+	@Autowired
+	private TipoDeDocumentoService tipoDeDocumentoService;
+	
 	@Override
 	public SubirArhivoDTO subirArchivo(Usuario usuario, SubirArhivoDTO subirArhivoDTO) throws SgdpException, SgdpExceptionValidaTareaEnBE {
 		
@@ -140,6 +145,13 @@ public class SubirArchivoServiceImpl implements SubirArchivoService {
 		RespuestaAsignarNumeroDocumento respuestaAsignarNumeroDocumento = new RespuestaAsignarNumeroDocumento();		
 		
 		try {	
+			
+			boolean estaTipoDeDocumentoEnProceso = estaTipoDeDocumentoEnProceso(subirArhivoDTO); 
+			
+			if (estaTipoDeDocumentoEnProceso == false) {
+				SgdpExceptionValidaTareaEnBE se = new SgdpExceptionValidaTareaEnBE(configProps.getProperty("tipoDeDocumentoNoEstaEnProceso"), Level.WARN, true);
+				throw se;
+			}
 			
 			if (subirArhivoDTO.isValidaInstanciaDeTareaEnBE()==true) {
 				InstanciaDeTarea instanciaDeTarea = instanciaDeTareaDao.getInstanciaDeTareaPorIdInstanciaDeTarea(subirArhivoDTO.getIdInstanciaDeTareaSubirArchivo());
@@ -682,6 +694,22 @@ public class SubirArchivoServiceImpl implements SubirArchivoService {
 		    return respuestaMailDTO;
 		}
 			
+	}
+	
+	private boolean estaTipoDeDocumentoEnProceso(SubirArhivoDTO subirArhivoDTO) {
+		
+		if (subirArhivoDTO.getIdTipoDeDocumentoSubir()==Long.parseLong(configProps.getProperty("idTipoDeDocumentoAntecedente"))) {
+			return true;
+		} else {
+			List<TipoDeDocumentoDTO> tiposDeDocumentosDTO = tipoDeDocumentoService.getTiposDeDocumentosPorIdExpediente(subirArhivoDTO.getIdExpedienteSubirArchivo());
+			for (TipoDeDocumentoDTO tipoDeDocumentoDTO : tiposDeDocumentosDTO) {
+				if (tipoDeDocumentoDTO.getIdTipoDeDocumento() == subirArhivoDTO.getIdTipoDeDocumentoSubir()) {
+					return true;
+				}
+			}
+			return false;
+		}
+		
 	}
 
 }

@@ -1,6 +1,8 @@
 package cl.gob.scj.sgdp.config;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -103,6 +105,10 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
 		try {
 			alfTicket = autenticacionService.login(idUsuario);
 		} catch (Exception e) {
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			String exceptionAsString = sw.toString();
+			log.error(exceptionAsString);
 			throw new SgdpException("Ocurrio un error en la autenticaci\u00f3n");
 		}
 				

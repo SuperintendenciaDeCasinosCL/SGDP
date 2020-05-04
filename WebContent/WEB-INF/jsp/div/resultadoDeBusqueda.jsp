@@ -557,7 +557,13 @@
 								        	<a href="#" class="btn btn-primary btn-sm boton-cerrar-expediente" title="Vinculaciones" 																										
 													onclick="vinculaciones('${elementoResultadoBusquedaDTO.idObjeto}', '${elementoResultadoBusquedaDTO.nombreDeObjeto}')">
 													<span class="glyphicon glyphicon-link font-icon-1"></span>
-									        </a>	
+									        </a>
+									        
+									        <%-- <a href="#" class="btn btn-primary btn-sm boton-cerrar-expediente" title="Edita Materia/Asunto" 																										
+													onclick="actualizaMateria'${elementoResultadoBusquedaDTO.idObjeto}')">
+													<span class="glyphicon glyphicon-pencil font-icon-1"></span>
+													
+									        </a> --%>	
 																						
 										</c:when>
 									</c:choose></td>
