@@ -114,10 +114,11 @@
 <script>
 
 function formatTablaTareas() {
-
+	
+	$('#tablaTareas').DataTable().destroy();
 	var tablaTareas = $('#tablaTareas')
 	.DataTable(
-			{
+			{	
 				"autoWidth": false,
 				buttons : [ {
 					extend : 'excelHtml5',
@@ -135,16 +136,7 @@ function formatTablaTareas() {
   		             {
   		                 "targets": [ 7, 8 ],
   		                 "visible": false				                       		                
-  		             }/*,
-  		       		{ "width": "15%", "targets": 0 },
-  		           	{ "width": "15%", "targets": 1 },
-  		          	{ "width": "15%", "targets": 2 },
-  		        	{ "width": "15%", "targets": 3 },
-  		      		{ "width": "10%", "targets": 4 },
-  		    		{ "width": "10%", "targets": 5 },
-  		  			{ "width": "10%", "targets": 6 },
-  		  			{ "width": "10%", "targets": 7 },
-  					{ "width": "5%", "targets": 8 }*/
+  		             }
   		         ]
 				
 			});
