@@ -213,15 +213,7 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 			firmaAvanzadaArchivoRequest.setType(parametroPorContextoDTO.getValorParametroChar());
 			firmaAvanzadaArchivoRequest.setDescription(firmaAvanzadaDTO.getNombreArchivo());
 		
-			byte[] byteArchivo = gestorDeDocumentosCMSService.getContenidoArchivo(firmaAvanzadaDTO.getIdDocumento(), usuario);
-			
-			ParametroDTO parametroDTONombreCarpetaImagenesFEA = parametroService.getParametroPorID(Constantes.ID_PARAM_NOMBRE_CARPETA_IMAGENES_FEA);
-			String nombreCarpetaImagenesFEA = parametroDTONombreCarpetaImagenesFEA.getValorParametroChar();
-			
-			IdArchivoPorIdUsrNomCarpetaResponse idArchivoPorIdUsrNomCarpetaResponse = 
-					gestorDeDocumentosCMSService.getIdArchivoPorIdUsrNomCarpeta(usuario, nombreCarpetaImagenesFEA);
-			
-			log.debug(idArchivoPorIdUsrNomCarpetaResponse.toString());
+			byte[] byteArchivo = gestorDeDocumentosCMSService.getContenidoArchivo(firmaAvanzadaDTO.getIdDocumento(), usuario);			
 			
 			byte[] byteArchivoImagenLogoSCJ = gestorDeDocumentosCMSService.getContenidoArchivo(parametroDTOIdLogoSCJ.getValorParametroChar(), usuario);
 			
@@ -237,7 +229,17 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 			Font font = FontFactory.getFont(FontFactory.HELVETICA, 9); 
 		
 			if (colocaImagenFea!=null && colocaImagenFea.equals("SI")) {
+				
 				/*Agrega imagen de la firma en la ultima pagina*/
+				
+				ParametroDTO parametroDTONombreCarpetaImagenesFEA = parametroService.getParametroPorID(Constantes.ID_PARAM_NOMBRE_CARPETA_IMAGENES_FEA);
+				String nombreCarpetaImagenesFEA = parametroDTONombreCarpetaImagenesFEA.getValorParametroChar();
+				
+				IdArchivoPorIdUsrNomCarpetaResponse idArchivoPorIdUsrNomCarpetaResponse = 
+						gestorDeDocumentosCMSService.getIdArchivoPorIdUsrNomCarpeta(usuario, nombreCarpetaImagenesFEA);
+				
+				log.debug(idArchivoPorIdUsrNomCarpetaResponse.toString());				
+				
 				byte[] byteArchivoImagenFEA = gestorDeDocumentosCMSService.getContenidoArchivo(idArchivoPorIdUsrNomCarpetaResponse.getIdArchivo(), usuario);
 				Image img = Image.getInstance(byteArchivoImagenFEA);		
 				PdfImage stream = new PdfImage(img, "", null);            
@@ -312,8 +314,9 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
             
             String reason = parametroService.getParametroPorID(Constantes.ID_PARAM_REASON_FEA).getValorParametroChar();
             String location = parametroService.getParametroPorID(Constantes.ID_PARAM_LOCATION_FEA).getValorParametroChar();
-            log.info("reason" + reason);
-            log.info("location" + location);
+            
+            log.info("Reason: " + reason);
+            log.info("Location: " + location);
           
             Font font2 = FontFactory.getFont(FontFactory.HELVETICA, 8);       
             ColumnText.showTextAligned(over, Element.ALIGN_LEFT, new Phrase("Digitally signed by " + usuario.getNombreCompleto(), font2), 300 , 41, 0);
@@ -322,7 +325,6 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
             ColumnText.showTextAligned(over, Element.ALIGN_LEFT, new Phrase("Location: " + location, font2), 300 , 14, 0);
             
             stamper.close();
-            //logo.close();
             reader.close();
             
             byteArchivo = ba.toByteArray();
@@ -361,7 +363,7 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 			
 			log.info("firmaAvanzadaRequest.getToken(): " + firmaAvanzadaRequest.getToken());
 			
-			TokenResponse tokenResponse = firmaAvanzadaInterService.firmarDocumentoConFEA(firmaAvanzadaRequest/*, firmaAvanzadaDTO.getOpt()*/);
+			TokenResponse tokenResponse = firmaAvanzadaInterService.firmarDocumentoConFEA(firmaAvanzadaRequest);
 			
 			log.info("tokenResponse.getSession_token(): " + tokenResponse.getSession_token());
 			
@@ -430,7 +432,11 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 			e.printStackTrace(new PrintWriter(sw));
 			String exceptionAsString = sw.toString();
 			log.error(exceptionAsString);
-			firmaAvanzadaDTO.setResultadoFirmarDocumentoConFEA(configProps.getProperty("errorAlFirmarDocumento"));
+			if (e instanceof SgdpException) {
+				firmaAvanzadaDTO.setResultadoFirmarDocumentoConFEA(e.getMessage());
+			} else {
+				firmaAvanzadaDTO.setResultadoFirmarDocumentoConFEA(configProps.getProperty("errorAlFirmarDocumento"));
+			}			
 			firmaAvanzadaDTO.setCssStatus(configProps.getProperty("cssError"));	
 			if (puedeBorrarRegistroDoc==true) {
 				BorraRegistroDocumentoRequestRest borraRegistroDocumentoRequestRest = new BorraRegistroDocumentoRequestRest();
@@ -495,7 +501,7 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 			if (colocaImagenFea!=null && colocaImagenFea.equals("SI")) {
 				idArchivoDefirma = gestorDeDocumentosCMSService.getIdArchivoPorIdUsrNomCarpeta(usuario, nombreCarpetaImagenesFEA);	
 			} else {
-				idArchivoDefirma = new  IdArchivoPorIdUsrNomCarpetaResponse();
+				idArchivoDefirma = new IdArchivoPorIdUsrNomCarpetaResponse();
 				idArchivoDefirma.setIdArchivo("0");
 			}			
 			String textoVerificaValidezFea = parametroService.getParametroPorID(Constantes.ID_PARAM_URL_VERIFICACION_DOC_FEA).getValorParametroChar();			
