@@ -474,7 +474,8 @@ function aplicarFirmaAvanzada() {
 			} else {
 				$("#contenedorBEPrincipal").find(".cargando").remove();
 				$.notify({
-	     			message: 'Error al firmar documento!'
+	     			//message: 'Error al firmar documento!'
+	     			message: returnData.responseJSON.resultadoFirmarDocumentoConFEA
 	     		},{
 	     			type: 'danger'
 	     		});
