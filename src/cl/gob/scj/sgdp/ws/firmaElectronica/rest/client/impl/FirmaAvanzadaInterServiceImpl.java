@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import cl.gob.scj.sgdp.config.Constantes;
 import cl.gob.scj.sgdp.dto.ParametroDTO;
+import cl.gob.scj.sgdp.exception.SgdpException;
 import cl.gob.scj.sgdp.service.ParametroService;
 import cl.gob.scj.sgdp.util.SingleObjectFactory;
 import cl.gob.scj.sgdp.ws.firmaElectronica.rest.client.FirmaAvanzadaInterService;
@@ -33,7 +34,7 @@ public class FirmaAvanzadaInterServiceImpl implements FirmaAvanzadaInterService 
 	private ParametroService parametroService;
 	
 	@Override
-	public TokenResponse firmarDocumentoConFEA(FirmaAvanzadaRequest firmaAvanzadaRequest/*, String opt*/) throws Exception {
+	public TokenResponse firmarDocumentoConFEA(FirmaAvanzadaRequest firmaAvanzadaRequest) throws Exception {
 		
 		log.info("firmarDocumentoConFEA... inicio");
 		
@@ -84,15 +85,18 @@ public class FirmaAvanzadaInterServiceImpl implements FirmaAvanzadaInterService 
             br.close();
 			
             log.debug("sb.toString(): " + sb.toString());
-            
+             
             if (status == 200) {
             	tokenResponse = mapper.readValue(sb.toString(), TokenResponse.class);
             	return tokenResponse;
+            } else if (status == 500) {            	
+            	SgdpException e = new SgdpException("El servicio de firma de Segpres no est\u00E1 disponible en este momento, por favor int\u00E9ntelo m\u00E1s tarde.");
+            	throw e;
             } else {
             	log.error("sb.toString(): " + sb.toString());
             	Exception e = new Exception(sb.toString());
             	throw e;
-            }     	
+            }   	
 			
 			
 	    } catch (Exception e) {
@@ -147,12 +151,19 @@ public class FirmaAvanzadaInterServiceImpl implements FirmaAvanzadaInterService 
 			if (status == 200) {
 				firmaAvanzadaMinSegPresResponse = mapper.readValue(result.toString(), FirmaAvanzadaMinSegPresResponse.class);
             	return firmaAvanzadaMinSegPresResponse;
+            } else if (status == 401 || status == 206) {
+            	log.error("result.toString(): " + result.toString());
+            	SgdpException e = new SgdpException("OTP expirado, por favor intentar nuevamente.");
+            	throw e;
+            } else if (status == 500) {
+            	log.error("result.toString(): " + result.toString());
+            	SgdpException e = new SgdpException("El servicio de firma de Segpres no est\u00E1 disponible en este momento, por favor int\u00E9ntelo m\u00E1s tarde.");
+            	throw e;
             } else {
             	log.error("result.toString(): " + result.toString());
             	Exception e = new Exception(result.toString());
             	throw e;
-            } 
-			
+            } 		
 			
 		} catch (Exception e) {
 	    	StringWriter sw = new StringWriter();
