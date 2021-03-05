@@ -74,27 +74,29 @@ function cargaDetalleDeTarea(nombreExpediente, idInstanciaDeTarea, muestraSoloDo
     		var urlGetTablaHistorialDeDocumentoPorIdExpediente = $("#urlGetTablaHistorialDeDocumentoPorIdExpediente").val();
     		
     		console.log("urlGetHistoricoDeInstDeTareaPorIdExpedienteBusqueda: " + urlGetHistoricoDeInstDeTareaPorIdExpedienteBusqueda);
+
+			resetCondicioDeSatisFaccion();
     		
-    		 $("#divTabsDetalleDeTareaForm").addClass("hide");	 
-    		 $("#divTablaHistorialDeDocumentosForm").empty();
-    		 $("#divTablaHistorialDeInstanciaDeProcesoForm").empty();
-
-    		 $("#divDetalleDeTarea").empty();
-    		 $("#divTablaHistorialDeInstanciaDeProceso").empty();
-    		 $("#divTablaHistorialDeDocumentos").empty();	
-
-    		 $("#liTabDivDetalleDeTarea").addClass("active");
-    		 $("#liTabHistorialDeTareas").removeClass("active");   
-    		 $("#liTabHistorialDeDocumentos").removeClass("active");
-
-    		 $("#tabDivDetalleDeTarea").addClass("active");
-    		 $("#tabDivDetalleDeTarea").addClass("in");
-
-    		 $("#tabDivHistorialDeTareas").removeClass("active");
-    		 $("#tabDivHistorialDeTareas").removeClass("in");
-
-    		 $("#tabDivHistorialDeDocumentos").removeClass("active");
-    		 $("#tabDivHistorialDeDocumentos").removeClass("in");
+		 	$("#divTabsDetalleDeTareaForm").addClass("hide");	 
+		 	$("#divTablaHistorialDeDocumentosForm").empty();
+		 	$("#divTablaHistorialDeInstanciaDeProcesoForm").empty();
+		
+		 	$("#divDetalleDeTarea").empty();
+		 	$("#divTablaHistorialDeInstanciaDeProceso").empty();
+		 	$("#divTablaHistorialDeDocumentos").empty();	
+		
+		 	$("#liTabDivDetalleDeTarea").addClass("active");
+		 	$("#liTabHistorialDeTareas").removeClass("active");   
+		 	$("#liTabHistorialDeDocumentos").removeClass("active");
+		
+		 	$("#tabDivDetalleDeTarea").addClass("active");
+		 	$("#tabDivDetalleDeTarea").addClass("in");
+		
+		 	$("#tabDivHistorialDeTareas").removeClass("active");
+		 	$("#tabDivHistorialDeTareas").removeClass("in");
+		
+		 	$("#tabDivHistorialDeDocumentos").removeClass("active");
+		 	$("#tabDivHistorialDeDocumentos").removeClass("in");
     		
     		if (urlControl!=null && urlControl!="") {
     					

@@ -18,4 +18,6 @@ public interface HistoricoDeInstDeTareaService {
 	
 	HistoricoDeInstDeTareaDTO getHisDeInstDeTareaPorIdInstDeTareaDTODeDestIdUsrOrigenMaxFechaMov(long idInstanciaDeTarea, String idUsuarioOrigen);
 	
+	int getCantidadDeEjecutacionesInstanciaDeTarea(long idInstanciaDeTarea);
+	
 }

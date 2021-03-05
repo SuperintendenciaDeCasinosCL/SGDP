@@ -1,0 +1,10 @@
+{
+  "realm": "${sgdp.realm}",
+  "auth-server-url": "${sgdp.auth.server.url}",
+  "ssl-required": "none",
+  "resource": "${sgdp.resource}",
+  "credentials": {
+    "secret": "${sgdp.credentials.secret}"
+  },
+  "use-resource-role-mappings": true
+}

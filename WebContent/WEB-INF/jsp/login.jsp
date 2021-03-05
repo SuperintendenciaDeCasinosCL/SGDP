@@ -33,8 +33,10 @@
 		                        <label for="idUsuario" class="col-sm-3 control-label">
 		                            <spring:message code="login.form.input.nombreUsuario.nombre"/></label>
 		                        <div class="col-sm-9">
-		                            <input class="form-control validate[required]" placeholder='<spring:message code="login.form.input.nombreUsuario.placeholder"/>'
-								name="idUsuario" id="idUsuario" onblur="cargarRolesUsuario()" />
+		                            <%--<input class="form-control validate[required]" placeholder='<spring:message code="login.form.input.nombreUsuario.placeholder"/>'
+								name="idUsuario" id="idUsuario" onblur="cargarRolesUsuario()" />--%>
+									<input class="form-control validate[required]" placeholder='<spring:message code="login.form.input.nombreUsuario.placeholder"/>'
+								name="idUsuario" id="idUsuario" />
 		                        </div>
 		                    </div>		                   
 		                    <div class="form-group">
@@ -46,14 +48,14 @@
 								type="password" value="" />
 		                        </div>
 		                    </div>
-		                    <div class="form-group hide" id="divRolUsuarioSeleccionado">
+		                    <%--<div class="form-group hide" id="divRolUsuarioSeleccionado">
 		                    	 <label for="idRolUsuarioSeleccionado" class="col-sm-3 control-label">
 		                            <spring:message code="login.form.input.rol.nombre"/></label>
 		                        <div class="col-sm-9">
 		                           <select class="form-control validate[required]" id="idRolUsuarioSeleccionado" name="idRolUsuarioSeleccionado">
 									</select>
 		                        </div>
-		                    </div>	                    
+		                    </div>--%>	                    
 		                    <div class="form-group last">
 		                        <div class="col-sm-offset-3 col-sm-9">
 		                            <button type="button" onclick="enviarFormLogin()" class="btn btn-primary btn-md">

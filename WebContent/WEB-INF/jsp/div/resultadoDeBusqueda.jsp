@@ -291,50 +291,86 @@
 									<c:choose>
 										<c:when
 											test="${elementoResultadoBusquedaDTO.tipoObjeto == nombreTipoDocumento}">
-											<a href="#" class="btn btn-info btn-xs"
-												onclick="cargarDetalleDeProceso('${elementoResultadoBusquedaDTO.idExpedienteQueLoContiene}', 
-				    																'${elementoResultadoBusquedaDTO.subProceso}',
-				    																'${elementoResultadoBusquedaDTO.nombreExpedienteQueLoContiene}')">
-												 Ver
-											</a><br>
-											<a href="#" data-nombreexpediente="${elementoResultadoBusquedaDTO.nombreExpedienteQueLoContiene}" 
-												onclick="notificarInstanciaDeProcesoDesdeBusqqueda('${elementoResultadoBusquedaDTO.nombreExpedienteQueLoContiene}')"
-												class="btn btn-default btn-sm boton-notificar-busqueda" id="botonNotificarInstanciaDeProcesoDesdeBusqqueda">
-												<span class="glyphicon glyphicon-send"></span>									            
-											</a><br>
 											
-										<%-- Boton que permite buscar el diagrama  --%>	
-										
-											<a href="#" class="btn btn-primary btn-sm boton-cerrar-expediente" title="Diagrama del Subproceso" 																										
-												onclick="buscarDiagramaSubproceso('${elementoResultadoBusquedaDTO.idExpedienteQueLoContiene}')">
-												<span class="fa fa-gears"></span>
-								        	</a>
+											 <div>
+											    <p>
+											    
+											    	<a href="#" class="btn btn-info btn-xs"
+														onclick="cargarDetalleDeProceso('${elementoResultadoBusquedaDTO.idExpedienteQueLoContiene}', 
+						    																'${elementoResultadoBusquedaDTO.subProceso}',
+						    																'${elementoResultadoBusquedaDTO.nombreExpedienteQueLoContiene}')">
+														 Ver
+													</a>
+											    
+											    </p>
+											 </div>
+											 
+											  <div>
+											    <p>
+											    
+											    	<a href="#" data-nombreexpediente="${elementoResultadoBusquedaDTO.nombreExpedienteQueLoContiene}" 
+														onclick="notificarInstanciaDeProcesoDesdeBusqqueda('${elementoResultadoBusquedaDTO.nombreExpedienteQueLoContiene}')"
+														class="btn btn-default btn-sm boton-notificar-busqueda" id="botonNotificarInstanciaDeProcesoDesdeBusqqueda">
+														<span class="glyphicon glyphicon-send"></span>									            
+													</a>
+											    
+											    </p>
+											 </div>
+											 
+											  <div>
+											    <p>
+											    	<a href="#" class="btn btn-primary btn-sm boton-cerrar-expediente" title="Diagrama del Subproceso" 																										
+														onclick="buscarDiagramaSubproceso('${elementoResultadoBusquedaDTO.idExpedienteQueLoContiene}')">
+														<span class="fa fa-gears"></span>
+										        	</a>
 								        	
-							        	<%-- ///////////////////////////////////////////////////  --%>	
+											    </p>
+											 </div>
+									
 										</c:when>
 										<c:when
-											test="${elementoResultadoBusquedaDTO.tipoObjeto == nombreTipoExpediente}">
-											<a href="#" class="btn btn-info btn-xs"
+											test="${elementoResultadoBusquedaDTO.tipoObjeto == nombreTipoExpediente}">											
+											
+											<div>
+										      <p>
+										      	<a href="#" class="btn btn-info btn-xs"
 												onclick="cargarDetalleDeProceso('${elementoResultadoBusquedaDTO.idObjeto}', 
 				    																'${elementoResultadoBusquedaDTO.subProceso}',
 				    																'${elementoResultadoBusquedaDTO.nombreDeObjeto}')">
 												 Ver
-											</a><br>
-											<a href="#" data-nombreexpediente="${elementoResultadoBusquedaDTO.nombreDeObjeto}" 
-												onclick="notificarInstanciaDeProcesoDesdeBusqqueda('${elementoResultadoBusquedaDTO.nombreDeObjeto}')"
-												class="btn btn-default btn-sm boton-notificar-busqueda" id="botonNotificarInstanciaDeProcesoDesdeBusqqueda">	
-												<span class="glyphicon glyphicon-send"></span>											
-											</a><br>
-											
-											
-											<%-- Boton que permite buscar el diagrama  --%>	
-											
-												<a href="#" class="btn btn-primary btn-sm boton-cerrar-expediente" title="Diagrama del Subproceso" 																										
-													onclick="buscarDiagramaSubproceso('${elementoResultadoBusquedaDTO.idObjeto}')">
-													<span class="fa fa-gears"></span>
-									        	</a>
-									        	
-								        	<%-- ///////////////////////////////////////////////////  --%>		
+												</a>
+											</p>
+										    </div>
+										    
+										    <div>
+											    <p>
+											    	<a href="#" data-nombreexpediente="${elementoResultadoBusquedaDTO.nombreDeObjeto}" 
+														onclick="notificarInstanciaDeProcesoDesdeBusqqueda('${elementoResultadoBusquedaDTO.nombreDeObjeto}')"
+														class="btn btn-default btn-sm boton-notificar-busqueda" id="botonNotificarInstanciaDeProcesoDesdeBusqqueda">	
+														<span class="glyphicon glyphicon-send"></span>											
+													</a>
+											    </p>
+										    </div>
+										    
+										    <div>
+											    <p>
+											    
+											    	<a href="#" class="btn btn-primary btn-sm boton-cerrar-expediente" title="Diagrama del Subproceso" 																										
+														onclick="buscarDiagramaSubproceso('${elementoResultadoBusquedaDTO.idObjeto}')">
+														<span class="fa fa-gears"></span>
+										        	</a>
+											    </p>
+										    </div>
+										    
+										    <div>
+											    <p>											    
+											    	<a href="#" class="btn btn-warning btn-xs" title="Historial de Requisitos de Satisfacci&oacute;n y/o Salidas no Conformes"		
+														onclick="cargaHistorialDeCondicionesDeSatisfaccionPorIdExpediente('${elementoResultadoBusquedaDTO.nombreDeObjeto}',
+					    										'${elementoResultadoBusquedaDTO.idObjeto}')">
+														RDS/SNC
+										        	</a>								        	
+											    </p>
+										    </div>
 											
 										</c:when>
 									</c:choose>									
@@ -475,95 +511,135 @@
 																						
 												<c:when test="${buscarDTO.tipoDocumentoOficial eq tipoDocumentoOficial and permisos[permisoNoFiltraPorConfidencialidad] eq permisoNoFiltraPorConfidencialidad}">
 												
-													<a href="#" class="btn btn-info btn-xs"
-														onclick="cargarDetalleDeProceso('${elementoResultadoBusquedaDTO.idExpedienteQueLoContiene}', 
-					    																'${elementoResultadoBusquedaDTO.subProceso}',
-					    																'${elementoResultadoBusquedaDTO.nombreExpedienteQueLoContiene}')">
-													 Ver
-													</a><br>												
+													<div>
+											    		<p>
+											    			<a href="#" class="btn btn-info btn-xs"
+																onclick="cargarDetalleDeProceso('${elementoResultadoBusquedaDTO.idExpedienteQueLoContiene}', 
+							    																'${elementoResultadoBusquedaDTO.subProceso}',
+							    																'${elementoResultadoBusquedaDTO.nombreExpedienteQueLoContiene}')">
+															 Ver
+															</a>	
+											    		</p>
+											    	</div>									
 												
 												</c:when>
 												
 												<c:when test="${buscarDTO.tipoDocumentoOficial eq tipoDocumentoOficial and haParticipado eq 'true'}">
 												
-													<a href="#" class="btn btn-info btn-xs"
-														onclick="cargarDetalleDeProceso('${elementoResultadoBusquedaDTO.idExpedienteQueLoContiene}', 
-					    																'${elementoResultadoBusquedaDTO.subProceso}',
-					    																'${elementoResultadoBusquedaDTO.nombreExpedienteQueLoContiene}')">
-													 Ver
-													</a><br>												
+													<div>
+											    		<p>
+											    			<a href="#" class="btn btn-info btn-xs"
+																onclick="cargarDetalleDeProceso('${elementoResultadoBusquedaDTO.idExpedienteQueLoContiene}', 
+							    																'${elementoResultadoBusquedaDTO.subProceso}',
+							    																'${elementoResultadoBusquedaDTO.nombreExpedienteQueLoContiene}')">
+															 Ver
+															</a>
+											    		</p>
+											    	</div>																								
 												
 												</c:when>
 												
 												<c:when test="${buscarDTO.tipoDocumentoOficial ne tipoDocumentoOficial}">
 												
-													<a href="#" class="btn btn-info btn-xs"
-														onclick="cargarDetalleDeProceso('${elementoResultadoBusquedaDTO.idExpedienteQueLoContiene}', 
-					    																'${elementoResultadoBusquedaDTO.subProceso}',
-					    																'${elementoResultadoBusquedaDTO.nombreExpedienteQueLoContiene}')">
-													 Ver
-													</a><br>												
+													<div>
+											    		<p>
+											    			<a href="#" class="btn btn-info btn-xs"
+																onclick="cargarDetalleDeProceso('${elementoResultadoBusquedaDTO.idExpedienteQueLoContiene}', 
+							    																'${elementoResultadoBusquedaDTO.subProceso}',
+							    																'${elementoResultadoBusquedaDTO.nombreExpedienteQueLoContiene}')">
+															 Ver
+															</a>	
+											    		</p>											    		
+											    	</div>									
 												
 												</c:when>											
 											
 											</c:choose>											
 											
-											<a href="#" data-nombreexpediente="${elementoResultadoBusquedaDTO.nombreExpedienteQueLoContiene}"
-												onclick="notificarInstanciaDeProcesoDesdeBusqqueda('${elementoResultadoBusquedaDTO.nombreExpedienteQueLoContiene}')" 
-												class="btn btn-default btn-sm boton-notificar-busqueda" id="botonNotificarInstanciaDeProcesoDesdeBusqqueda">
-												<span class="glyphicon glyphicon-send"></span>												
-											</a><br>
+											<div>
+												<p>
+													<a href="#" data-nombreexpediente="${elementoResultadoBusquedaDTO.nombreExpedienteQueLoContiene}"
+														onclick="notificarInstanciaDeProcesoDesdeBusqqueda('${elementoResultadoBusquedaDTO.nombreExpedienteQueLoContiene}')" 
+														class="btn btn-default btn-sm boton-notificar-busqueda" id="botonNotificarInstanciaDeProcesoDesdeBusqqueda">
+														<span class="glyphicon glyphicon-send"></span>												
+													</a>	
+												</p>
+											</div>
 											
-											<!--  Boton que permite buscar el diagrama   -->
-											
-												<a href="#" class="btn btn-primary btn-sm boton-cerrar-expediente" title="Diagrama del Subproceso" 																										
-													onclick="buscarDiagramaSubproceso('${elementoResultadoBusquedaDTO.idExpedienteQueLoContiene}')">
-													<span class="fa fa-gears"></span>
-									        	</a>
-									        	
-								        	<!-- ///////////////////////////////////////////////////  -->
-											
+											<div>
+												<p>
+													<a href="#" class="btn btn-primary btn-sm boton-cerrar-expediente" title="Diagrama del Subproceso" 																										
+															onclick="buscarDiagramaSubproceso('${elementoResultadoBusquedaDTO.idExpedienteQueLoContiene}')">
+															<span class="fa fa-gears"></span>
+											        </a>	
+												</p>
+											</div>
 											
 										</c:when>
 										<c:when test="${elementoResultadoBusquedaDTO.tipoObjeto == nombreTipoExpediente}">
 										
-											<a href="#" class="btn btn-info btn-xs"
-												onclick="cargarDetalleDeProceso('${elementoResultadoBusquedaDTO.idObjeto}', 
-				    																'${elementoResultadoBusquedaDTO.subProceso}',
-				    																'${elementoResultadoBusquedaDTO.nombreDeObjeto}')">
-												 Ver
-											</a>												
+											<div>
+												<p>
+													<a href="#" class="btn btn-info btn-xs"
+														onclick="cargarDetalleDeProceso('${elementoResultadoBusquedaDTO.idObjeto}', 
+						    																'${elementoResultadoBusquedaDTO.subProceso}',
+						    																'${elementoResultadoBusquedaDTO.nombreDeObjeto}')">
+														 Ver
+													</a>	
+												</p>
+											</div>
 											
-											<a href="#" data-nombreexpediente="${elementoResultadoBusquedaDTO.nombreDeObjeto}"
-												onclick="notificarInstanciaDeProcesoDesdeBusqqueda('${elementoResultadoBusquedaDTO.nombreDeObjeto}')" 
-												class="btn btn-default btn-sm" id="botonNotificarInstanciaDeProcesoDesdeBusqqueda">
-												<span class="glyphicon glyphicon-send"></span>												
-											</a>
+											<div>
+												<p>
+													<a href="#" data-nombreexpediente="${elementoResultadoBusquedaDTO.nombreDeObjeto}"
+														onclick="notificarInstanciaDeProcesoDesdeBusqqueda('${elementoResultadoBusquedaDTO.nombreDeObjeto}')" 
+														class="btn btn-default btn-sm" id="botonNotificarInstanciaDeProcesoDesdeBusqqueda">
+														<span class="glyphicon glyphicon-send"></span>												
+													</a>
+												</p>
+											</div>
 											
-											<a href="#" class="btn btn-primary btn-sm boton-cerrar-expediente" title="Diagrama del Subproceso" 																										
-													onclick="buscarDiagramaSubproceso('${elementoResultadoBusquedaDTO.idObjeto}')">
-													<span class="fa fa-gears"></span>
-									        </a>								        	
-								        	
+											<div>
+												<p>
+													<a href="#" class="btn btn-primary btn-sm boton-cerrar-expediente" title="Diagrama del Subproceso" 																										
+														onclick="buscarDiagramaSubproceso('${elementoResultadoBusquedaDTO.idObjeto}')">
+														<span class="fa fa-gears"></span>
+										        	</a>	
+												</p>
+											</div>
+												
 								        	<c:if test="${permisos[permisoReabrirExpYSaltarTareas] eq permisoReabrirExpYSaltarTareas}">
 								        	
-								        		<a href="#" class="btn btn-primary btn-sm boton-cerrar-expediente" title="Reapertura y cierre de tareas" 																										
-													onclick="abrirDiagramaSubprocesoParaReaperturaYSalto('${elementoResultadoBusquedaDTO.nombreDeObjeto}')">
-													<span class="glyphicon glyphicon-retweet"></span>
-									        	</a>
+								        		<div>
+													<p>
+														<a href="#" class="btn btn-primary btn-sm boton-cerrar-expediente" title="Reapertura y cierre de tareas" 																										
+															onclick="abrirDiagramaSubprocesoParaReaperturaYSalto('${elementoResultadoBusquedaDTO.nombreDeObjeto}')">
+															<span class="glyphicon glyphicon-retweet"></span>
+											        	</a>
+													</p>
+												</div>
+								        		
 								        	
 								        	</c:if>
 								        	
-								        	<a href="#" class="btn btn-primary btn-sm boton-cerrar-expediente" title="Vinculaciones" 																										
-													onclick="vinculaciones('${elementoResultadoBusquedaDTO.idObjeto}', '${elementoResultadoBusquedaDTO.nombreDeObjeto}')">
-													<span class="glyphicon glyphicon-link font-icon-1"></span>
-									        </a>
-									        
-									        <%-- <a href="#" class="btn btn-primary btn-sm boton-cerrar-expediente" title="Edita Materia/Asunto" 																										
-													onclick="actualizaMateria'${elementoResultadoBusquedaDTO.idObjeto}')">
-													<span class="glyphicon glyphicon-pencil font-icon-1"></span>
-													
-									        </a> --%>	
+								        	<div>
+												<p>
+													<a href="#" class="btn btn-primary btn-sm boton-cerrar-expediente" title="Vinculaciones" 																										
+														onclick="vinculaciones('${elementoResultadoBusquedaDTO.idObjeto}', '${elementoResultadoBusquedaDTO.nombreDeObjeto}')">
+														<span class="glyphicon glyphicon-link font-icon-1"></span>
+										        	</a>
+												</p>
+											</div>
+											
+											<div>
+												<p>
+													<a href="#" class="btn btn-warning btn-xs" title="Historial de Requisitos de Satisfacci&oacute;n y/o Salidas no Conformes"		
+														onclick="cargaHistorialDeCondicionesDeSatisfaccionPorIdExpediente('${elementoResultadoBusquedaDTO.nombreDeObjeto}',
+					    										'${elementoResultadoBusquedaDTO.idObjeto}')">
+														RDS/SNC
+										        	</a>
+												</p>
+											</div>									      	
 																						
 										</c:when>
 									</c:choose></td>

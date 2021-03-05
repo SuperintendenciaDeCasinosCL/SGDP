@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
@@ -34,6 +35,7 @@ import cl.gob.scj.sgdp.dto.ContinuarProcesoDTO;
 import cl.gob.scj.sgdp.dto.DetalleDeArchivoDTO;
 import cl.gob.scj.sgdp.dto.EtapaDeInstanciaDeProcesoDTO;
 import cl.gob.scj.sgdp.dto.ExpedienteDTO;
+import cl.gob.scj.sgdp.dto.HistoricoFirmaDTO;
 import cl.gob.scj.sgdp.dto.InstanciaDeTareaDTO;
 import cl.gob.scj.sgdp.dto.ProcesoDTO;
 import cl.gob.scj.sgdp.dto.RetrocedeProcesoDTO;
@@ -79,6 +81,7 @@ import cl.gob.scj.sgdp.model.UsuarioRol;
 import cl.gob.scj.sgdp.service.BandejaDeEntradaService;
 import cl.gob.scj.sgdp.service.CrearExpedienteService;
 import cl.gob.scj.sgdp.service.HistoricoDeInstDeTareaService;
+import cl.gob.scj.sgdp.service.HistoricoFirmaService;
 import cl.gob.scj.sgdp.service.InstanciaDeProcesoService;
 import cl.gob.scj.sgdp.service.InstanciaDeTareaService;
 import cl.gob.scj.sgdp.service.MueveProcesoService;
@@ -96,11 +99,10 @@ import cl.gob.scj.sgdp.util.FechaUtil;
 import cl.gob.scj.sgdp.util.FileUtil;
 import cl.gob.scj.sgdp.util.SgdpMultipartFile;
 import cl.gob.scj.sgdp.util.SingleObjectFactory;
+import cl.gob.scj.sgdp.util.StringUtilSGDP;
 import cl.gob.scj.sgdp.ws.alfresco.rest.client.AutenticacionService;
 import cl.gob.scj.sgdp.ws.alfresco.rest.client.GestorDeTagsCMSService;
-import cl.gob.scj.sgdp.ws.alfresco.rest.client.SubirArchivoCMSService;
 import cl.gob.scj.sgdp.ws.alfresco.rest.response.AgregaRemueveTagDeObjetoResponse;
-import cl.gob.scj.sgdp.ws.alfresco.rest.response.SubirArchivoResponse;
 import cl.gob.scj.sgdp.ws.rest.service.ExpedienteRestService;
 
 @Service
@@ -152,9 +154,6 @@ public class ExpedienteRestServiceImpl implements ExpedienteRestService {
 	
 	@Autowired	
 	private TipoDeDocumentoService tipoDeDocumentoService;
-		
-	@Autowired
-	private SubirArchivoCMSService subirArchivoCMSService;
 	
 	@Autowired
 	private BandejaDeEntradaService bandejaDeEntradaService;
@@ -167,6 +166,9 @@ public class ExpedienteRestServiceImpl implements ExpedienteRestService {
 	
 	@Autowired
 	private ProcesoService procesoService;
+	
+	@Autowired
+	private HistoricoFirmaService historicoFirmaService;
 	
 	@Resource(name = "configProps")
 	private Properties configProps;
@@ -200,15 +202,16 @@ public class ExpedienteRestServiceImpl implements ExpedienteRestService {
 			}
 			
 			usuario.setIdUsuario(expedienteRestDto.getIdUsuario());
-			usuario.setIdRolUsuarioSeleccionado(expedienteRestDto.getIdRolUsuarioSeleccionado());
+			//usuario.setIdRolUsuarioSeleccionado(expedienteRestDto.getIdRolUsuarioSeleccionado());
 				
 			logger.info("Termino de setear los valores");
 	
 			usuario.setAlfTicket(autenticacionService.login(expedienteRestDto.getIdUsuario()));
 			
 			List<UsuarioRol> usuarioRoles = usuarioRolService.getUsuarioRolesPorIdUsuario(usuario.getIdUsuario());
-			usuario.setRolUnidadPermisosPorIdRolUsuarioSeleccionado(usuarioRoles);
-				
+			//usuario.setRolUnidadPermisosPorIdRolUsuarioSeleccionado(usuarioRoles);
+			usuario.setPermisosRolesYUnidades(usuarioRoles);	
+			
 			respuestaEmpedienteRestDto.setMensaje(crearExpedienteService.crearExpediente(expedienteDTO, usuario));
 			logger.info("Creo el expediente de manera exitosa");
 
@@ -285,9 +288,13 @@ public class ExpedienteRestServiceImpl implements ExpedienteRestService {
 			subirArhivoDTO.setIdExpedienteSubirArchivo(subirArchivoRestDTO.getIdExpedienteSubirArchivo());
 			subirArhivoDTO.setNombreDeArchivo(subirArchivoRestDTO.getName());
 			subirArhivoDTO.setNumeroDocumento(subirArchivoRestDTO.getNumeroDocumento());
+			subirArhivoDTO.setIdTipoDeDocumentoSubir(subirArchivoRestDTO.getIdTipoDeDocumentoSubir());
+			subirArhivoDTO.setIdInstanciaDeTareaSubirArchivo(subirArchivoRestDTO.getIdInstanciaDeTareaSubirArchivo());
 			logger.info(subirArhivoDTO.toString());
-			SubirArchivoResponse subirArchivoResponse = subirArchivoCMSService.subirArchivo(usuario, subirArhivoDTO);
-			respuestaSubirArchivoDTO.setIdArchivo(subirArchivoResponse.getIdArchivo());
+			//SubirArchivoResponse subirArchivoResponse = subirArchivoCMSService.subirArchivo(usuario, subirArhivoDTO);
+			SubirArhivoDTO subirArhivoDTORespuesta = subirArchivoService.subirArchivo(usuario, subirArhivoDTO);
+			//respuestaSubirArchivoDTO.setIdArchivo(subirArchivoResponse.getIdArchivo());
+			respuestaSubirArchivoDTO.setIdArchivo(subirArhivoDTORespuesta.getIdArchivoEnCMS());
 			respuestaSubirArchivoDTO.setMensaje(configProps.getProperty("respuestaOK"));
 			return respuestaSubirArchivoDTO;
 		} catch (Exception e) {
@@ -436,7 +443,6 @@ public class ExpedienteRestServiceImpl implements ExpedienteRestService {
 
 		Usuario usuario = new Usuario();
 		usuario.setIdUsuario(avanzaEstadoRestDTO.getEmisor());		
-		
 
 		ObjectMapper mapper = SingleObjectFactory.getMapper();
 
@@ -460,10 +466,8 @@ public class ExpedienteRestServiceImpl implements ExpedienteRestService {
 				instanciasDeTareasPorIdExpediente = instanciaDeTareaDao.getInstanciasDeTareasPorIdExpedienteAsignadasEnEspera(avanzaEstadoRestDTO.getIdExpediente());
 			} else {
 				instanciasDeTareasPorIdExpediente = instanciaDeTareaDao.getInstanciasDeTareasOrdenUnoPorIdExpedienteAsignadas(avanzaEstadoRestDTO.getIdExpediente());				
-			} 
+			} 			
 			
-			logger.debug("instanciasDeTareasPorIdExpediente.size(): " + instanciasDeTareasPorIdExpediente.size());
-
 			for (InstanciaDeTarea instanciaDeTarea : instanciasDeTareasPorIdExpediente) {
 				ContinuarProcesoDTO continuarProcesoDTO = new ContinuarProcesoDTO();
 				continuarProcesoDTO.setComentario(avanzaEstadoRestDTO.getComentario());
@@ -511,8 +515,8 @@ public class ExpedienteRestServiceImpl implements ExpedienteRestService {
 
 			String listaIdInstanciaDeTarea = "";
 
-			if (instanciasDeTareasPorIdExpediente.size() != 0) {
-				logger.info("Es distinto de 0");
+			if (instanciasDeTareasPorIdExpediente!=null && instanciasDeTareasPorIdExpediente.size() != 0) {
+				logger.info("instanciasDeTareasPorIdExpediente!=null");
 				List<InstanciaDeTarea> RespuestaInstanciasDeTareasPorIdExpediente = instanciaDeTareaDao
 						.getInstanciasDeTareasPorIdExpedienteAsignadas(avanzaEstadoRestDTO.getIdExpediente());
 
@@ -535,14 +539,20 @@ public class ExpedienteRestServiceImpl implements ExpedienteRestService {
 			respuestaCambiaEstado.setMensaje(configProps.getProperty("respuestaOK"));
 			return respuestaCambiaEstado;		
 			
-		} catch  (IOException e) {			
+		}/* catch  (IOException e) {			
 			logger.error("AvanzarRetrocederEstado " + e.getMessage());
 			throw new SgdpException();
-		} catch (SgdpException e) {		
-			logger.error("AvanzarRetrocederEstado " + e.getMessage());
+		} */catch (SgdpException e) {		
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			String exceptionAsString = sw.toString();
+			logger.error(exceptionAsString);
 			throw e;
-		} catch (Exception e) {
-			logger.error("AvanzarRetrocederEstado " + e.getMessage());
+		} catch (Exception e) {			
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			String exceptionAsString = sw.toString();			
+			logger.error(exceptionAsString);
 			throw new SgdpException();
 		} finally {
 			if (usuario.getAlfTicket() != null) {
@@ -887,6 +897,118 @@ public class ExpedienteRestServiceImpl implements ExpedienteRestService {
 		}
 		docOficialesDeExpResponse.setDetalleDeDocOficiales(detalleDeDocOficiales);
 		return docOficialesDeExpResponse;		
+	}
+	
+	@Override
+	public String getIdArchivoPorIdDocumentoFirmado(long idDocumentoFirmado) {
+		HistoricoFirmaDTO historicoFirmaDTO = historicoFirmaService.getHistoricoFirmaDTOPorIdDocumentoFirmado(idDocumentoFirmado);
+		if (historicoFirmaDTO!=null) {
+			return historicoFirmaDTO.getIdArchivoCMS();
+		} else {
+			return "";
+		}				
+	}
+	
+	@Override
+	public String getIdArchivoPorIdErroneoIdExpediente(String idArhivoErroneo, String idExpediente, String idUsuario) throws Exception {
+		Usuario usuario = new Usuario();
+		usuario.setIdUsuario(idUsuario);
+		DetalleDeArchivoDTO detalleDeArchivoDTOBase = null;
+		List<ArchivoInfoDTO> archivosExpedienteDTO = obtenerArchivosExpedienteService.obtenerArchivosExpediente(usuario, idExpediente, false, false, false, 0);
+		long diferenciaInicialErrorIdArchivoValidador = Constantes.DIFERENCIA_MILISEGUNDOS_INICIAL_ERROR_ID_ARCHIVO_VALIDADOR;
+		logger.info("diferenciaInicialErrorIdArchivoValidador: " + diferenciaInicialErrorIdArchivoValidador);
+		logger.info("Constantes.DIFERENCIA_MILISEGUNDOS_INICIAL_ERROR_ID_ARCHIVO_VALIDADOR: " + Constantes.DIFERENCIA_MILISEGUNDOS_INICIAL_ERROR_ID_ARCHIVO_VALIDADOR);
+		//boolean retornaId = false;
+		for (ArchivoInfoDTO archivoInfoDTO : archivosExpedienteDTO) {
+			if (archivoInfoDTO.getIdArchivo().equals(idArhivoErroneo)) {
+				detalleDeArchivoDTOBase = obtenerDetalleDeArchivoService.obtenerDetalleDeArchivo(usuario, archivoInfoDTO.getIdArchivo());
+				break;
+			}
+		}
+		if (detalleDeArchivoDTOBase!=null) {
+			logger.info("detalleDeArchivoDTOBase!=null true");			
+			/*for (ArchivoInfoDTO archivoInfoDTO : archivosExpedienteDTO) {
+				logger.info("archivoInfoDTO.getIdArchivo(): " + archivoInfoDTO.getIdArchivo());
+				logger.info("archivoInfoDTO.getNombre(): " + archivoInfoDTO.getNombre());
+				if (archivoInfoDTO.getEsDocumentoOficial().contentEquals("true") && 
+						StringUtilSGDP.comparaStringConLevenshteinDistance(archivoInfoDTO.getTipoDeDocumento(), detalleDeArchivoDTOBase.getTipoDeDocumento(), 3) == true &&
+						//archivoInfoDTO.getUsuarioUltimaModificacion().equals(detalleDeArchivoDTOBase.getUsuarioUltimaModificacion()) &&
+						!archivoInfoDTO.getIdArchivo().equals(idArhivoErroneo)
+						) {	
+					Date fechaUltimaModificacionArchivoInfoDTO = FechaUtil.simpleDateFormatFormHHMMSS.parse(archivoInfoDTO.getFechaUltimaModificacionCompleta());
+					Date fechaUltimaModificacionArchivoDTOBase = FechaUtil.simpleDateFormatFormHHMMSS.parse(detalleDeArchivoDTOBase.getFechaUltimaModificacionCompleta());
+					logger.info("fechaUltimaModificacionArchivoInfoDTO: " + archivoInfoDTO.getFechaUltimaModificacionCompleta());
+					logger.info("fechaUltimaModificacionArchivoDTOBase: " + detalleDeArchivoDTOBase.getFechaUltimaModificacionCompleta());
+					long diferenciaEnMilisegundos = fechaUltimaModificacionArchivoInfoDTO.getTime() - fechaUltimaModificacionArchivoDTOBase.getTime();
+					logger.info("diferenciaEnMilisegundos: " + diferenciaEnMilisegundos);					
+					logger.info("diferenciaInicialErrorIdArchivoValidador: " + diferenciaInicialErrorIdArchivoValidador);
+					if (diferenciaEnMilisegundos<=diferenciaInicialErrorIdArchivoValidador && diferenciaEnMilisegundos>=0l) {
+						logger.info("diferenciaEnMilisegundos<=diferenciaInicialErrorIdArchivoValidador && diferenciaEnMilisegundos>=0 : true");
+						diferenciaInicialErrorIdArchivoValidador = diferenciaEnMilisegundos;
+						List<HistoricoFirmaDTO> hf = historicoFirmaService.getHistoricoFirmaDocumentoFEAPorIdArchivo(archivoInfoDTO.getIdArchivo());
+						if (hf!=null && !hf.isEmpty()) {
+							logger.info("hf!=null && !hf.isEmpty()");
+							detalleDeArchivoDTOBase = obtenerDetalleDeArchivoService.obtenerDetalleDeArchivo(usuario, archivoInfoDTO.getIdArchivo()); 
+							detalleDeArchivoDTOBase.setIdArchivo(archivoInfoDTO.getIdArchivo());	
+							retornaId = true;
+						}
+					}					
+				}
+			}*/
+			/*if (retornaId == true) {
+				return detalleDeArchivoDTOBase.getIdArchivo();
+			}*/	
+			List<ArchivoInfoDTO> listaPosiblesArchivoInfoDTO = cargaListaPosiblesArchivoInfoDTO(archivosExpedienteDTO, detalleDeArchivoDTOBase, idArhivoErroneo);
+			if (!listaPosiblesArchivoInfoDTO.isEmpty()) {
+				ArchivoInfoDTO archivoInfoDTOMayorFechaModificacion = getArchivoInfoDTOMayorFechaModificacion(listaPosiblesArchivoInfoDTO);
+				if (archivoInfoDTOMayorFechaModificacion!=null) {
+					return archivoInfoDTOMayorFechaModificacion.getIdArchivo();
+				}
+			}
+		}		
+		return "";		
+	}
+	
+	private List<ArchivoInfoDTO> cargaListaPosiblesArchivoInfoDTO(List<ArchivoInfoDTO> archivosExpedienteDTO, DetalleDeArchivoDTO detalleDeArchivoDTOBase, String idArhivoErroneo) throws Exception {
+		List<ArchivoInfoDTO> archivosExpedienteDTOPosibles = new ArrayList<ArchivoInfoDTO>();		
+		for (ArchivoInfoDTO archivoInfoDTO : archivosExpedienteDTO) {
+			logger.info("archivoInfoDTO.getIdArchivo(): " + archivoInfoDTO.getIdArchivo() + " - archivoInfoDTO.getNombre(): " + archivoInfoDTO.getNombre());
+			logger.info("archivoInfoDTO.getEsDocumentoOficial(): " + archivoInfoDTO.getEsDocumentoOficial());
+			if (archivoInfoDTO.getEsDocumentoOficial().contentEquals("true") && 
+					StringUtilSGDP.comparaStringConLevenshteinDistance(archivoInfoDTO.getTipoDeDocumento(), detalleDeArchivoDTOBase.getTipoDeDocumento(), 3) == true &&					
+					!archivoInfoDTO.getIdArchivo().equals(idArhivoErroneo)
+					) {	
+				List<HistoricoFirmaDTO> hf = historicoFirmaService.getHistoricoFirmaDocumentoFEAPorIdArchivo(archivoInfoDTO.getIdArchivo());
+				if (hf!=null && !hf.isEmpty()) {
+					logger.info("hf!=null && !hf.isEmpty()");
+					logger.info("archivosExpedienteDTOPosibles.add(archivoInfoDTO)");
+					logger.info("archivoInfoDTO.getIdArchivo(): " + archivoInfoDTO.getIdArchivo() + " - archivoInfoDTO.getNombre(): " + archivoInfoDTO.getNombre());
+					archivosExpedienteDTOPosibles.add(archivoInfoDTO);
+				}
+			}
+		}		
+		return archivosExpedienteDTOPosibles;		
+	}
+	
+	private ArchivoInfoDTO getArchivoInfoDTOMayorFechaModificacion(List<ArchivoInfoDTO> listaPosiblesArchivoInfoDTO) throws ParseException {
+		Date fechaArchivoInfoDTOComparar = null;
+		ArchivoInfoDTO archivoInfoDTORespueta = null;
+		for (ArchivoInfoDTO archivoInfoDTO : listaPosiblesArchivoInfoDTO) {
+			logger.info("archivoInfoDTO.getIdArchivo(): " + archivoInfoDTO.getIdArchivo() + " - archivoInfoDTO.getNombre(): " + archivoInfoDTO.getNombre());
+			Date fechaUltimaModificacionArchivoInfoDTO = FechaUtil.simpleDateFormatFormHHMMSS.parse(archivoInfoDTO.getFechaUltimaModificacionCompleta());			
+			if (fechaArchivoInfoDTOComparar!=null && fechaUltimaModificacionArchivoInfoDTO.compareTo(fechaArchivoInfoDTOComparar) > 0) {
+				archivoInfoDTORespueta = archivoInfoDTO;
+			} else {
+				fechaArchivoInfoDTOComparar = new Date(fechaUltimaModificacionArchivoInfoDTO.getTime());
+				archivoInfoDTORespueta = archivoInfoDTO;
+			}
+		}		
+		return archivoInfoDTORespueta;
+	}
+	
+	@Override
+	public boolean validaSiHayFirmaHoy(Long idTipoDeDocumento, Long idInstanciaDeTarea, String idUsuario) {
+		return historicoFirmaService.validaSiHayFirmaHoy(idTipoDeDocumento, idInstanciaDeTarea, idUsuario);
 	}
 	
 }

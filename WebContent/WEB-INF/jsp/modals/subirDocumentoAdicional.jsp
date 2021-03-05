@@ -285,7 +285,7 @@ var inicializaFileUploadDocumentoAdicionalModal = function(){
         }
   	});
 };
-var inicializaBotonSubirDocumentoAdicionalModal = function() {
+/*var inicializaBotonSubirDocumentoAdicionalModal = function() {
 	$("#botonSubirDocumentoAdicionalModal").off('click').on('click', function () {		
 		var x = $("#formSubirDocumentoAdicionalModal").validationEngine('hide');	
 		var validaForm = $("#formSubirDocumentoAdicionalModal").validationEngine('validate');	
@@ -296,13 +296,13 @@ var inicializaBotonSubirDocumentoAdicionalModal = function() {
 		var validaFechMenor = validaFechaMenor('fechaDocumentoAdicionalModal', 'fechaRecepcionDocumentoAdicionalModal', 'Fecha documento mayor a fecha recepci&oacute;n');		
 		console.log("validaFechMenor: " + validaFechMenor);					
 	});	
-};
+};*/
 $(document).ready(function() {
 	$(inicializaSelect2SubirDocumentoAdicionalModal);	
 	$(inicializaFechasDocumentoAdicionalModal);
 	$(inicializaSelect2MultipleSubirDocumentoAdicionalModal);
 	$(inicializaFileUploadDocumentoAdicionalModal);
-	$(inicializaBotonSubirDocumentoAdicionalModal);
+	/*inicializaBotonSubirDocumentoAdicionalModal);*/
 	
 });
 </script>

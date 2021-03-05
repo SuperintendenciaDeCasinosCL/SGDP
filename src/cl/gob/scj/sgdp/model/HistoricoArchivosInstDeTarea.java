@@ -181,7 +181,6 @@ import cl.gob.scj.sgdp.config.Constantes;
 		+ "WHERE ip.idExpediente = :idExpediente "
 		+ "GROUP BY i.idInstanciaDeTarea, t.nombreTarea, ai.idArchivoCms, ai.mimeType, ai.nombreArchivo, "
 		+ "ai.idUsuario, td.idTipoDeDocumento, td.nombreDeTipoDeDocumento, t.puedeVisarDocumentos, t.puedeAplicarFEA, ip.idExpediente, t.idTarea ORDER BY fechaSubido DESC ")*/
-
 	
 })
 public class HistoricoArchivosInstDeTarea implements Serializable {

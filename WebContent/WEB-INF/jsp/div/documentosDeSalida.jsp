@@ -92,7 +92,7 @@
 	                        
 	                        <a	data-toggle="tooltip" title="Firma con token"
 	                        		onclick="firmarConToken('<c:url value="/firmaApplets/${archivoInfoDTO.idArchivo}/${archivoInfoDTO.nombre}/${archivoInfoDTO.idExpediente}/${archivoInfoDTO.idTipoDeDocumento}/${instanciaDeTareaDTO.idInstanciaDeTarea}"/>',
-	                        			'${archivoInfoDTO.idArchivo}', ${instanciaDeTareaDTO.idInstanciaDeTarea})"
+	                        			'${archivoInfoDTO.idArchivo}', ${instanciaDeTareaDTO.idInstanciaDeTarea}, ${archivoInfoDTO.idTipoDeDocumento})"
 	                                 class="btn btn-primary btn-sm"> 
 	                              <span class="glyphicon glyphicon-modal-window font-icon-2"></span>
 	                        </a>
@@ -537,10 +537,10 @@ var inicializaBotonEditarDocumentoEnEjecucionTarea = function(){
 		});
 	});
 };
-function firmarConToken(url, idArchivo, idInstanciaDeTarea) {
-	console.log("url: " + url);
+function firmarConToken(url, idArchivo, idInstanciaDeTarea, idTipoDeDocumento) {
+	/*console.log("url: " + url);
 	console.log("idArchivo: " + idArchivo);
-	console.log("idInstanciaDeTarea: " + idInstanciaDeTarea);
+	console.log("idInstanciaDeTarea: " + idInstanciaDeTarea);*/
     $.get("${sessionURL}", function(haySession) {
         if(haySession) {
         	var urlEstaDocumentoFirmado = "${pageContext.request.contextPath}" + "/estaDocumentoFirmado/" + idArchivo + "/" + idInstanciaDeTarea;
@@ -563,12 +563,41 @@ function firmarConToken(url, idArchivo, idInstanciaDeTarea) {
         		            if (result == true) {
         		            	$("#linkFirmarConTokenHidden").attr('href', url);            	    		
         	                	document.getElementById("linkFirmarConTokenHidden").click();
+        	                	consultaEstadoDocumentoFirmado(idInstanciaDeTarea);
         				    }
         		        }
         		    });
-                } else {
-                	 $("#linkFirmarConTokenHidden").attr('href', url);            	    		
-                     document.getElementById("linkFirmarConTokenHidden").click();
+                } else {                	
+					var urlValidaSiHayFirmaHoy = "${pageContext.request.contextPath}" + "/validaSiHayFirmaHoy/" + idTipoDeDocumento + "/" + idInstanciaDeTarea;					
+	        		$.get(urlValidaSiHayFirmaHoy, function(urlValidaSiHayFirmaHoy) {
+	        			if (urlValidaSiHayFirmaHoy == true) {	        			
+	        				bootbox.confirm({
+		        		    	title: "Firmar documento",
+		        		        message: "En esta tarea HOY ya se firm&oacute; un documento, ¿desea firmar nuevamente?",
+		        		        buttons: {
+		        		            confirm: {
+		        		                label: '<span class="glyphicon glyphicon-ok-circle font-icon-3"></span>',
+		        		                className: 'btn-success'
+		        		            },
+		        		            cancel: {
+		        		                label: '<span class="glyphicon glyphicon-remove-circle font-icon-3"></span>',
+		        		                className: 'btn-danger'
+		        		            }
+		        		        },
+		        		        callback: function (result) {        		            
+		        		            if (result == true) {
+		        		            	$("#linkFirmarConTokenHidden").attr('href', url);            	    		
+		    	                        document.getElementById("linkFirmarConTokenHidden").click();
+		    	                        consultaEstadoDocumentoFirmado(idInstanciaDeTarea);
+		        				    }
+		        		        }
+	        		    	});	        				
+	        			} else {	        				
+	        				$("#linkFirmarConTokenHidden").attr('href', url);            	    		
+	                        document.getElementById("linkFirmarConTokenHidden").click();
+	                        consultaEstadoDocumentoFirmado(idInstanciaDeTarea);	                        
+	        			}	        			
+	        		});
                 }
             });            
         } else {

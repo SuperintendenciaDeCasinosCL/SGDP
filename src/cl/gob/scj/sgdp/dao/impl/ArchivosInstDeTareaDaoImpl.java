@@ -1,5 +1,6 @@
 package cl.gob.scj.sgdp.dao.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -12,9 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import cl.gob.scj.sgdp.dao.ArchivosInstDeTareaDao;
 import cl.gob.scj.sgdp.dto.ArchivosInstDeTareaDTO;
-import cl.gob.scj.sgdp.dto.SubirArhivoDTO;
 import cl.gob.scj.sgdp.model.ArchivosInstDeTarea;
-import cl.gob.scj.sgdp.service.impl.ObtenerArchivosExpedienteServiceImpl;
 
 @Repository
 public class ArchivosInstDeTareaDaoImpl implements ArchivosInstDeTareaDao {
@@ -246,6 +245,35 @@ public class ArchivosInstDeTareaDaoImpl implements ArchivosInstDeTareaDao {
 		query.setString("idExpediente", idExpediente);
         query.setResultTransformer(Transformers.aliasToBean(ArchivosInstDeTareaDTO.class));
 		return query.list();
+	}	
+	
+	@Override
+	public ArchivosInstDeTarea getArchivoPorIdInstanciaDeTareaIdTipoDeDocumento(long idInstanciaDeTarea, long idTipoDeDocumento) {
+		Query query = getSession().getNamedQuery("ArchivosInstDeTarea.getArchivoPorIdInstanciaDeTareaIdTipoDeDocumento");	
+		query.setLong("idInstanciaDeTarea", idInstanciaDeTarea);
+		query.setLong("idTipoDeDocumento", idTipoDeDocumento);
+		return (ArchivosInstDeTarea) query.uniqueResult();
+	}
+	
+	@Override
+	public ArchivosInstDeTarea getUltimoArchivoInstDeTareaFirmado(long idInstanciaDeTarea, long idTipoDeDocumento, String idUsuario) {
+		Query query = getSession().getNamedQuery("ArchivosInstDeTarea.getUltimoArchivoInstDeTareaFirmado");	
+		query.setLong("idInstanciaDeTarea", idInstanciaDeTarea);
+		query.setLong("idTipoDeDocumento", idTipoDeDocumento);
+		query.setString("idUsuario", idUsuario);
+		query.setFirstResult(0);
+        query.setMaxResults(1);
+		return (ArchivosInstDeTarea) query.uniqueResult();
+	}
+	
+	@Override
+	public List<ArchivosInstDeTarea> getArchivosInstDeTareaPorIdInstTareaIdUsuarioNombreTipoDocFechaSubidoMayorA(Long idInstanciaDeTarea, String idUsuario, String nombreDeTipoDeDocumento, Date fechaSubido) {
+		Query query = getSession().getNamedQuery("ArchivosInstDeTarea.getArchivosInstDeTareaPorIdInstTareaIdUsuarioNombreTipoDocFechaSubidoMayorA");		
+		query.setLong("idInstanciaDeTarea", idInstanciaDeTarea);
+		query.setString("idUsuario", idUsuario);
+		query.setString("nombreDeTipoDeDocumento", nombreDeTipoDeDocumento);
+		query.setTimestamp("fechaSubido", fechaSubido);
+		return query.list();	
 	}
 	
 }

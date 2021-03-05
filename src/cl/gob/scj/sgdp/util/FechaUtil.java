@@ -41,6 +41,8 @@ public class FechaUtil {
 	
 	public static SimpleDateFormat simpleDateFormatFormHHMMSSMS = new SimpleDateFormat(Constantes.FORMATO_FECHA_FORM_HH_MM_SS_SSS);
 	
+	public static SimpleDateFormat simpleDateFormatFormHHMM = new SimpleDateFormat(Constantes.FORMATO_FECHA_FORM_HH_MM);
+	
 	private static final Logger log = Logger.getLogger(FechaUtil.class);
 	
 	public static Calendar getFechaHabil(Calendar calendar, FechaFeriadoDao fechaFeriadoDao, int diasSuma) {

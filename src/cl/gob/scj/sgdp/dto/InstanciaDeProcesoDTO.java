@@ -21,6 +21,8 @@ public class InstanciaDeProcesoDTO implements Serializable {
 	private int diasHabilesMaxDuracion;
 	private String asunto;
 	private String comentarioSolicitudCreacionExpediente;
+	private boolean tieneParametroPorTarea;
+	private long idProceso;
 	
 	public long getIdInstanciaDeProceso() {
 		return idInstanciaDeProceso;
@@ -112,6 +114,19 @@ public class InstanciaDeProcesoDTO implements Serializable {
 	public void setComentarioSolicitudCreacionExpediente(String comentarioSolicitudCreacionExpediente) {
 		this.comentarioSolicitudCreacionExpediente = comentarioSolicitudCreacionExpediente;
 	}
+	public boolean isTieneParametroPorTarea() {
+		return tieneParametroPorTarea;
+	}
+	public void setTieneParametroPorTarea(boolean tieneParametroPorTarea) {
+		this.tieneParametroPorTarea = tieneParametroPorTarea;
+	}	
+	public long getIdProceso() {
+		return idProceso;
+	}
+	public void setIdProceso(long idProceso) {
+		this.idProceso = idProceso;
+	}
+		
 	@Override
 	public String toString() {
 		return "InstanciaDeProcesoDTO [idInstanciaDeProceso=" + idInstanciaDeProceso + ", nombreExpediente="
@@ -123,6 +138,8 @@ public class InstanciaDeProcesoDTO implements Serializable {
 				+ ", diasHabilesMaxDuracion=" + diasHabilesMaxDuracion
 				+ ", asunto=" + asunto 
 				+ ", comentarioSolicitudCreacionExpediente=" + comentarioSolicitudCreacionExpediente 
+				+ ", tieneParametroPorTarea=" + tieneParametroPorTarea
+				+ ", idProceso=" + idProceso
 				+ "]";
 	}
 }

@@ -50,6 +50,7 @@ public class SubirArhivoDTO implements Serializable {
 	protected boolean recarga;
 	private long idCategoriaDocumento;
 	private String categoriaDocumento;
+	//private boolean cambiaNombreArchivo;
 	
 	public SubirArhivoDTO() {	
 	}
@@ -324,6 +325,14 @@ public class SubirArhivoDTO implements Serializable {
 	public void setCategoriaDocumento(String categoriaDocumento) {
 		this.categoriaDocumento = categoriaDocumento;
 	}
+	
+	/*public boolean isCambiaNombreArchivo() {
+		return cambiaNombreArchivo;
+	}
+
+	public void setCambiaNombreArchivo(boolean cambiaNombreArchivo) {
+		this.cambiaNombreArchivo = cambiaNombreArchivo;
+	}*/
 
 	public SubirArhivoDTO(MultipartFile archivo, String cdr, String numeroDocumento, String fechaCreacionArchivo,
 			String fechaRecepcionArchivo, long idAutorSubirDocumento, String otro, long idTipoDeDocumentoSubir,
@@ -382,6 +391,7 @@ public class SubirArhivoDTO implements Serializable {
 				+ ", recarga=" + recarga
 				+ ", idCategoriaDocumento=" + idCategoriaDocumento
 				+ ", categoriaDocumento=" + categoriaDocumento
+				//+ ", cambiaNombreArchivo=" + cambiaNombreArchivo				
 				+ "]";
 	}
 	

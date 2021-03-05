@@ -250,6 +250,40 @@ public class ExpedienteRestControl {
 
 	}
 	
+	@RequestMapping(value = "descargarArchivo/{idArchivo}/{idUsuario}", method = RequestMethod.GET, produces = "application/json")
+	public void descargarArchivo(@PathVariable("idArchivo") String idArchivo, @PathVariable("idUsuario") String idUsuario, HttpServletResponse response)
+			throws IOException {
+
+		Usuario usuario = new Usuario();
+		usuario.setIdUsuario(idUsuario);		
+
+		DetalleDeArchivoDTO detalleDeArchivoDTO = new DetalleDeArchivoDTO();
+		logger.info(detalleDeArchivoDTO.toString());
+
+		try {
+			usuario.setAlfTicket(autenticacionService.login(usuario.getIdUsuario()));
+			
+			detalleDeArchivoDTO = obtenerDetalleDeArchivoService.obtenerDetalleDeArchivo(usuario, idArchivo);
+			InputStream archivoDes = new ByteArrayInputStream(
+					gestorDeDocumentosService.getContenidoArchivo(idArchivo, usuario));
+
+			response.setHeader("Content-Disposition", "attachment; filename=" + detalleDeArchivoDTO.getNombre());
+			org.apache.commons.io.IOUtils.copy(archivoDes, response.getOutputStream());
+			response.flushBuffer();
+
+		} catch (Exception e) {
+			logger.error("Error al descargar El archivo", e);
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			// throw new RuntimeException("IOError writing file to output
+			// stream");
+		} finally {
+			if (usuario.getAlfTicket() != null) {
+				autenticacionService.logout(usuario.getAlfTicket());
+			}
+		}
+
+	}
+	
 	@RequestMapping(value = "descargarArchivoByte/{idArchivo}", method = RequestMethod.GET)
 	public byte[] descargarArchivoByte(@PathVariable("idArchivo") String idArchivo, HttpServletResponse response) throws IOException {
 		
@@ -497,13 +531,12 @@ public class ExpedienteRestControl {
 	
 	@RequestMapping(value = "avanzarEstadoTareasEnEspera", method = RequestMethod.POST, produces = "application/json")
 	public @ResponseBody RespuestaCambiaEstado avanzarEstadoTareasEnEspera(@RequestBody AvanzaEstadoRestDTO avanzaEstadoRestDTO) {
-
-		logger.info("Inicio avanzarEstado");
+		logger.info("Inicio avanzarEstadoTareasEnEspera");
 		logger.info(avanzaEstadoRestDTO.toString());
-
 		RespuestaCambiaEstado respuestaCambiaEstado;
 		try {
 			avanzaEstadoRestDTO.setTareasEnEspera(true);
+			logger.info(avanzaEstadoRestDTO.toString());
 			respuestaCambiaEstado = expedienteRestService.avanzarEstado(avanzaEstadoRestDTO);
 			logger.info(respuestaCambiaEstado.toString());
 			return respuestaCambiaEstado;
@@ -517,7 +550,7 @@ public class ExpedienteRestControl {
 	
 	@RequestMapping(value = "getDocOficialesDeExpediente/{idExpediente}/{idUsuario}", method = RequestMethod.GET, produces = "application/json")
 	public @ResponseBody DocOficialesDeExpResponse getDocOficialesDeExpediente(@PathVariable("idExpediente") String idExpediente
-			,@PathVariable("idUsuario") String idUsuario) {		
+			, @PathVariable("idUsuario") String idUsuario) {		
 		DocOficialesDeExpResponse docOficialesDeExpResponse;
 		try {
 			docOficialesDeExpResponse = expedienteRestService.getDocOficialesDeExpediente(idExpediente, idUsuario);
@@ -558,4 +591,35 @@ public class ExpedienteRestControl {
 		
 	}
 	
+	@RequestMapping(value="/getIdArchivoPorIdDocumentoFirmado/{idDocumentoFirmado}", method=RequestMethod.GET)
+	public @ResponseBody String getIdArchivoPorIdDocumentoFirmado(@PathVariable("idDocumentoFirmado") long idDocumentoFirmado, Model model, HttpServletRequest request) {
+		return expedienteRestService.getIdArchivoPorIdDocumentoFirmado(idDocumentoFirmado);		
+	}
+	
+	@RequestMapping(value="/getIdArchivoPorIdErroneoIdExpediente/{idArhivoErroneo}/{idExpediente}/{idUsuario}", method=RequestMethod.GET)
+	public @ResponseBody String getIdArchivoPorIdErroneoIdExpediente(@PathVariable("idArhivoErroneo") String idArhivoErroneo, @PathVariable("idExpediente") String idExpediente, @PathVariable("idUsuario") String idUsuario) {
+		try {
+			return expedienteRestService.getIdArchivoPorIdErroneoIdExpediente(idArhivoErroneo, idExpediente, idUsuario);
+		} catch (Exception e) {			
+			logger.info(e.getMessage());
+			return "";
+		}		
+	}
+	
+	@RequestMapping(value="/validaSiHayFirmaHoy/{idTipoDeDocumento}/{idInstanciaDeTarea}/{idUsuario}", method=RequestMethod.GET)
+	public @ResponseBody boolean validaSiHayFirmaHoy(@PathVariable("idTipoDeDocumento") long idTipoDeDocumento,
+			@PathVariable("idInstanciaDeTarea") long idInstanciaDeTarea, @PathVariable("idUsuario") String idUsuario,
+			Model model, HttpServletRequest request) {		
+		try {
+			return expedienteRestService.validaSiHayFirmaHoy(idTipoDeDocumento, idInstanciaDeTarea, idUsuario);
+		} catch (Exception e) {
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			String exceptionAsString = sw.toString();
+			logger.error(exceptionAsString);
+			return false;
+		}
+
+	}
+
 }

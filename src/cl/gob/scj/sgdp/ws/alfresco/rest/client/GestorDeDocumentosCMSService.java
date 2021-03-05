@@ -29,4 +29,6 @@ public interface GestorDeDocumentosCMSService {
 	
 	byte[] getContenidoArchivoDesdeUrlYVersion(DetalleDeArchivoDTO detalleDeArchivoDTO, String version, Usuario usuario) throws Exception;
 	
+	//RespuestaSimpleDTO copiaArchivo(Usuario usuario, String idExpedienteOrigen, String idExpedienteDestino, String idArchivo, String nuevoNombre) throws Exception;
+	
 }

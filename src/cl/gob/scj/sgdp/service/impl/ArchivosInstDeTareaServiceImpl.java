@@ -26,7 +26,6 @@ public class ArchivosInstDeTareaServiceImpl implements ArchivosInstDeTareaServic
 	
 	@Override
 	public List<String> getIdDeDocumentosSubidosOficiales() {
-		// TODO Auto-generated method stub
 		return archivosInstDeTareaDao.getIdDeDocumentosSubidosOficiales();
 	}
 	

@@ -38,7 +38,7 @@
 						</c:otherwise>						
 					</c:choose> 
 					
-					<div id="divBackHeaderSolicitudesCreacionExp" class="row" style="background-color: ${colorBackHeaderSolicitudesCreacionExp}; color: #fff;">
+					<div id="divBackHeaderSolicitudesCreacionExp" class="row div-area-trabajo-cab" style="background-color: ${colorBackHeaderSolicitudesCreacionExp}; color: #fff;">
 			    	
 			    		<div class="col-sm-1"></div>
 			    	
@@ -51,7 +51,9 @@
 		      		<hr>
 			    
    					<div class="col-sm-12" id="solicitudesCreacionExp">
-				    	<c:import url="/WEB-INF/jsp/div/solicitudesDeCreacionDeExpediente.jsp"></c:import>	 		
+   						
+				    	<c:import url="/WEB-INF/jsp/div/solicitudesDeCreacionDeExpediente.jsp"></c:import>
+				    		 		
 					</div>  
 			    
 			    

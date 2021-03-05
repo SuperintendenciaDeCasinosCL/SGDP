@@ -60,12 +60,15 @@ import cl.gob.scj.sgdp.config.Constantes;
 			+ ", i.idInstanciaDeTarea as idInstanciaDeTareaDeOrigen, id.idInstanciaDeTarea as idInstanciaDeTareaDeDestino "
 			+ ", td.nombreTarea as nombreTareaDeDestino, hu.id.idUsuario as usuariosDestinoString,"
 			+ "CASE "
-			+ "WHEN (SELECT COUNT(*) FROM h.historicosValorParametroDeTarea hv) > 0 THEN true "
+			+ "WHEN (SELECT COUNT(*) FROM ParametroRelacionTarea pr WHERE pr.id.tarea.idTarea = i.tarea.idTarea) > 0 THEN true "
 			+ "ELSE false "
 			+ "END as tieneHistoricoValorParametroDeTarea, "
 			+ "p.nombreExpediente as nombreExpediente, "			
 			+ "rto.id.responsabilidad.nombreResponsabilidad as nombreResponsabilidadOrigen, "
-			+ "rtd.id.responsabilidad.nombreResponsabilidad as nombreResponsabilidadDestino "			
+			+ "rtd.id.responsabilidad.nombreResponsabilidad as nombreResponsabilidadDestino, "
+			+ "h.idHistoricoDeInstDeTarea as idHistoricoDeInstDeTarea, "
+			+ "h.horasOcupadas as horasOcupadas ,"
+			+ "h.minutosOcupados as minutosOcupados "
 			+ "FROM HistoricoDeInstDeTarea h, ResponsabilidadTarea rto, ResponsabilidadTarea rtd "
 			+ "INNER JOIN h.instanciaDeTareaDeOrigen i "
 			+ "INNER JOIN h.instanciaDeTareaDeOrigen.instanciaDeProceso p "
@@ -152,7 +155,14 @@ import cl.gob.scj.sgdp.config.Constantes;
 			+ "FROM HistoricoDeInstDeTarea h "			
 			+ "WHERE h.instanciaDeTareaDeOrigen.idInstanciaDeTarea = :idInstanciaDeTareaOrigen "
 			+ "AND h.instanciaDeTareaDeDestino.idInstanciaDeTarea = :idInstanciaDeTareaDestino "
-			+ ")")
+			+ ")"),
+	
+	@NamedQuery(name="HistoricoDeInstDeTarea.getEjecutacionesInstanciaDeTarea",	
+	query="SELECT h "			
+			+ "FROM HistoricoDeInstDeTarea h "			
+			+ "WHERE h.instanciaDeTareaDeOrigen.idInstanciaDeTarea = :idInstanciaDeTarea "
+			+ "AND h.accionHistInstDeTarea.idAccionHistoricoInstDeTarea in (2, 3, 6) ")
+	
 })
 public class HistoricoDeInstDeTarea implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -201,6 +211,15 @@ public class HistoricoDeInstDeTarea implements Serializable {
 	
 	@Column(name="\"A_MENSAJE_EXCEPCION\"")
 	private String mensajeException;
+	
+	@Column(name="\"N_DIAS_OCUPADOS\"")
+	private Short diasOcupados;
+	
+	@Column(name="\"N_HORAS_OCUPADAS\"")
+	private Short horasOcupadas;
+	
+	@Column(name="\"N_MINUTOS_OCUPADOS\"")
+	private Short minutosOcupados;
 	
 	public HistoricoDeInstDeTarea() {
 	}
@@ -337,6 +356,30 @@ public class HistoricoDeInstDeTarea implements Serializable {
 	public void setMensajeException(String mensajeException) {
 		this.mensajeException = mensajeException;
 	}
+	
+	public Short getDiasOcupados() {
+		return diasOcupados;
+	}
+
+	public void setDiasOcupados(Short diasOcupados) {
+		this.diasOcupados = diasOcupados;
+	}
+
+	public Short getHorasOcupadas() {
+		return horasOcupadas;
+	}
+
+	public void setHorasOcupadas(Short horasOcupadas) {
+		this.horasOcupadas = horasOcupadas;
+	}
+
+	public Short getMinutosOcupados() {
+		return minutosOcupados;
+	}
+
+	public void setMinutosOcupados(Short minutosOcupados) {
+		this.minutosOcupados = minutosOcupados;
+	}
 
 	@Override
 	public int hashCode() {
@@ -378,6 +421,8 @@ public class HistoricoDeInstDeTarea implements Serializable {
 				+ ", idInstanciaDeTareaDeOrigen=" + this.instanciaDeTareaDeOrigen.getIdInstanciaDeTarea()
 				+ ", idInstanciaDeTareaDeDestino=" + this.instanciaDeTareaDeDestino.getIdInstanciaDeTarea()
 				+ ", accion=" + this.accionHistInstDeTarea.getNombreAccion()
+				+ ", diasOcupados=" + diasOcupados
+				+ ", horasOcupadas=" + horasOcupadas
 				+ "]";
 	}
 

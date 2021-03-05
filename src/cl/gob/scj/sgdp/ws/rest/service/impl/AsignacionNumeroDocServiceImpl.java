@@ -257,13 +257,16 @@ public class AsignacionNumeroDocServiceImpl implements
 			historicoFirmaDTO.setIdUsuario(asignacionesNumerosDocDto.getIdUsuario());
 			historicoFirmaDTO.setTipoFirma(firmaTypeWebStart);
 			historicoFirmaDTO.setIdTipoDeDocumento(asignacionesNumerosDocDto.getTipoDeDocumento());
-			gestorDeDocumentosService.registraFirma(asignacionesNumerosDocDto.getIdUsuario(), historicoFirmaDTO);			
+			historicoFirmaDTO.setIdDocumentoFirmado(asignacionesNumerosDocDto.getIdDocumentoFirmado());
+			//gestorDeDocumentosService.registraFirma(asignacionesNumerosDocDto.getIdUsuario(), historicoFirmaDTO);			
 			usuario.setIdUsuario(asignacionesNumerosDocDto.getIdUsuario());
 			usuario.setAlfTicket(asignacionesNumerosDocDto.getAlfTicket());
 			subirArhivoDTO.setIdArchivoEnCMS(asignacionesNumerosDocDto.getIdArchivo());
 			subirArhivoDTO.setIdTipoDeDocumentoSubir(asignacionesNumerosDocDto.getTipoDeDocumento());
 			subirArhivoDTO.setIdInstanciaDeTareaSubirArchivo(asignacionesNumerosDocDto.getIdInstanciaDeTarea());
-			subirArchivoService.marcarArchivoComoSubido(usuario, subirArhivoDTO);
+			//Esto ya no es necesario ya que  subirArchivoDirectoCMS usa subirArchivoService.subirArchivo el cual marca el archivo como subido
+			//subirArchivoService.marcarArchivoComoSubido(usuario, subirArhivoDTO);
+			gestorDeDocumentosService.registraFirma(asignacionesNumerosDocDto.getIdUsuario(), historicoFirmaDTO);
 			respuestaAsignacionesNumerosDocDto.setRespuesta("OkModificacion");
 	
 			return respuestaAsignacionesNumerosDocDto;

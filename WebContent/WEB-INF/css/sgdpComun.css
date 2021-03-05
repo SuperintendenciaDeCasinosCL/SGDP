@@ -496,3 +496,30 @@ td {
        z-index: 1000;
        padding-bottom: 70%;
 }
+
+.subproceso-rds-snc {
+	background-color: #d6d4d4;
+}
+
+.tarea-rds-snc {
+	background-color: #ffc586;
+}
+
+.tarea-rds {
+	background-color: #d1ffc8 !important;	
+}
+
+.tarea-snc {	
+	background-color: #ffafa0 !important;
+}
+
+.logo-sgdp {
+	width: 6em !important;
+	height: 6em !important;
+	border-radius: 0em !important;
+}
+
+.div-area-trabajo-cab {	
+	 padding-left: 2em !important;
+	 padding-top: 1.5em !important;
+}

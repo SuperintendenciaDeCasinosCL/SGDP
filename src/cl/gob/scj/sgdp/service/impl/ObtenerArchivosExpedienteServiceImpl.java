@@ -394,10 +394,13 @@ public class ObtenerArchivosExpedienteServiceImpl implements
 			) throws Exception {
 		log.debug("Inicio cargaDocBuscandoHaciaAtrasEnHistoricoInsTarea");
 		log.debug(historicoDeInstDeTarea.toString());						
-		for (int i = 0; i < cantidadArchivos; i++) {				
+		for (int i = 0; i < cantidadArchivos; i++) {
 			List<ArchivosInstDeTarea> archivosInstDeTareaPorIDInstTareaIdUsuarioNombreTipoDoc = 
-					archivosInstDeTareaDao.getArchivosInstDeTareaPorIdInstTareaIdUsuarioNombreTipoDoc(historicoDeInstDeTarea.getInstanciaDeTareaDeOrigen().getIdInstanciaDeTarea(),
-							historicoDeInstDeTarea.getIdUsuarioOrigen(), tipoDeDocumentoDTODInstanciaDeTarea.getNombreDeTipoDeDocumento());
+					/*archivosInstDeTareaDao.getArchivosInstDeTareaPorIdInstTareaIdUsuarioNombreTipoDoc(historicoDeInstDeTarea.getInstanciaDeTareaDeOrigen().getIdInstanciaDeTarea(),
+							historicoDeInstDeTarea.getIdUsuarioOrigen(), tipoDeDocumentoDTODInstanciaDeTarea.getNombreDeTipoDeDocumento());*/
+					archivosInstDeTareaDao.getArchivosInstDeTareaPorIdInstTareaIdUsuarioNombreTipoDocFechaSubidoMayorA(historicoDeInstDeTarea.getInstanciaDeTareaDeOrigen().getIdInstanciaDeTarea(),
+							historicoDeInstDeTarea.getIdUsuarioOrigen(), tipoDeDocumentoDTODInstanciaDeTarea.getNombreDeTipoDeDocumento(),
+							historicoDeInstDeTarea.getInstanciaDeTareaDeOrigen().getFechaAsignacion());
 			if (archivosInstDeTareaPorIDInstTareaIdUsuarioNombreTipoDoc!=null && !archivosInstDeTareaPorIDInstTareaIdUsuarioNombreTipoDoc.isEmpty()) {
 				log.debug("archivosInstDeTareaPorIDInstTareaIdUsuarioNombreTipoDoc!=null && !archivosInstDeTareaPorIDInstTareaIdUsuarioNombreTipoDoc.isEmpty()");
 				for (ArchivosInstDeTarea archivosInstDeTarea : archivosInstDeTareaPorIDInstTareaIdUsuarioNombreTipoDoc) {

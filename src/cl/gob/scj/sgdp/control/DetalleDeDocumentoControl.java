@@ -36,6 +36,7 @@ import cl.gob.scj.sgdp.service.ArchivosInstDeTareaService;
 import cl.gob.scj.sgdp.service.BandejaDeEntradaService;
 import cl.gob.scj.sgdp.service.GestorDeDocumentosService;
 import cl.gob.scj.sgdp.service.GestorMetadataService;
+import cl.gob.scj.sgdp.service.HistoricoFirmaService;
 import cl.gob.scj.sgdp.service.InstanciaDeTareaService;
 import cl.gob.scj.sgdp.service.ObtenerArchivosExpedienteService;
 import cl.gob.scj.sgdp.service.ObtenerDetalleDeArchivoService;
@@ -77,6 +78,9 @@ public class DetalleDeDocumentoControl {
 	
 	@Autowired
 	private ArchivosInstDeTareaService archivosInstDeTareaService;
+	
+	@Autowired
+	private HistoricoFirmaService historicoFirmaService;
 	
 	@Resource(name = "configProps")
 	private Properties configProps;
@@ -288,6 +292,18 @@ public class DetalleDeDocumentoControl {
 			return false;
 		}		
 		
+	}
+	
+	@RequestMapping(value="/validaSiHayFirmaHoy/{idTipoDeDocumento}/{idInstanciaDeTarea}", method=RequestMethod.GET)
+	public @ResponseBody boolean validaSiHayFirmaHoy(@PathVariable("idTipoDeDocumento") Long idTipoDeDocumento, @PathVariable("idInstanciaDeTarea") Long idInstanciaDeTarea, HttpServletRequest request) {
+		Usuario usuario = (Usuario)request.getSession().getAttribute("usuario");
+		return historicoFirmaService.validaSiHayFirmaHoy(idTipoDeDocumento, idInstanciaDeTarea, usuario.getIdUsuario());		
+	}
+	
+	@RequestMapping(value="/getUltimoArchivoInstDeTareaFirmado/{idInstanciaDeTarea}/{idTipoDeDocumento}", method=RequestMethod.GET)
+	public @ResponseBody ArchivosInstDeTareaDTO getUltimoArchivoInstDeTareaFirmado(@PathVariable("idInstanciaDeTarea") Long idInstanciaDeTarea, @PathVariable("idTipoDeDocumento") Long idTipoDeDocumento, HttpServletRequest request) {
+		Usuario usuario = (Usuario)request.getSession().getAttribute("usuario");		
+		return gestorDeDocumentosService.getUltimoArchivoInstDeTareaFirmado(idInstanciaDeTarea, idTipoDeDocumento, usuario.getIdUsuario());		
 	}
 	
 }

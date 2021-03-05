@@ -21,3 +21,59 @@
 	    </div>    
   	</div>
 </div> 
+
+<script>
+
+	function cargaHistorialDeCondicionesDeSatisfaccionPorIdExpediente(nombreExpediente, idExpediente) {
+	
+		var urlSessionValida = $("#urlSessionValida").val();
+		var raizURL = $("#raizURL").val();
+	
+		$.get(urlSessionValida, function(haySession) {
+		      console.log("haySession: " + haySession);
+		      if(haySession) {
+		   			var urlGetHistorialDeCondicionesDeSatisfaccionPorIdExpediente = $("#urlGetHistorialDeCondicionesDeSatisfaccionPorIdExpediente").val();
+		    		$("#historialCondicionesDeSatisfaccionH4").empty();
+		    		$("#historialCondicionesDeSatisfaccionH4").append('Historial de Requisitos de Satisfacci&oacute;n y/o Salidas no Conformes: ( ' + nombreExpediente + ' ) ');
+		    		$('#historialDeCondicionesDeSatisfaccionDiv').load(urlGetHistorialDeCondicionesDeSatisfaccionPorIdExpediente + "/" + idExpediente );
+		    		$('#historialCondDeSatisfaccionModal').modal({backdrop: 'static', keyboard: false});
+		      }	else {
+		            bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acci&oacute;n y hemos caducado tu sesi&oacute;n por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+		                          , function(){
+		                                window.open(raizURL, '_blank');
+		                          }
+		             );
+		      }
+		}); 
+		
+	}
+	
+	function cargaHistorialDeCondicionesDeSatisfaccionPorIdHistoricoDeInstDeTarea(idHistoricoDeInstDeTarea, nombreExpediente, nombreTarea) {
+
+		var urlSessionValida = $("#urlSessionValida").val();
+		var raizURL = $("#raizURL").val();
+
+		$.get(urlSessionValida, function(haySession) {
+		      console.log("haySession: " + haySession);
+		      if(haySession) {
+		    	  	var urlGetHistorialDeCondicionesDeSatisfaccionPorIdHistoricoDeInstDeTarea = $("#urlGetHistorialDeCondicionesDeSatisfaccionPorIdHistoricoDeInstDeTarea").val();
+		    		console.log("urlGetHistorialDeCondicionesDeSatisfaccionPorIdHistoricoDeInstDeTarea: " + urlGetHistorialDeCondicionesDeSatisfaccionPorIdHistoricoDeInstDeTarea);
+		    		console.log("idHistoricoDeInstDeTarea: " + idHistoricoDeInstDeTarea);
+		    		$("#historialCondicionesDeSatisfaccionH4").empty();
+		    		$("#historialCondicionesDeSatisfaccionH4").append('Historial de Requisitos de Satisfacci&oacute;n y/o Salidas no Conformes: ' + nombreTarea + " ( " + nombreExpediente + " ) ");
+		    		$('#historialCondDeSatisfaccionModal').modal({backdrop: 'static', keyboard: false});
+		    		$('#historialDeCondicionesDeSatisfaccionDiv').load(urlGetHistorialDeCondicionesDeSatisfaccionPorIdHistoricoDeInstDeTarea + "/" + idHistoricoDeInstDeTarea );
+		      }	else {
+		            bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acci&oacute;n y hemos caducado tu sesi&oacute;n por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+		                          , function(){
+		                                window.open(raizURL, '_blank');
+		                          }
+		             );
+		      }
+		}); 
+		
+	}
+
+
+</script>
+

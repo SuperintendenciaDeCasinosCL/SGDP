@@ -4,18 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import cl.gob.scj.sgdp.dao.HistoricoValorParametroDeTareaDao;
-import cl.gob.scj.sgdp.dto.HistoricoDeInstDeTareaDTO;
+import cl.gob.scj.sgdp.dao.ResponsabilidadTareaDao;
 import cl.gob.scj.sgdp.dto.HistoricoValorParametroDeTareaDTO;
+import cl.gob.scj.sgdp.dto.InstanciaDeTareaDTO;
 import cl.gob.scj.sgdp.dto.ParametroDeTareaDTO;
 import cl.gob.scj.sgdp.dto.TipoParametroDeTareaDTO;
-import cl.gob.scj.sgdp.model.HistoricoDeInstDeTarea;
 import cl.gob.scj.sgdp.model.HistoricoValorParametroDeTarea;
+import cl.gob.scj.sgdp.model.InstanciaDeTarea;
 import cl.gob.scj.sgdp.model.ParametroDeTarea;
+import cl.gob.scj.sgdp.model.ResponsabilidadTarea;
+import cl.gob.scj.sgdp.model.TareaRol;
 import cl.gob.scj.sgdp.model.TipoParametroDeTarea;
 import cl.gob.scj.sgdp.service.HistoricoValorParametroDeTareaService;
 
@@ -27,35 +31,56 @@ public class HistoricoValorParametroDeTareaServiceImpl implements HistoricoValor
 
 	@Autowired
 	private HistoricoValorParametroDeTareaDao historicoValorParametroDeTareaDao;
+	
+	@Autowired
+	private ResponsabilidadTareaDao responsabilidadTareaDao;
 
 	@Override
-	public List<HistoricoValorParametroDeTareaDTO> getHistoricoValorParametroDeTareaPorIdInstanciaDeTareaOrigen(
-			long idInstanciaDeTareaOrigen) {
-		log.debug("Inicio getHistoricoValorParametroDeTareaPorIdInstanciaDeTareaOrigen");
-		log.debug("idInstanciaDeTareaOrigen: " + idInstanciaDeTareaOrigen);
-		List<HistoricoValorParametroDeTarea> historicoValorParametroDeTareaList = historicoValorParametroDeTareaDao.getHistoricoValorParametroDeTareaPorIdInstanciaDeTareaOrigen(idInstanciaDeTareaOrigen);
+	public List<HistoricoValorParametroDeTareaDTO> getHistoricoValorParametroDeTareaPorIdInstanciaDeTarea(
+			long idInstanciaDeTarea) {
+		log.debug("Inicio getHistoricoValorParametroDeTareaPorIdInstanciaDeTarea");
+		log.debug("idInstanciaDeTarea: " + idInstanciaDeTarea);
+		List<HistoricoValorParametroDeTarea> historicoValorParametroDeTareaList = historicoValorParametroDeTareaDao.getHistoricoValorParametroDeTareaPorIdInstanciaDeTarea(idInstanciaDeTarea);
+		return getHistoricoValorParametroDeTareaDTOList(historicoValorParametroDeTareaList);
+	}
+	
+	@Override
+	public List<HistoricoValorParametroDeTareaDTO> getHistoricoValorParametroDeTareaPorIdExpediente(
+			String idExpediente) {
+		log.debug("Inicio getHistoricoValorParametroDeTareaPorIdExpediente");
+		log.debug("idExpediente: " + idExpediente);
+		List<HistoricoValorParametroDeTarea> historicoValorParametroDeTareaList = historicoValorParametroDeTareaDao.getHistoricoValorParametroDeTareaPorIdExpediente(idExpediente);
+		return getHistoricoValorParametroDeTareaDTOList(historicoValorParametroDeTareaList);
+	}
+	
+	@Override
+	public List<HistoricoValorParametroDeTareaDTO> getHistoricoValorParametroDeTareaPorIdHistoricoInstanciaDeTarea(long idHistoricoDeInstDeTarea) {
+		log.debug("Inicio getHistorialDeCondicionesDeSatisfaccionPorIdHistoricoInstanciaDeTarea");
+		log.debug("idHistoricoDeInstDeTarea: " + idHistoricoDeInstDeTarea);
+		List<HistoricoValorParametroDeTarea> historicoValorParametroDeTareaList = historicoValorParametroDeTareaDao.getHistoricoValorParametroDeTareaPorIdHistoricoInstanciaDeTarea(idHistoricoDeInstDeTarea);
+		return getHistoricoValorParametroDeTareaDTOList(historicoValorParametroDeTareaList);
+	}
+	
+	private List<HistoricoValorParametroDeTareaDTO> getHistoricoValorParametroDeTareaDTOList(List<HistoricoValorParametroDeTarea> historicoValorParametroDeTareaList) {
 		List<HistoricoValorParametroDeTareaDTO> historicoValorParametroDeTareaDTOList = new ArrayList<HistoricoValorParametroDeTareaDTO>();
 		for (HistoricoValorParametroDeTarea historicoValorParametroDeTarea : historicoValorParametroDeTareaList) {
 			HistoricoValorParametroDeTareaDTO historicoValorParametroDeTareaDTO = new HistoricoValorParametroDeTareaDTO();
 			historicoValorParametroDeTareaDTO.setIdHistoricoValorParametroDeTarea(historicoValorParametroDeTarea.getIdHistoricoValorParametroDeTarea());
 			historicoValorParametroDeTareaDTO.setComentario(historicoValorParametroDeTarea.getComentario());
 			historicoValorParametroDeTareaDTO.setValor(historicoValorParametroDeTarea.getValor());
-			HistoricoDeInstDeTarea historicoDeInstDeTarea = historicoValorParametroDeTarea.getHistoricoDeInstDeTarea();
-			ParametroDeTarea parametroDeTarea = historicoValorParametroDeTarea.getParametroDeTarea();			
-			HistoricoDeInstDeTareaDTO historicoDeInstDeTareaDTO = new HistoricoDeInstDeTareaDTO();
-			historicoDeInstDeTareaDTO.setComentario(historicoDeInstDeTarea.getComentario());
-			historicoDeInstDeTareaDTO.setFechaMovimiento(historicoDeInstDeTarea.getFechaMovimiento());
-			historicoDeInstDeTareaDTO.setIdAccionHistoricoInstDeTarea(historicoDeInstDeTarea.getAccionHistInstDeTarea().getIdAccionHistoricoInstDeTarea());
-			historicoDeInstDeTareaDTO.setNombreAccion(historicoDeInstDeTarea.getAccionHistInstDeTarea().getNombreAccion());
-			historicoDeInstDeTareaDTO.setIdHistoricoDeInstDeTarea(historicoDeInstDeTarea.getIdHistoricoDeInstDeTarea());
-			historicoDeInstDeTareaDTO.setIdInstanciaDeTareaDeDestino(historicoDeInstDeTarea.getInstanciaDeTareaDeDestino().getIdInstanciaDeTarea());
-			historicoDeInstDeTareaDTO.setIdInstanciaDeTareaDeOrigen(historicoDeInstDeTarea.getInstanciaDeTareaDeOrigen().getIdInstanciaDeTarea());
-			historicoDeInstDeTareaDTO.setIdUsuarioOrigen(historicoDeInstDeTarea.getIdUsuarioOrigen());
-			historicoDeInstDeTareaDTO.setNombreTareaDeDestino(historicoDeInstDeTarea.getInstanciaDeTareaDeDestino().getTarea().getNombreTarea());
-			historicoDeInstDeTareaDTO.setNombreTareaDeOrigen(historicoDeInstDeTarea.getInstanciaDeTareaDeOrigen().getTarea().getNombreTarea());		
+			historicoValorParametroDeTareaDTO.setIdUsuario(historicoValorParametroDeTarea.getIdUsuario());
+			historicoValorParametroDeTareaDTO.setFecha(historicoValorParametroDeTarea.getFecha());
+			InstanciaDeTarea instanciaDeTarea = historicoValorParametroDeTarea.getInstanciaDeTarea();
+			List<ResponsabilidadTarea> responsabilidadesTareas = responsabilidadTareaDao.getResponsabilidadesTareasPorIdTarea(instanciaDeTarea.getTarea().getIdTarea());
+			if (responsabilidadesTareas!=null && responsabilidadesTareas.size()>=1) {
+				ResponsabilidadTarea rt = responsabilidadesTareas.get(0);
+				historicoValorParametroDeTareaDTO.setNombreResponsabilidad(rt.getId().getResponsabilidad().getNombreResponsabilidad());
+			}
+			ParametroDeTarea parametroDeTarea = historicoValorParametroDeTarea.getParametroDeTarea();
 			ParametroDeTareaDTO parametroDeTareaDTO = new ParametroDeTareaDTO();
 			parametroDeTareaDTO.setIdParamTarea(parametroDeTarea.getIdParamTarea());
 			parametroDeTareaDTO.setNombreParamTarea(parametroDeTarea.getNombreParamTarea());
+			parametroDeTareaDTO.setEsSNC(parametroDeTarea.getEsSNC());
 			TipoParametroDeTarea tipoParametroDeTarea = parametroDeTarea.getTipoParametroDeTarea();
 			TipoParametroDeTareaDTO tipoParametroDeTareaDTO = new TipoParametroDeTareaDTO();
 			tipoParametroDeTareaDTO.setComenta(tipoParametroDeTarea.getComenta());
@@ -63,11 +88,15 @@ public class HistoricoValorParametroDeTareaServiceImpl implements HistoricoValor
 			tipoParametroDeTareaDTO.setNombreTipoParametroDeTarea(tipoParametroDeTarea.getNombreTipoParametroDeTarea());
 			tipoParametroDeTareaDTO.setTextoHtml(tipoParametroDeTarea.getTextoHtml());
 			parametroDeTareaDTO.setTipoParametroDeTareaDTO(tipoParametroDeTareaDTO);
-			historicoValorParametroDeTareaDTO.setHistoricoDeInstDeTareaDTO(historicoDeInstDeTareaDTO);
+			InstanciaDeTareaDTO instanciaDeTareaDTO = new InstanciaDeTareaDTO();
+			BeanUtils.copyProperties(instanciaDeTarea, instanciaDeTareaDTO);
+			instanciaDeTareaDTO.setNombreDeTarea(instanciaDeTarea.getTarea().getNombreTarea());
+			historicoValorParametroDeTareaDTO.setInstanciaDeTareaDTO(instanciaDeTareaDTO);
 			historicoValorParametroDeTareaDTO.setParametroDeTareaDTO(parametroDeTareaDTO);
+			log.debug(historicoValorParametroDeTareaDTO.toString());
 			historicoValorParametroDeTareaDTOList.add(historicoValorParametroDeTareaDTO);
 		}		
 		return historicoValorParametroDeTareaDTOList;
 	}
-
+	
 }

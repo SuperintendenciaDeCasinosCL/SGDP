@@ -1,7 +1,5 @@
 package cl.gob.scj.sgdp.control;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Properties;
 
 import javax.annotation.Resource;

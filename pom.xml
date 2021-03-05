@@ -257,8 +257,17 @@
 		<dependency>
 		    <groupId>cl.gob.scj</groupId>
 		    <artifactId>integracion-client-api</artifactId>
-		    <version>0.0.1</version>
-		</dependency>					
+		    <version>0.0.2</version>
+		</dependency>	
+		<!-- Configuracion para SSO DesComentar -->
+		<!--  
+		<dependency>
+		    <groupId>org.keycloak</groupId>
+		    <artifactId>keycloak-eap6-adapter-dist</artifactId>
+		    <version>7.0.1</version>
+		    <type>pom</type>
+		</dependency>
+		-->	
 	</dependencies>
 	<!-- Profiles start here -->
   <profiles>
@@ -328,8 +337,8 @@
                                 <goal>deploy</goal>
                             </goals>
                         </execution>
-                    </executions>
-                </plugin>
+                    </executions>                    
+                </plugin>                
             </plugins>
       </build>
     </profile>

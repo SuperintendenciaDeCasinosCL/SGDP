@@ -42,7 +42,7 @@
 						</c:otherwise>						
 					</c:choose> 
 					
-					<div id="divBackHeaderMantenedorProcCreacExp" class="row" style="background-color: ${colorBackHeaderMantenedorProcCreacExp}; color: #fff;">
+					<div id="divBackHeaderMantenedorProcCreacExp" class="row div-area-trabajo-cab" style="background-color: ${colorBackHeaderMantenedorProcCreacExp}; color: #fff;">
 			    	
 			    		<div class="col-sm-1"></div>
 			    	
@@ -73,7 +73,9 @@
 	            	<div class="row">	   
 	            	
 	            		<div class="col-sm-12" id="mantProcSolCreaExpDiv">
-				    		<c:import url="/WEB-INF/jsp/div/mantProcSolCreaExp.jsp"></c:import>	 		
+	            			
+				    		<c:import url="/WEB-INF/jsp/div/mantProcSolCreaExp.jsp"></c:import>
+				    			 		
 						</div>
 				   		
 	            	</div> 			     

@@ -76,9 +76,17 @@
 
 	 <div class="row" style="background-color:#00a8b3;">	
 	 
-	 	<div class="user-head col-sm-offset-4">
+	 	<div class="user-head col-sm-offset-3">	 	
 
-            <a class="inbox-avatar avatar-scj" href="#" style="background-image: url('<c:url value="/img/no-image.png"/>');"></a>           
+	 		<%--<div class="logo-sgdp" style="background-image: url('<c:url value="/img/logo_sgdp.png"/>');">
+                        	
+            </div>--%>
+            
+            <div class="inbox-avatar avatar-scj logo-sgdp" style="background-image: url('/sgdp/img/logo_sgdp.png');">
+                        	
+            </div>
+
+            <%--<a class="inbox-avatar avatar-scj" href="#" style="background-image: url('<c:url value="/img/no-image.png"/>');"></a>--%>           
 
             <div class="user-name">
             
@@ -230,7 +238,7 @@
 	   	
 	   	
 	   	 <li class="${classSolicitudesCreacionExpActive} liMenu">
-		 	<a href="${solicitudesCreacionExpURL}"><i class="glyphicon glyphicon-bullhorn"></i> Solicitudes de creaci&oacute;n expedientes</a>
+		 	<a href="${solicitudesCreacionExpURL}"><i class="glyphicon glyphicon-bullhorn"></i> Solicitudes de Creaci&oacute;n Expedientes</a>
 		 </li>		 
 	     
 	     

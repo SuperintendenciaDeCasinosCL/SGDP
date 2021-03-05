@@ -76,5 +76,11 @@ public interface ExpedienteRestService {
 	ObtenerTodasLasInstDeTareasAsigPorIdExpResponse obtenerTodasLasInstDeTareasAsigPorIdExp(String idExpediente);
 	
 	DocOficialesDeExpResponse getDocOficialesDeExpediente(String idExpediente, String idUsuario) throws SgdpException;
+	
+	String getIdArchivoPorIdDocumentoFirmado(long idDocumentoFirmado);
+	
+	String getIdArchivoPorIdErroneoIdExpediente(String idArhivoErroneo, String idExpediente, String idUsuario) throws Exception;
+	
+	boolean validaSiHayFirmaHoy(Long idTipoDeDocumento, Long idInstanciaDeTarea, String idUsuario);
 		
 }

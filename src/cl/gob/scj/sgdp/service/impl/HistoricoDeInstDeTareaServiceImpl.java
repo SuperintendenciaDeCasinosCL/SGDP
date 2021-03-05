@@ -5,6 +5,7 @@ import java.util.Properties;
 
 import javax.annotation.Resource;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,14 +19,15 @@ import cl.gob.scj.sgdp.service.HistoricoDeInstDeTareaService;
 
 @Service
 @Transactional(rollbackFor = Throwable.class)
-public class HistoricoDeInstDeTareaServiceImpl implements
-		HistoricoDeInstDeTareaService {
+public class HistoricoDeInstDeTareaServiceImpl implements HistoricoDeInstDeTareaService {
 	
 	@Autowired
 	private HistoricoDeInstDeTareaDao historicoDeInstDeTareaDao;
 	
 	@Resource(name = "configProps")
 	private Properties configProps;
+	
+	private static final Logger log = Logger.getLogger(HistoricoDeInstDeTareaServiceImpl.class);
 	
 	@Override
 	public void cargaHistorialDeTareasPorIdIntanciaDeTarea(long idInstanciaDeTarea, List<HistoricoDeInstDeTareaDTO> historicosDeInstDeTareaDTO) {
@@ -70,6 +72,16 @@ public class HistoricoDeInstDeTareaServiceImpl implements
 		HistoricoDeInstDeTareaDTO historicoDeInstDeTareaDTO = new HistoricoDeInstDeTareaDTO();		
 		BeanUtils.copyProperties(historicoDeInstDeTarea, historicoDeInstDeTareaDTO);
 		return historicoDeInstDeTareaDTO;
+	}
+
+	@Override
+	public int getCantidadDeEjecutacionesInstanciaDeTarea(long idInstanciaDeTarea) {
+		List<HistoricoDeInstDeTarea> historicoDeInstDeTareas = historicoDeInstDeTareaDao.getEjecutacionesInstanciaDeTarea(idInstanciaDeTarea);
+		if (historicoDeInstDeTareas == null || historicoDeInstDeTareas.isEmpty()) {
+			return 1;
+		} else {
+			return historicoDeInstDeTareas.size() + 1;
+		}
 	}
 
 }

@@ -37,5 +37,7 @@ public interface HistoricoDeInstDeTareaDao {
 	HistoricoDeInstDeTarea getHistDeInstDeTareaPorIdInstaDeTareaDeOrigenMaxFechaMov(long idInstanciaDeTareaOrigen);
 	
 	List<HistoricoDeInstDeTarea> getHistoricosDeInstDeTareaPorIdInstanciaDeTareaDeOrigenYDestino(long idInstanciaDeTareaOrigen, long idInstanciaDeTareaDestino);
+	
+	List<HistoricoDeInstDeTarea> getEjecutacionesInstanciaDeTarea(long idInstanciaDeTarea);
 
 }

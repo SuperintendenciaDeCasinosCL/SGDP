@@ -3,7 +3,12 @@ package cl.gob.scj.sgdp.dto;
 import java.io.Serializable;
 import java.util.Date;
 
-public class ArchivosInstDeTareaDTO implements Serializable  {
+public class ArchivosInstDeTareaDTO extends RespuestaDTO implements Serializable  {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6812730917092358190L;
 	
 	private long idInstanciaDeTarea;
 	private String nombreTarea;

@@ -29,9 +29,7 @@
 		<fieldset>    
 	 
 			<legend>Documentos ${instanciaDeTareaDTO.nombreExpediente}</legend>
-												
-			<c:import url="/WEB-INF/jsp/div/tablaDetalleDeExpediente.jsp"></c:import>						
-		
+			<c:import url="/WEB-INF/jsp/div/tablaDetalleDeExpediente.jsp"></c:import>
 			<br>
 		
 			<div class="row">

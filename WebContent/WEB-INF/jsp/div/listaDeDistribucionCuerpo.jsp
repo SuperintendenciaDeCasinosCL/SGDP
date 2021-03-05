@@ -127,7 +127,7 @@ function borrarRegistroListaDeDistribucion(idListaDeDistribucion) {
         	var urlCargaListaDeDistribucion = $("#urlCargaListaDeDistribucion").val();        	
         	bootbox.confirm({
             	title: "Borrar registro",
-                message: "Desea eliminar el registro",
+                message: "¿Desea eliminar el registro?",
                 buttons: {
                     confirm: {
                         label: '<span class="glyphicon glyphicon-ok-circle font-icon-3"></span>',

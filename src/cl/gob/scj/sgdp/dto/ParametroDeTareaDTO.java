@@ -2,13 +2,22 @@ package cl.gob.scj.sgdp.dto;
 
 import java.io.Serializable;
 
+import cl.gob.scj.sgdp.tipos.RequisitoType;
+
 public class ParametroDeTareaDTO implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2051171311383931878L;
 	private Long idParamTarea;
 	private String nombreParamTarea;
 	private TipoParametroDeTareaDTO tipoParametroDeTareaDTO;
 	private String titulo;
 	private String textoHtml;
+	private Boolean vigente;
+	private Boolean esSNC;
+	private String nombreDeTipoDeRequisito;
 	
 	public Long getIdParamTarea() {
 		return idParamTarea;
@@ -39,12 +48,38 @@ public class ParametroDeTareaDTO implements Serializable {
 	}
 	public void setTextoHtml(String textoHtml) {
 		this.textoHtml = textoHtml;
+	}	
+	public Boolean getVigente() {
+		return vigente;
+	}
+	public void setVigente(Boolean vigente) {
+		this.vigente = vigente;
+	}
+	public Boolean getEsSNC() {
+		return esSNC;
+	}	
+	public String getNombreDeTipoDeRequisito() {
+		return nombreDeTipoDeRequisito;
+	}
+	public void setNombreDeTipoDeRequisito(String nombreDeTipoDeRequisito) {
+		this.nombreDeTipoDeRequisito = nombreDeTipoDeRequisito;
+	}
+	public void setEsSNC(Boolean esSNC) {
+		if (esSNC != null && esSNC.booleanValue() == true) {
+			this.nombreDeTipoDeRequisito = RequisitoType.SNC.getNombreDeTipoDeRequisito();
+		} else {
+			this.nombreDeTipoDeRequisito = RequisitoType.RDS.getNombreDeTipoDeRequisito();
+		}
+		this.esSNC = esSNC;
 	}
 	@Override
 	public String toString() {
-		return "ParametroDeTareaDTO [idParamTarea=" + idParamTarea + ", nombreParamTarea=" + nombreParamTarea + ", titulo=" + titulo
-				+ ", tipoParametroDeTareaDTO=" + tipoParametroDeTareaDTO
-				+ ", textoHtml=" + textoHtml
+		return "ParametroDeTareaDTO [idParamTarea=" + idParamTarea + ", nombreParamTarea=" + nombreParamTarea
+				+ ", tipoParametroDeTareaDTO=" + tipoParametroDeTareaDTO + ", titulo=" + titulo + ", textoHtml="
+				+ textoHtml 
+				+ ", vigente=" + vigente 
+				+ ", esSNC=" + esSNC 
+				+ ", nombreDeTipoDeRequisito=" + nombreDeTipoDeRequisito 
 				+ "]";
 	}	
 }

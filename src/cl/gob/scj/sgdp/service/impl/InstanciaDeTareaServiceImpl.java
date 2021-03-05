@@ -3,13 +3,16 @@ package cl.gob.scj.sgdp.service.impl;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
 import javax.annotation.Resource;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,15 +31,18 @@ import cl.gob.scj.sgdp.dto.ParametroDTO;
 import cl.gob.scj.sgdp.dto.TipoDeDocumentoDTO;
 import cl.gob.scj.sgdp.exception.SgdpException;
 import cl.gob.scj.sgdp.model.ArchivosInstDeTarea;
+import cl.gob.scj.sgdp.model.DocumentoDeSalidaDeTarea;
 import cl.gob.scj.sgdp.model.HistoricoDeInstDeTarea;
 import cl.gob.scj.sgdp.model.HistoricoValorParametroDeTarea;
 import cl.gob.scj.sgdp.model.InstanciaDeTarea;
+import cl.gob.scj.sgdp.model.ParametroRelacionTarea;
 import cl.gob.scj.sgdp.service.InstanciaDeTareaService;
 import cl.gob.scj.sgdp.service.MueveProcesoService;
 import cl.gob.scj.sgdp.service.ObtenerArchivosExpedienteService;
 import cl.gob.scj.sgdp.service.ParametroService;
 import cl.gob.scj.sgdp.service.TipoDeDocumentoService;
 import cl.gob.scj.sgdp.service.UsuarioResponsabilidadService;
+import cl.gob.scj.sgdp.util.FechaUtil;
 import cl.gob.scj.sgdp.util.SGDPUtil;
 
 @Service
@@ -97,11 +103,11 @@ public class InstanciaDeTareaServiceImpl implements InstanciaDeTareaService {
 			log.debug("historicoDeInstDeTareaUltimo: " + historicoDeInstDeTareaUltimo.toString());
 			instanciaDeTareaDTO.setUltimoComentario(historicoDeInstDeTareaUltimo.getComentario());
 			instanciaDeTareaDTO.setPuedeDevolver(true);
-			List<HistoricoValorParametroDeTarea> historicosValorParametroDeTarea = historicoDeInstDeTareaUltimo.getHistoricosValorParametroDeTarea();
+			/*List<HistoricoValorParametroDeTarea> historicosValorParametroDeTarea = historicoDeInstDeTareaUltimo.getHistoricosValorParametroDeTarea();
 			if (historicosValorParametroDeTarea!=null && !historicosValorParametroDeTarea.isEmpty()) {
 				instanciaDeTareaDTO.setIdUltimaInstanciaDeTareaAnterior(historicoDeInstDeTareaUltimo.getInstanciaDeTareaDeOrigen().getIdInstanciaDeTarea());
 				instanciaDeTareaDTO.setNombreTareaUltimaInstanciaDeTareaAnterior(historicoDeInstDeTareaUltimo.getInstanciaDeTareaDeOrigen().getTarea().getNombreTarea());
-			}
+			}*/
 			InstanciaDeTarea instanciaDeTareaAnterior = historicoDeInstDeTareaUltimo.getInstanciaDeTareaDeOrigen();//instanciaDeTareaDao.getInstanciaDeTareaPorIdInstanciaDeTarea(historicoDeInstDeTareaUltimo.getInstanciaDeTareaDeOrigen().getIdInstanciaDeTarea());
 			if (instanciaDeTareaAnterior.getUsuariosAsignados()!=null && !instanciaDeTareaAnterior.getUsuariosAsignados().isEmpty()) {
 				instanciaDeTareaDTO.setUsuarioAnterior(instanciaDeTareaAnterior.getUsuariosAsignados().get(0).getId().getIdUsuario());
@@ -330,6 +336,75 @@ public class InstanciaDeTareaServiceImpl implements InstanciaDeTareaService {
 		instanciaDeTareaDTO.cargaInstanciaDeTareaDTO(instanciaDeTarea);
 		usuarioResponsabilidadService.cargaUsuariosRolesPosiblesPorIdInstanciaDeTarea(instanciaDeTareaDTO.getIdInstanciaDeTarea(), instanciaDeTareaDTO.getPosiblesIdUsuarios());
 		return instanciaDeTareaDTO;
-	}	
+	}
+	
+	/*public void cargaInstanciaDeTareaDTO(InstanciaDeTarea instanciaDeTarea, InstanciaDeTareaDTO instanciaDeTareaDTO) {
+		log.debug("Inicio cargaInstanciaDeTareaDTO");		
+		if (instanciaDeTarea.getInstanciaDeProceso().getInstanciaDeProcesoPadre()!= null) {
+			instanciaDeTareaDTO.setOrigen(instanciaDeTarea.getInstanciaDeProceso().getInstanciaDeProcesoPadre().getProceso().getUnidad().getCodigoUnidad());
+		} 
+		instanciaDeTareaDTO.setIdInstanciaDeTarea(instanciaDeTarea.getIdInstanciaDeTarea());
+		instanciaDeTareaDTO.setNombreDeProceso(instanciaDeTarea.getTarea().getProceso().getNombreProceso());		
+		instanciaDeTareaDTO.setNombreDeTarea(instanciaDeTarea.getTarea().getNombreTarea());			
+		instanciaDeTareaDTO.setNombreExpediente(instanciaDeTarea.getInstanciaDeProceso().getNombreExpediente());
+		instanciaDeTareaDTO.setFechaVencimientoInstanciaDeTarea(instanciaDeTarea.getFechaVencimiento());
+		instanciaDeTareaDTO.setTieneDocumentosEnCMS(instanciaDeTarea.getInstanciaDeProceso().getTieneDocumentosEnCMS());
+		instanciaDeTareaDTO.setOrden(instanciaDeTarea.getTarea().getOrden());
+		instanciaDeTareaDTO.setIdExpediente(instanciaDeTarea.getInstanciaDeProceso().getIdExpediente());
+		instanciaDeTareaDTO.setFechaDeInicio(instanciaDeTarea.getFechaInicio());
+		instanciaDeTareaDTO.setIniciadorProceso(instanciaDeTarea.getInstanciaDeProceso().getIdUsuarioInicia());		
+		instanciaDeTareaDTO.setEsUltimaTarea(instanciaDeTarea.getTarea().getEsUltimaTarea());
+		instanciaDeTareaDTO.setFechaVencimientoInstanciaDeProceso(instanciaDeTarea.getInstanciaDeProceso().getFechaVencimiento());
+		instanciaDeTareaDTO.setTipoDeBifurcacion(instanciaDeTarea.getTarea().getTipoDeBifurcacion());
+		instanciaDeTareaDTO.setPuedeVisarDocumentos(instanciaDeTarea.getTarea().getPuedeVisarDocumentos());
+		instanciaDeTareaDTO.setPuedeAplicarFEA(instanciaDeTarea.getTarea().getPuedeAplicarFEA());
+		instanciaDeTareaDTO.cargaIdUsuariosAsignados(instanciaDeTarea.getUsuariosAsignados());	
+		instanciaDeTareaDTO.setFechaVencimientoUsuario(instanciaDeTarea.getFechaVencimientoUsuario());
+		instanciaDeTareaDTO.setEmisor(instanciaDeTarea.getInstanciaDeProceso().getEmisor());
+		instanciaDeTareaDTO.setFechaInicioInstanciaDeProceso(instanciaDeTarea.getInstanciaDeProceso().getFechaInicio());
+		instanciaDeTareaDTO.setAsunto(instanciaDeTarea.getInstanciaDeProceso().getAsunto());
+		instanciaDeTareaDTO.setIdUsuarioQueAsigna(instanciaDeTarea.getIdUsuarioQueAsigna());
+		instanciaDeTareaDTO.setObligatoria(instanciaDeTarea.getTarea().getObligatoria());
+		//this.setNombreRolQueEjecuta(instanciaDeTarea.getTarea().getTareasRoles().get(0).getId().getRol().getNombreRol());
+		instanciaDeTareaDTO.setNombreRolQueEjecuta(instanciaDeTarea.getTarea().getResponsabilidadesTareas().get(0).getId().getResponsabilidad().getNombreResponsabilidad());
+		instanciaDeTareaDTO.setIdInstanciaDeProceso(instanciaDeTarea.getInstanciaDeProceso().getIdInstanciaDeProceso());
+		instanciaDeTareaDTO.setUrlControl(instanciaDeTarea.getTarea().getUrlControl());
+		instanciaDeTareaDTO.setIdDiagrama(instanciaDeTarea.getTarea().getIdDiagrama());
+		instanciaDeTareaDTO.setIdProceso(instanciaDeTarea.getInstanciaDeProceso().getProceso().getIdProceso());
+		instanciaDeTareaDTO.setIdEstadoTarea(instanciaDeTarea.getEstadoDeTarea().getIdEstadoDeTarea());
+		instanciaDeTareaDTO.setAsignaNumDoc(instanciaDeTarea.getTarea().getAsignaNumDoc());
+		instanciaDeTareaDTO.setEsperaRespuesta(instanciaDeTarea.getTarea().getEsperarResp());
+		instanciaDeTareaDTO.setIdTarea(instanciaDeTarea.getTarea().getIdTarea());
+		instanciaDeTareaDTO.setDistribuye(instanciaDeTarea.getTarea().getDistribuye() == null ? false : instanciaDeTarea.getTarea().getDistribuye().booleanValue());
+		
+		List<ParametroRelacionTarea> parametrosRelacionTarea = instanciaDeTarea.getTarea().getParametroRelacionTareas();
+		
+		if (parametrosRelacionTarea!=null && !parametrosRelacionTarea.isEmpty()) {
+			instanciaDeTareaDTO.setEsRdsSnc(true);
+		}
+		
+		instanciaDeTareaDTO.setProcesoTieneRdsSnc(instanciaDeTarea.getTarea().getProceso().getTieneRdsSnc() == null ? false : instanciaDeTarea.getTarea().getProceso().getTieneRdsSnc().booleanValue());
+		
+		if (instanciaDeTarea.getFechaVencimiento()!=null) {
+			try {
+				instanciaDeTareaDTO.setFechaVencimientoInstanciaDeTareaJavaScript(FechaUtil.toFormat(instanciaDeTarea.getFechaVencimiento(), FechaUtil.simpleDateFormatShortDate));			
+			} catch (ParseException e) {
+				StringWriter sw = new StringWriter();
+				e.printStackTrace(new PrintWriter(sw));
+				String exceptionAsString = sw.toString();
+				log.error(exceptionAsString);
+			}
+		}
+		List<DocumentoDeSalidaDeTarea> documentosDeSalidasDeTarea = instanciaDeTarea.getTarea().getDocumentosDeSalidasDeTarea();
+		if (documentosDeSalidasDeTarea!=null && documentosDeSalidasDeTarea.size()>0) {
+			instanciaDeTareaDTO.setTiposDeDocumentosDeSalida(new HashMap<String, TipoDeDocumentoDTO>());
+			for (DocumentoDeSalidaDeTarea documentoDeSalidaDeTarea : documentosDeSalidasDeTarea) {
+				TipoDeDocumentoDTO tipoDeDocumentoDTO = new TipoDeDocumentoDTO(documentoDeSalidaDeTarea.getId().getTipoDeDocumento().getIdTipoDeDocumento(), documentoDeSalidaDeTarea.getId().getTipoDeDocumento().getNombreDeTipoDeDocumento());
+				instanciaDeTareaDTO.getTiposDeDocumentosDeSalida().put(documentoDeSalidaDeTarea.getId().getTipoDeDocumento().getNombreDeTipoDeDocumento(), tipoDeDocumentoDTO);
+			}
+		}
+		BeanUtils.copyProperties(instanciaDeTarea.getInstanciaDeProceso(), instanciaDeTareaDTO.getInstanciaDeProcesoDTO());
+	}*/
+	
 	
 }

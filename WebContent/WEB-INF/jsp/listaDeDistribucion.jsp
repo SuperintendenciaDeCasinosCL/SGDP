@@ -38,7 +38,7 @@
 						</c:otherwise>						
 					</c:choose> 
 					
-					<div id="divBackHeaderListaDeDistribucion" class="row" style="background-color: ${colorBackHeaderListaDeDistribucion}; color: #fff;">
+					<div id="divBackHeaderListaDeDistribucion" class="row div-area-trabajo-cab" style="background-color: ${colorBackHeaderListaDeDistribucion}; color: #fff;">
 			    	
 			    		<div class="col-sm-1"></div>
 			    	
@@ -51,7 +51,9 @@
 		      		<hr>
 			    
    					<div class="col-sm-12" id="listaDeDistribucionCuerpo">
-				    	<c:import url="/WEB-INF/jsp/div/listaDeDistribucionCuerpo.jsp"></c:import>     			
+   						
+				    	<c:import url="/WEB-INF/jsp/div/listaDeDistribucionCuerpo.jsp"></c:import>
+				    	     			
 					</div>  
 			    
 			    

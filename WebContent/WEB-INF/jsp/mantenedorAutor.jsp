@@ -46,7 +46,7 @@
 						</c:otherwise>						
 					</c:choose> 
 					
-					<div id="divBackHeaderMantenedorAutor" class="row" style="background-color: ${colorBackHeaderMantenedorAutor}; color: #fff;">
+					<div id="divBackHeaderMantenedorAutor" class="row div-area-trabajo-cab" style="background-color: ${colorBackHeaderMantenedorAutor}; color: #fff;">
 			    	
 			    		<div class="col-sm-1"></div>
 			    	

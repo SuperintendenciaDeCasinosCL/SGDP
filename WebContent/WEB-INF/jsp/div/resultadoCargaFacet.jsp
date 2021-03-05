@@ -6,7 +6,9 @@
 	
 	<c:if test="${mensajeVistaDTO.mensajes ne null and !empty mensajeVistaDTO.mensajes}">
 		<div class="col-sm-12" id="mensajeria">
+		 
 			<c:import url="/WEB-INF/jsp/div/mensajeria.jsp"></c:import>
+		  
 		</div>
 	</c:if>
 	

@@ -52,6 +52,7 @@ import cl.gob.scj.sgdp.dto.CierraInstanciaDeTareaDTO;
 import cl.gob.scj.sgdp.dto.ContinuarProcesoDTO;
 import cl.gob.scj.sgdp.dto.DetalleDeArchivoDTO;
 import cl.gob.scj.sgdp.dto.FinalizaProcesoDTO;
+import cl.gob.scj.sgdp.dto.HistoricoFirmaDTO;
 import cl.gob.scj.sgdp.dto.InstanciaDeProcesoDTO;
 import cl.gob.scj.sgdp.dto.InstanciaDeTareaDTO;
 import cl.gob.scj.sgdp.dto.ParametroDTO;
@@ -81,11 +82,13 @@ import cl.gob.scj.sgdp.model.ValorParametroDeTarea;
 import cl.gob.scj.sgdp.service.EmailService;
 import cl.gob.scj.sgdp.service.GestorDeDocumentosService;
 import cl.gob.scj.sgdp.service.GestorMetadataService;
+import cl.gob.scj.sgdp.service.HistoricoFirmaService;
 import cl.gob.scj.sgdp.service.InstanciaDeProcesoService;
 import cl.gob.scj.sgdp.service.InstanciaDeTareaService;
 import cl.gob.scj.sgdp.service.MueveProcesoService;
 import cl.gob.scj.sgdp.service.ObtenerArchivosExpedienteService;
 import cl.gob.scj.sgdp.service.ObtenerDetalleDeArchivoService;
+import cl.gob.scj.sgdp.service.ParametroDeTareaService;
 import cl.gob.scj.sgdp.service.ParametroService;
 import cl.gob.scj.sgdp.service.UsuarioResponsabilidadService;
 import cl.gob.scj.sgdp.tipos.AccionesHistInstDeTareaType;
@@ -170,16 +173,13 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 	private GestorDeDocumentosService gestorDeDocumentosService;
 	
 	@Autowired
-	private ParametroDeTareaDao parametroDeTareaDao;
-	
-	@Autowired
-	private HistoricoValorParametroDeTareaDao historicoValorParametroDeTareaDao;
-	
-	@Autowired
-	private ValorParametroDeTareaDao valorParametroDeTareaDao;
-	
-	@Autowired
 	private InstanciaDeTareaService instanciaDeTareaService;	
+	
+	@Autowired
+	private HistoricoFirmaService historicoFirmaService;
+	
+	@Autowired
+	private ParametroDeTareaService parametroDeTareaService;
 	
 	EstadoDeProcesoType estadoDeProcesoType = EstadoDeProcesoType.NUEVO;
 	
@@ -305,6 +305,8 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 		//Se actualiza la siguiente instancia de tarea en su fecha y su usuario asignado
 		InstanciaDeTarea instanciaDeTareaSiguiente = instanciaDeTareaDao.getInstanciaDeTareaPorIdInstanciaDeTarea(idSiguienteTarea);
 		
+		Boolean tieneRdsSnc = instanciaDeTareaDeOrigen.getInstanciaDeProceso().getProceso().getTieneRdsSnc();
+		
 		log.debug("instanciaDeTareaSiguiente.getTarea().getNombreTarea(): "+ instanciaDeTareaSiguiente.getTarea().getNombreTarea());
 		continuarProcesoDTO.setNombreDeTarea(instanciaDeTareaSiguiente.getTarea().getNombreTarea());
 		
@@ -363,6 +365,8 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 			historicoDeInstDeTarea.setFechaMovimiento(new Date());
 			historicoDeInstDeTarea.setInstanciaDeTareaDeDestino(instanciaDeTareaSiguiente);
 			historicoDeInstDeTarea.setInstanciaDeTareaDeOrigen(instanciaDeTareaDeOrigen);
+			historicoDeInstDeTarea.setHorasOcupadas(continuarProcesoDTO.getHorasOcupadas());
+			historicoDeInstDeTarea.setMinutosOcupados(continuarProcesoDTO.getMinutosOcupados());
 			
 			if (continuarProcesoDTO.isAvanzaProcesoConAdvertenciaVisacion()) {
 				historicoDeInstDeTarea.setMensajeException(MensajeExceptionType.AVANZA_PROCESO_CON_ADVERTENCIA_VISACION.getNombreMensajeException());
@@ -381,13 +385,20 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 				HistoricoUsuariosAsignadosATarea historicoUsuariosAsignadosATarea = new HistoricoUsuariosAsignadosATarea();
 				historicoUsuariosAsignadosATarea.setId(historicoUsuariosAsignadosATareaPK);
 				historicoUsuariosAsignadosATareaDao.insertHistoricoUsuarioAsignadoATarea(historicoUsuariosAsignadosATarea, usuario);
-			}	
+			}				
 			
-			//Se guardan parametros de formulario en historico			
-			if (continuarProcesoDTO.getParametrosMapParaGuardarJSON()!=null && !continuarProcesoDTO.getParametrosMapParaGuardarJSON().isEmpty()) {
+			//Se guarda en historico de archivos
+			List<ArchivosInstDeTarea> archivosInstDeTareaList = instanciaDeTareaDeOrigen.getArchivosInstDeTarea();
+			for (ArchivosInstDeTarea archivosInstDeTarea : archivosInstDeTareaList) {
+				HistoricoArchivosInstDeTarea historicoArchivosInstDeTarea = new HistoricoArchivosInstDeTarea(historicoDeInstDeTarea, archivosInstDeTarea);								
+				historicoArchivosInstDeTareaDao.insertArchivosHistInstDeTarea(historicoArchivosInstDeTarea, usuario);
+			}
+			
+			//Se guardan parametros de formulario
+			if (tieneRdsSnc!=null && tieneRdsSnc.booleanValue() == true && continuarProcesoDTO.getParametrosMapParaGuardarJSON()!=null && !continuarProcesoDTO.getParametrosMapParaGuardarJSON().isEmpty()) {
+				log.debug("continuarProcesoDTO.getParametrosMapParaGuardarJSON(): " + continuarProcesoDTO.getParametrosMapParaGuardarJSON());
 				ObjectMapper mapper = SingleObjectFactory.getMapper();
 				List<ParametroFormularioDTO> listParametroFormularioDTO;
-				log.debug("continuarProcesoDTO.getParametrosMapParaGuardarJSON(): " + continuarProcesoDTO.getParametrosMapParaGuardarJSON());
 				try {				
 					listParametroFormularioDTO = mapper.readValue(continuarProcesoDTO.getParametrosMapParaGuardarJSON(), new TypeReference<List<ParametroFormularioDTO>>(){});					
 				} catch (IOException e) {
@@ -396,16 +407,9 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 					String exceptionAsString = sw.toString();
 					log.error(exceptionAsString);				
 					throw new SgdpException(configProps.getProperty("errorAlAvanzarProceso"));
-                }
-				guardaHistoricoValorParametroDeTarea(listParametroFormularioDTO, historicoDeInstDeTarea);				
-			}
-			
-			//Se guarda en historico de archivos
-			List<ArchivosInstDeTarea> archivosInstDeTareaList = instanciaDeTareaDeOrigen.getArchivosInstDeTarea();
-			for (ArchivosInstDeTarea archivosInstDeTarea : archivosInstDeTareaList) {
-				HistoricoArchivosInstDeTarea historicoArchivosInstDeTarea = new HistoricoArchivosInstDeTarea(historicoDeInstDeTarea, archivosInstDeTarea);								
-				historicoArchivosInstDeTareaDao.insertArchivosHistInstDeTarea(historicoArchivosInstDeTarea, usuario);
-			}
+				}
+				parametroDeTareaService.guardaHistoricoValorParametroDeTarea(listParametroFormularioDTO, historicoDeInstDeTarea, instanciaDeTareaDeOrigen, usuario);				
+			}	
 					
 			return;
 			
@@ -487,6 +491,9 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 		historicoDeInstDeTarea.setFechaMovimiento(new Date());
 		historicoDeInstDeTarea.setInstanciaDeTareaDeDestino(instanciaDeTareaSiguiente);
 		historicoDeInstDeTarea.setInstanciaDeTareaDeOrigen(instanciaDeTareaDeOrigen);
+		historicoDeInstDeTarea.setHorasOcupadas(continuarProcesoDTO.getHorasOcupadas());
+		historicoDeInstDeTarea.setMinutosOcupados(continuarProcesoDTO.getMinutosOcupados());
+		
 		if (continuarProcesoDTO.isAvanzaProcesoConAdvertenciaVisacion()) {
 			historicoDeInstDeTarea.setMensajeException(MensajeExceptionType.AVANZA_PROCESO_CON_ADVERTENCIA_VISACION.getNombreMensajeException());
 		}
@@ -510,11 +517,11 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 			historicoArchivosInstDeTareaDao.insertArchivosHistInstDeTarea(historicoArchivosInstDeTarea, usuario);
 		}
 		
-		//Se guardan parametros de formulario en historico			
-		if (continuarProcesoDTO.getParametrosMapParaGuardarJSON()!=null && !continuarProcesoDTO.getParametrosMapParaGuardarJSON().isEmpty()) {
+		//Se guardan parametros de formulario
+		if (tieneRdsSnc!=null && tieneRdsSnc.booleanValue() == true && continuarProcesoDTO.getParametrosMapParaGuardarJSON()!=null && !continuarProcesoDTO.getParametrosMapParaGuardarJSON().isEmpty()) {
+			log.debug("continuarProcesoDTO.getParametrosMapParaGuardarJSON(): " + continuarProcesoDTO.getParametrosMapParaGuardarJSON());
 			ObjectMapper mapper = SingleObjectFactory.getMapper();
 			List<ParametroFormularioDTO> listParametroFormularioDTO;
-			log.debug("continuarProcesoDTO.getParametrosMapParaGuardarJSON(): " + continuarProcesoDTO.getParametrosMapParaGuardarJSON());
 			try {				
 				listParametroFormularioDTO = mapper.readValue(continuarProcesoDTO.getParametrosMapParaGuardarJSON(), new TypeReference<List<ParametroFormularioDTO>>(){});					
 			} catch (IOException e) {
@@ -523,15 +530,15 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 				String exceptionAsString = sw.toString();
 				log.error(exceptionAsString);				
 				throw new SgdpException(configProps.getProperty("errorAlAvanzarProceso"));
-            }
-			guardaHistoricoValorParametroDeTarea(listParametroFormularioDTO, historicoDeInstDeTarea);						
-		}
+			}
+			parametroDeTareaService.guardaHistoricoValorParametroDeTarea(listParametroFormularioDTO, historicoDeInstDeTarea, instanciaDeTareaDeOrigen, usuario);				
+		}	
 		
 		emailService.enviarMail(usuario, instanciaDeTareaDeOrigen, listaDeUsuariosAsignados, continuarProcesoDTO.getComentario(), instanciaDeTareaSiguiente);		
 		
 	}
 	
-	public String getComentarioDePorIdParamTareaEnListParametroFormularioDTO(String idParamTarea, List<ParametroFormularioDTO> listParametroFormularioDTO) {
+	/*public String getComentarioDePorIdParamTareaEnListParametroFormularioDTO(String idParamTarea, List<ParametroFormularioDTO> listParametroFormularioDTO) {
 		for (ParametroFormularioDTO parametroFormularioDTO : listParametroFormularioDTO) {	
 			if (parametroFormularioDTO.getName().contains("-") && parametroFormularioDTO.getName().contains(idParamTarea)) {
 				if (parametroFormularioDTO.getValue() instanceof String) {
@@ -543,7 +550,7 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 			}
 		}		
 		return null;
-	}
+	}*/
 
 	/**
 	 * Avanza un proceso a la siguiente tarea
@@ -563,6 +570,7 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 			List<AsignacionTareaDTO> asignacionesTareasDTO;
 			InstanciaDeTarea instanciaDeTareaDeOrigen = instanciaDeTareaDao.getInstanciaDeTareaPorIdInstanciaDeTarea(continuarProcesoDTO.getIdInstanciaDeTareaOrigen());
 			Tarea tareaDeOrigen = instanciaDeTareaDeOrigen.getTarea();
+			Boolean tieneRdsSnc = instanciaDeTareaDeOrigen.getInstanciaDeProceso().getProceso().getTieneRdsSnc();
 			if ((continuarProcesoDTO.getIdUsuarioMueve()!=null && !continuarProcesoDTO.getIdUsuarioMueve().isEmpty()) || continuarProcesoDTO.getReasigna()==true) {
 				validaTareaEstaBE = false;
 			}
@@ -586,7 +594,7 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 						instanciaDeTareaDeOrigen);
 			}
 			//Se guardan parametros de formulario
-			if (continuarProcesoDTO.getParametrosMapParaGuardarJSON()!=null && !continuarProcesoDTO.getParametrosMapParaGuardarJSON().isEmpty()) {
+			if (tieneRdsSnc!=null && tieneRdsSnc.booleanValue() == true && continuarProcesoDTO.getParametrosMapParaGuardarJSON()!=null && !continuarProcesoDTO.getParametrosMapParaGuardarJSON().isEmpty()) {
 				log.debug("continuarProcesoDTO.getParametrosMapParaGuardarJSON(): " + continuarProcesoDTO.getParametrosMapParaGuardarJSON());
 				try {				
 					listParametroFormularioDTO = mapper.readValue(continuarProcesoDTO.getParametrosMapParaGuardarJSON(), new TypeReference<List<ParametroFormularioDTO>>(){});					
@@ -597,7 +605,7 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 					log.error(exceptionAsString);				
 					throw new SgdpException(configProps.getProperty("errorAlAvanzarProceso"));
 				}
-				guardaValorParametroDeTarea(listParametroFormularioDTO, instanciaDeTareaDeOrigen);									
+				parametroDeTareaService.guardaValorParametroDeTarea(listParametroFormularioDTO, instanciaDeTareaDeOrigen);				
 			}			
 			log.info("Verificamos si es una tarea que llama a un ws");
 			log.info(tareaDeOrigen.toString());
@@ -606,40 +614,8 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 				IntegracionSatelitesDTO integracionSatelitesDTO = new IntegracionSatelitesDTO();
 				integracionSatelitesDTO.setIdExpediente(continuarProcesoDTO.getIdExpedienteContinuarProceso());
 				integracionSatelitesDTO.setNombreExpediente(instanciaDeTareaDeOrigen.getInstanciaDeProceso().getNombreExpediente());
-				integracionSatelitesDTO.setUrlWS(tareaDeOrigen.getUrlWS());
-				invocaWS(integracionSatelitesDTO, continuarProcesoDTO.getIdInstanciaDeTareaOrigen(), usuario);
-				/*List<ArchivosInstDeTarea> archivosInstDeTarea = archivosInstDeTareaDao.getArchivosPorIdInstanciaDeTareaTiposDeDocDeTarea(instanciaDeTareaDeOrigen.getIdInstanciaDeTarea());
-				if (archivosInstDeTarea!=null && !archivosInstDeTarea.isEmpty()) {
-					log.debug("archivosInstDeTarea!=null");
-					ArchivosInstDeTarea archivoInstDeTarea = archivosInstDeTarea.get(0);
-					DetalleDeArchivoDTO detalleDeArchivoDTO = obtenerDetalleDeArchivoService.obtenerDetalleDeArchivo(usuario, archivoInstDeTarea.getIdArchivoCms());
-					log.info(detalleDeArchivoDTO.toString());
-					byte[] contenidoArchivo = gestorDeDocumentosService.getContenidoArchivo(archivoInstDeTarea.getIdArchivoCms(), usuario);
-					String contenidoArchivoBase64;
-					try {
-						contenidoArchivoBase64 = FileUtil.encodeByteArrayToBase64(contenidoArchivo, "UTF-8");
-						integracionSatelitesDTO.setContenidoArchivo(contenidoArchivoBase64);
-						integracionSatelitesDTO.setContentType(detalleDeArchivoDTO.getMimeType());
-						integracionSatelitesDTO.setIdArchivo(archivoInstDeTarea.getIdArchivoCms());
-						integracionSatelitesDTO.setNombreArchivo(archivoInstDeTarea.getNombreArchivo());
-						integracionSatelitesDTO.setNumeroDocumento(detalleDeArchivoDTO.getNumeroDocumento());
-					} catch (IOException e) {
-						throw new SgdpException("Error al leer el archivo de la tarea para enviar al sistema satelite", Level.ERROR, false);
-					}
-					IntegracionClient integracionClient = new IntegracionClient();
-					log.info("Ejecutando servicio satelite");
-					log.info(integracionSatelitesDTO.toString());
-					RespuestaIntegracionDTO respuestaIntegracionDTO = integracionClient.ejecuta(integracionSatelitesDTO);
-					if (respuestaIntegracionDTO==null) {
-						throw new SgdpException("Sin respueta del sistema satelite", Level.ERROR, false);
-					} else if (!respuestaIntegracionDTO.getEstado().equals("OK")) {
-						log.info("respuestaIntegracionDTO.getEstado(): " + respuestaIntegracionDTO.getEstado());
-						log.info("respuestaIntegracionDTO.getDescripcionError(): " + respuestaIntegracionDTO.getDescripcionError());
-						throw new SgdpException(respuestaIntegracionDTO.getDescripcionError(), Level.ERROR, false);
-					}
-					log.info("respuestaIntegracionDTO.getEstado(): " + respuestaIntegracionDTO.getEstado());
-					log.info("respuestaIntegracionDTO.getDescripcionError(): " + respuestaIntegracionDTO.getDescripcionError());
-				}*/
+				integracionSatelitesDTO.setUrlWS(tareaDeOrigen.getUrlWS());				
+				invocaWS(integracionSatelitesDTO, continuarProcesoDTO.getIdInstanciaDeTareaOrigen(), usuario);				
 			}
 			//Verificamos si es una tarea de reseteo y si tiene alguna instancia de tarea anterior enviada
 			HistoricoDeInstDeTarea historicoDeInstDeTareaUltimo = historicoDeInstDeTareaDao.getUltimoHistoricoDeInstDeTareaPorInstanciaDeTareaDeDestino(instanciaDeTareaDeOrigen);
@@ -733,6 +709,7 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 		return configProps.getProperty("respuestaOK");
 	}
 		
+	@SuppressWarnings("unchecked")
 	@Override
 	public String retrocedeProceso(RetrocedeProcesoDTO retrocedeProcesoDTO, Usuario usuario) throws SgdpException {
 		
@@ -740,10 +717,14 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 		
 		String respuesta;	
 		List<String> listaDeUsuariosAsignados = new ArrayList<String>();
-		String usuarioDeOrigen;				
+		String usuarioDeOrigen;		
+		
+		ObjectMapper mapper = SingleObjectFactory.getMapper();
 		
 		InstanciaDeTarea instanciaDeTareaActual = instanciaDeTareaDao.getInstanciaDeTareaPorIdInstanciaDeTarea(retrocedeProcesoDTO.getIdInstanciaDeTareaSeleccionada());
 		log.debug("instanciaDeTareaActual: " + instanciaDeTareaActual.toString());	
+		
+		Boolean tieneRdsSnc = instanciaDeTareaActual.getInstanciaDeProceso().getProceso().getTieneRdsSnc();
 		
 		//Valida si la tarea la tiene el usuario que esta intentando retroceder		
 		log.debug("Valida si la tarea la tiene el usuario que esta intentando retroceder");
@@ -797,6 +778,8 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 		historicoDeInstDeTarea.setFechaMovimiento(new Date());
 		historicoDeInstDeTarea.setInstanciaDeTareaDeDestino(instanciaDeTareaAnterior);
 		historicoDeInstDeTarea.setInstanciaDeTareaDeOrigen(instanciaDeTareaActual);
+		historicoDeInstDeTarea.setHorasOcupadas(retrocedeProcesoDTO.getHorasOcupadas());
+		historicoDeInstDeTarea.setMinutosOcupados(retrocedeProcesoDTO.getMinutosOcupados());
 		historicoDeInstDeTareaDao.insertHistoricoDeInstDeTarea(historicoDeInstDeTarea, usuario);
 		HistoricoUsuariosAsignadosATareaPK historicoUsuariosAsignadosATareaPK = new HistoricoUsuariosAsignadosATareaPK(historicoDeInstDeTarea, usuarioDeOrigen);
 		HistoricoUsuariosAsignadosATarea historicoUsuariosAsignadosATarea = new HistoricoUsuariosAsignadosATarea();
@@ -834,73 +817,30 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 		
 		}
 		
+		//Se guardan parametros de formulario
+		if (tieneRdsSnc!=null && tieneRdsSnc.booleanValue() == true && retrocedeProcesoDTO.getParametrosMapParaGuardarJSON()!=null && !retrocedeProcesoDTO.getParametrosMapParaGuardarJSON().isEmpty()) {			
+			//List<ParametroFormularioDTO> listParametroFormularioDTO;
+			log.debug("retrocedeProceso.getParametrosMapParaGuardarJSON(): " + retrocedeProcesoDTO.getParametrosMapParaGuardarJSON());
+			try {				
+				//listParametroFormularioDTO = mapper.readValue(retrocedeProcesoDTO.getParametrosMapParaGuardarJSON(), new TypeReference<List<ParametroFormularioDTO>>(){});				
+				parametroDeTareaService.guardaValorParametroDeTarea((List<ParametroFormularioDTO>) mapper.readValue(retrocedeProcesoDTO.getParametrosMapParaGuardarJSON(), new TypeReference<List<ParametroFormularioDTO>>(){}), instanciaDeTareaActual);
+				parametroDeTareaService.guardaHistoricoValorParametroDeTarea((List<ParametroFormularioDTO>) mapper.readValue(retrocedeProcesoDTO.getParametrosMapParaGuardarJSON(), new TypeReference<List<ParametroFormularioDTO>>(){}), historicoDeInstDeTarea, instanciaDeTareaActual, usuario);				
+			} catch (IOException e) {
+				StringWriter sw = new StringWriter();
+				e.printStackTrace(new PrintWriter(sw));
+				String exceptionAsString = sw.toString();
+				log.error(exceptionAsString);				
+				throw new SgdpException(configProps.getProperty("errorAlAvanzarProceso"));
+			}
+							
+		}
+		
 		log.debug("retrocedeProceso... fin");		
 		
 		return respuesta;
 	
 	}
 	
-	private void guardaHistoricoValorParametroDeTarea(List<ParametroFormularioDTO> listParametroFormularioDTO, HistoricoDeInstDeTarea historicoDeInstDeTarea) throws SgdpException {
-		String valor;
-		for (ParametroFormularioDTO parametroFormularioDTO : listParametroFormularioDTO) {
-            log.debug(parametroFormularioDTO.toString());                    
-			if (parametroFormularioDTO.getName().contains("_")) {
-				String idParamTarea = parametroFormularioDTO.getName().split("_")[0];
-				ParametroDeTarea parametroDeTarea = parametroDeTareaDao.getParametroDeTareaPorIdParamTarea(Long.parseLong(idParamTarea));
-				HistoricoValorParametroDeTarea historicoValorParametroDeTarea = new HistoricoValorParametroDeTarea();
-				if (parametroDeTarea == null) {
-					log.error("No se encontro ParametroDeTarea con idParamTarea: " + idParamTarea);
-					throw new SgdpException(configProps.getProperty("errorAlAvanzarProceso"));
-                }
-                if (parametroFormularioDTO.getValue() instanceof String) {
-					valor = (String) parametroFormularioDTO.getValue();
-					historicoValorParametroDeTarea.setValor(valor);
-				} else if (parametroFormularioDTO.getValue() instanceof String[]) {
-					String[] valorArray = (String[]) parametroFormularioDTO.getValue();
-					valor =StringUtils.join(valorArray, ";");
-					historicoValorParametroDeTarea.setValor(valor);
-				}                        
-                historicoValorParametroDeTarea.setComentario(getComentarioDePorIdParamTareaEnListParametroFormularioDTO(idParamTarea, listParametroFormularioDTO));
-                historicoValorParametroDeTarea.setHistoricoDeInstDeTarea(historicoDeInstDeTarea);
-                historicoValorParametroDeTarea.setParametroDeTarea(parametroDeTarea);                        
-                historicoValorParametroDeTareaDao.insert(historicoValorParametroDeTarea);	
-			}										
-		}	
-	}
-	
-	private void guardaValorParametroDeTarea(List<ParametroFormularioDTO> listParametroFormularioDTO, InstanciaDeTarea instanciaDeTarea) throws SgdpException {
-		boolean insertaValorParametroDeTarea = false;
-		for (ParametroFormularioDTO parametroFormularioDTO : listParametroFormularioDTO) {
-			log.debug(parametroFormularioDTO.toString());
-			if (parametroFormularioDTO.getName().contains("_")) {
-				String idParamTarea = parametroFormularioDTO.getName().split("_")[0];
-				ValorParametroDeTarea valorParametroDeTarea = valorParametroDeTareaDao.getValorParametroDeTareaPorIdParamIdInstanciaTarea(Long.parseLong(idParamTarea), instanciaDeTarea.getIdInstanciaDeTarea());
-				ParametroDeTarea parametroDeTarea = parametroDeTareaDao.getParametroDeTareaPorIdParamTarea(Long.parseLong(idParamTarea));
-				if (parametroDeTarea == null) {
-					log.error("No se encontro ParametroDeTarea con idParamTarea: " + idParamTarea);
-					throw new SgdpException(configProps.getProperty("errorAlAvanzarProceso"));
-				}
-				if (valorParametroDeTarea == null) {
-					valorParametroDeTarea = new ValorParametroDeTarea();
-					insertaValorParametroDeTarea = true;
-				} 
-				valorParametroDeTarea.setFecha(new Date());
-				valorParametroDeTarea.setInstanciaDeTarea(instanciaDeTarea);
-				valorParametroDeTarea.setParametroDeTarea(parametroDeTarea);
-				valorParametroDeTarea.setComentario(getComentarioDePorIdParamTareaEnListParametroFormularioDTO(idParamTarea, listParametroFormularioDTO));
-				if (parametroFormularioDTO.getValue() instanceof String) {
-					String valor = (String) parametroFormularioDTO.getValue();
-					valorParametroDeTarea.setValor(valor);
-				} else if (parametroFormularioDTO.getValue() instanceof String[]) {
-					String[] valor = (String[]) parametroFormularioDTO.getValue();
-					valorParametroDeTarea.setValor(StringUtils.join(valor, ";"));
-				}
-				if (insertaValorParametroDeTarea == true) {
-					valorParametroDeTareaDao.insert(valorParametroDeTarea);
-				}
-			}										
-		}
-	}
 	
 	@Override
 	public String getUsuarioAAsignarIgualAUsuarioDeOrigenListaString(List<String> listaPosiblesUsuarios,
@@ -1038,6 +978,7 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 		return false;
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void finaliza(Usuario usuario, FinalizaProcesoDTO finalizaProcesoDTO) throws SgdpException {		
 		
@@ -1045,6 +986,8 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 		InstanciaDeProceso instanciaDeProceso = instanciaDeTarea.getInstanciaDeProceso();
 		EstadoDeProceso estadoDeProcesoFinalizado = estadoDeProcesoDao.getEstadoDeProcesoPorCodigo(estadoDeProcesoFinalizadoType.getCodigoEstadoDeProceso());
 		Tarea tareaDeOrigen = instanciaDeTarea.getTarea();
+		
+		Boolean tieneRdsSnc = instanciaDeTarea.getInstanciaDeProceso().getProceso().getTieneRdsSnc();
 		
 		ObjectMapper mapper = SingleObjectFactory.getMapper();
 		
@@ -1082,6 +1025,8 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 		historicoDeInstDeTarea.setFechaMovimiento(new Date());
 		historicoDeInstDeTarea.setInstanciaDeTareaDeDestino(instanciaDeTarea);
 		historicoDeInstDeTarea.setInstanciaDeTareaDeOrigen(instanciaDeTarea);
+		historicoDeInstDeTarea.setHorasOcupadas(finalizaProcesoDTO.getHorasOcupadas());
+		historicoDeInstDeTarea.setMinutosOcupados(finalizaProcesoDTO.getMinutosOcupados());
 		historicoDeInstDeTareaDao.insertHistoricoDeInstDeTarea(historicoDeInstDeTarea, usuario);
 		
 		//Se guarda en historico de archivos
@@ -1092,20 +1037,20 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 		}
 		
 		//Se guardan parametros de formulario
-		if (finalizaProcesoDTO.getParametrosMapParaGuardarJSON()!=null && !finalizaProcesoDTO.getParametrosMapParaGuardarJSON().isEmpty()) {			
-			List<ParametroFormularioDTO> listParametroFormularioDTO;
+		if (tieneRdsSnc!=null && tieneRdsSnc.booleanValue() == true && finalizaProcesoDTO.getParametrosMapParaGuardarJSON()!=null && !finalizaProcesoDTO.getParametrosMapParaGuardarJSON().isEmpty()) {			
+			//List<ParametroFormularioDTO> listParametroFormularioDTO;
 			log.debug("finalizaProcesoDTO.getParametrosMapParaGuardarJSON(): " + finalizaProcesoDTO.getParametrosMapParaGuardarJSON());
 			try {				
-				listParametroFormularioDTO = mapper.readValue(finalizaProcesoDTO.getParametrosMapParaGuardarJSON(), new TypeReference<List<ParametroFormularioDTO>>(){});					
+				//listParametroFormularioDTO = mapper.readValue(finalizaProcesoDTO.getParametrosMapParaGuardarJSON(), new TypeReference<List<ParametroFormularioDTO>>(){});					
+				parametroDeTareaService.guardaValorParametroDeTarea((List<ParametroFormularioDTO>) mapper.readValue(finalizaProcesoDTO.getParametrosMapParaGuardarJSON(), new TypeReference<List<ParametroFormularioDTO>>(){}), instanciaDeTarea);
+				parametroDeTareaService.guardaHistoricoValorParametroDeTarea((List<ParametroFormularioDTO>) mapper.readValue(finalizaProcesoDTO.getParametrosMapParaGuardarJSON(), new TypeReference<List<ParametroFormularioDTO>>(){}), historicoDeInstDeTarea, instanciaDeTarea, usuario);				
 			} catch (IOException e) {
 				StringWriter sw = new StringWriter();
 				e.printStackTrace(new PrintWriter(sw));
 				String exceptionAsString = sw.toString();
 				log.error(exceptionAsString);				
 				throw new SgdpException(configProps.getProperty("errorAlAvanzarProceso"));
-			}
-			guardaValorParametroDeTarea(listParametroFormularioDTO, instanciaDeTarea);
-			guardaHistoricoValorParametroDeTarea(listParametroFormularioDTO, historicoDeInstDeTarea);				
+			}			
 		}
 		//Verificamos si es una tarea de Distribucion
 		if (instanciaDeTarea.getTarea().getDistribuye()!=null && instanciaDeTarea.getTarea().getDistribuye().booleanValue() == true && finalizaProcesoDTO.getCierra()==false) {
@@ -1153,41 +1098,7 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 			integracionSatelitesDTO.setIdExpediente(instanciaDeProceso.getIdExpediente());
 			integracionSatelitesDTO.setNombreExpediente(instanciaDeProceso.getNombreExpediente());
 			integracionSatelitesDTO.setUrlWS(tareaDeOrigen.getUrlWS());			
-			invocaWS(integracionSatelitesDTO, finalizaProcesoDTO.getIdInstanciaDeTarea(), usuario) ;		
-			/*List<ArchivosInstDeTarea> archivosInstDeTarea = archivosInstDeTareaDao.getArchivosPorIdInstanciaDeTareaTiposDeDocDeTarea(instanciaDeTarea.getIdInstanciaDeTarea());
-			if (archivosInstDeTarea!=null && !archivosInstDeTarea.isEmpty()) {
-				log.debug("archivosInstDeTarea!=null");
-				ArchivosInstDeTarea archivoInstDeTarea = archivosInstDeTarea.get(0);
-				DetalleDeArchivoDTO detalleDeArchivoDTO = obtenerDetalleDeArchivoService.obtenerDetalleDeArchivo(usuario, archivoInstDeTarea.getIdArchivoCms());
-				log.info(detalleDeArchivoDTO.toString());
-				byte[] contenidoArchivo = gestorDeDocumentosService.getContenidoArchivo(archivoInstDeTarea.getIdArchivoCms(), usuario);
-				String contenidoArchivoBase64;
-				try {
-					contenidoArchivoBase64 = FileUtil.encodeByteArrayToBase64(contenidoArchivo, "UTF-8");
-					integracionSatelitesDTO.setContenidoArchivo(contenidoArchivoBase64);
-					integracionSatelitesDTO.setContentType(detalleDeArchivoDTO.getMimeType());
-					integracionSatelitesDTO.setIdArchivo(archivoInstDeTarea.getIdArchivoCms());
-					integracionSatelitesDTO.setNombreArchivo(archivoInstDeTarea.getNombreArchivo());
-					integracionSatelitesDTO.setNumeroDocumento(detalleDeArchivoDTO.getNumeroDocumento());
-				} catch (IOException e) {
-					throw new SgdpException("Error al leer el archivo de la tarea para enviar al sistema satelite", Level.ERROR, false);
-				}
-				IntegracionClient integracionClient = new IntegracionClient();
-				log.info("Ejecutando servicio satelite");
-				log.info(integracionSatelitesDTO.toString());
-				RespuestaIntegracionDTO respuestaIntegracionDTO = integracionClient.ejecuta(integracionSatelitesDTO);
-				if (respuestaIntegracionDTO==null) {
-					throw new SgdpException("Sin respueta del sistema satelite", Level.ERROR, false);
-				} else if (!respuestaIntegracionDTO.getEstado().equals("OK")) {
-					log.info("respuestaIntegracionDTO.getEstado(): " + respuestaIntegracionDTO.getEstado());
-					log.info("respuestaIntegracionDTO.getDescripcionError(): " + respuestaIntegracionDTO.getDescripcionError());
-					throw new SgdpException(respuestaIntegracionDTO.getDescripcionError(), Level.ERROR, false);
-				}
-				log.info("respuestaIntegracionDTO.getEstado(): " + respuestaIntegracionDTO.getEstado());
-				log.info("respuestaIntegracionDTO.getDescripcionError(): " + respuestaIntegracionDTO.getDescripcionError());
-			}*/
-			
-			
+			invocaWS(integracionSatelitesDTO, finalizaProcesoDTO.getIdInstanciaDeTarea(), usuario) ;	
 		}		
 	}
 	
@@ -1323,6 +1234,7 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 			log.info(detalleDeArchivoDTO.toString());
 			byte[] contenidoArchivo = gestorDeDocumentosService.getContenidoArchivo(archivosInstDeTareaDTO.getIdArchivoCms(), usuario);
 			String contenidoArchivoBase64;
+			HistoricoFirmaDTO historicoFirmaDTO = historicoFirmaService.getUltimoHistoricoFirmaDocumentoFEAPorIdArchivo(archivosInstDeTareaDTO.getIdArchivoCms());
 			try {
 			    contenidoArchivoBase64 = FileUtil.encodeByteArrayToBase64(contenidoArchivo, "UTF-8");
 			    integracionSatelitesDTO.setContenidoArchivo(contenidoArchivoBase64);
@@ -1330,6 +1242,7 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 			    integracionSatelitesDTO.setIdArchivo(archivosInstDeTareaDTO.getIdArchivoCms());
 			    integracionSatelitesDTO.setNombreArchivo(archivosInstDeTareaDTO.getNombreArchivo());
 			    integracionSatelitesDTO.setNumeroDocumento(detalleDeArchivoDTO.getNumeroDocumento());
+			    integracionSatelitesDTO.setFechaFirmaDocumentoOficial(historicoFirmaDTO.getFechaFirma());
 			} catch (IOException e) {
 			    throw new SgdpException("Error al leer el archivo para enviar al sistema satelite", Level.ERROR, false);
 			}
@@ -1349,11 +1262,4 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 		}
 	}
 	
-	/*private boolean validaTodosLosDocConFea(HistoricoFirmaDTO historicoFirmaDTOConsulta) {
-		InstanciaDeTarea instanciaDeTarea = instanciaDeTareaService.getInstanciaDeTareaPorIdInstanciaDeTarea(historicoFirmaDTOConsulta.getIdInstanciaDeTarea());
-		
-		instanciaDeTarea.getArchivosInstDeTarea()
-		
-	}*/
-
 }

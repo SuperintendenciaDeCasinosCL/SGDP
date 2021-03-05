@@ -36,6 +36,12 @@ public class TipoParametroDeTarea implements Serializable {
 
 	@Column(name="\"B_COMENTA\"")
 	private Boolean comenta;
+	
+	@Column(name="\"A_VALOR_PARAM_SETEADO\"")
+	private String valorParamSeteado;
+	
+	@Column(name="\"A_VALOR_PARAM_NO_SETEADO\"")
+	private String valorParamNoSeteado;	
 
 	//bi-directional many-to-one association to ParametroDeTarea
 	@OneToMany(mappedBy="tipoParametroDeTarea", cascade={CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch=FetchType.LAZY)
@@ -97,5 +103,21 @@ public class TipoParametroDeTarea implements Serializable {
 
 		return ParametrosDeTarea;
 	}
+
+	public String getValorParamSeteado() {
+		return valorParamSeteado;
+	}
+
+	public void setValorParamSeteado(String valorParamSeteado) {
+		this.valorParamSeteado = valorParamSeteado;
+	}
+
+	public String getValorParamNoSeteado() {
+		return valorParamNoSeteado;
+	}
+
+	public void setValorParamNoSeteado(String valorParamNoSeteado) {
+		this.valorParamNoSeteado = valorParamNoSeteado;
+	}	
 
 }

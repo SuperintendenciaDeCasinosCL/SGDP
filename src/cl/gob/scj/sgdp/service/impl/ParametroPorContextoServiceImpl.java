@@ -12,9 +12,12 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cl.gob.scj.sgdp.auth.user.Usuario;
+import cl.gob.scj.sgdp.config.Constantes;
 import cl.gob.scj.sgdp.dao.ParametroPorContextoDao;
 import cl.gob.scj.sgdp.dto.KeyParametroPorContextoDTO;
 import cl.gob.scj.sgdp.dto.ParametroPorContextoDTO;
+import cl.gob.scj.sgdp.dto.RolDTO;
 import cl.gob.scj.sgdp.model.ParametroPorContexto;
 import cl.gob.scj.sgdp.service.ParametroPorContextoService;
 
@@ -111,6 +114,29 @@ public class ParametroPorContextoServiceImpl implements
 		
 	}
 	
-	
+	@Override
+	public ParametroPorContextoDTO getParametroPorContextoDTOMuestraTodasLasTareaEjecucion(Usuario usuario) {
+		
+		List<RolDTO> rolesDTO = usuario.getTodosLosRoles();
+		
+		ParametroPorContextoDTO parametroPorContextoDTO = null;
+		
+		for (RolDTO rolDTO: rolesDTO) {
+		 
+			ParametroPorContexto parametroPorContexto = parametroPorContextoDao.
+			getParametroPorContextoPorNombreParamValorContexto(Constantes.NOMBRE_PARAMETRO_POR_CONTEXTO_MUESTRA_TAREAS_EN_EJECUCION_POR_ID_ROL, 
+					Long.toString(rolDTO.getIdRol()));
+		 
+			if (parametroPorContexto!=null && parametroPorContexto.getValorParametroChar().equals(Constantes.MUESTRA_TODAS_LAS_TAREAS_EN_EJECUCION)) {
+				parametroPorContextoDTO = new ParametroPorContextoDTO();
+				BeanUtils.copyProperties(parametroPorContexto, parametroPorContextoDTO);
+				return parametroPorContextoDTO;
+			}
+		 
+		}
+		
+		return parametroPorContextoDTO;
+		
+	}
 
 }

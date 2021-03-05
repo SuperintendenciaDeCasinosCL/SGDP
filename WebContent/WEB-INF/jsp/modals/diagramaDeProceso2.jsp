@@ -28,8 +28,7 @@
 					<br>
 					<br>
 					<div class="col-sm-12">
-						<c:import url="${urlDiagramaSubProceso2}"></c:import>
-					</div>
+						<c:import url="${urlDiagramaSubProceso2}"></c:import>  
 				</div>
 				
 				<br>

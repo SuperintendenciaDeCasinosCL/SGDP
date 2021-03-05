@@ -19,7 +19,7 @@
 
 <div class="dropdown">
 	<br>
-   <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+   <button class="btn btn-primary btn-block dropdown-toggle" type="button" data-toggle="dropdown">
    	<i class="glyphicon glyphicon-education"></i> Tutoriales
    	<span class="caret"></span>
    </button>

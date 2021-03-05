@@ -95,7 +95,7 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
 		
 		Usuario usuario;
 		
-		Long idRolUsuarioSeleccionado = new Long(request.getParameter("idRolUsuarioSeleccionado"));
+		//Long idRolUsuarioSeleccionado = new Long(request.getParameter("idRolUsuarioSeleccionado"));
 		
 		request.getSession().removeAttribute("usuario");	
 			
@@ -113,13 +113,15 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
 		}
 				
 		usuario.setIdUsuario(idUsuario);
-		//usuario.setClave(clave);
+			
+		//usuario.setIdRolUsuarioSeleccionado(idRolUsuarioSeleccionado);	
 		
-		usuario.setIdRolUsuarioSeleccionado(idRolUsuarioSeleccionado);	
+		//usuario.setRolUnidadPermisosPorIdRolUsuarioSeleccionado(usuarioRoles);
 		
-		usuario.setRolUnidadPermisosPorIdRolUsuarioSeleccionado(usuarioRoles);
+		usuario.setPermisosRolesYUnidades(usuarioRoles);
 		
-		cargaFueraDeOficina(usuario, idRolUsuarioSeleccionado, usuarioRoles);
+		//cargaFueraDeOficina(usuario, idRolUsuarioSeleccionado, usuarioRoles);
+		cargaFueraDeOficina(usuario, usuarioRoles);
 		
 		usuario.setAlfTicket(alfTicket);
 		
@@ -129,14 +131,26 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
 		
 	}
 	
-	private void cargaFueraDeOficina(Usuario usuario, Long idRolUsuarioSeleccionado, List<UsuarioRol> usuarioRoles) {
+	/*private void cargaFueraDeOficina(Usuario usuario, Long idRolUsuarioSeleccionado, List<UsuarioRol> usuarioRoles) {
 		log.debug("Inicio cargaFueraDeOficina");
 		log.debug(usuario.toString());
 		log.debug("idRolUsuarioSeleccionado: " + idRolUsuarioSeleccionado);
 		for (UsuarioRol usuarioRol : usuarioRoles) {
 			log.debug(usuarioRol.toString());
+			usuario.setFueraDeOficina(usuarioRol.getFueraDeOficina());
 			if (usuarioRol.getRol().getIdRol() == idRolUsuarioSeleccionado.longValue()) {
 				log.debug("usuarioRol.getRol().getIdRol() == idRolUsuarioSeleccionado.longValue()");				
+				usuario.setFueraDeOficina(usuarioRol.getFueraDeOficina());
+				return;
+			}
+		}
+	}*/
+	
+	private void cargaFueraDeOficina(Usuario usuario, List<UsuarioRol> usuarioRoles) {
+		log.debug("Inicio cargaFueraDeOficina");
+		log.debug(usuario.toString());	
+		for (UsuarioRol usuarioRol : usuarioRoles) {			
+			if (usuarioRol.getFueraDeOficina()==true) {
 				usuario.setFueraDeOficina(usuarioRol.getFueraDeOficina());
 				return;
 			}

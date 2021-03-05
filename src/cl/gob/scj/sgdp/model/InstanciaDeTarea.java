@@ -20,6 +20,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -57,7 +58,7 @@ import cl.gob.scj.sgdp.config.Constantes;
 	+ ")"),	
 	
 	@NamedQuery(name="InstanciaDeTarea.getInstanciasDeTareaPorIdUsrNombreEstadoTarea", 
-				query="SELECT i from InstanciaDeTarea i, UsuarioAsignado u where i.idInstanciaDeTarea = u.id.instanciaDeTarea.idInstanciaDeTarea "
+				query="SELECT i FROM InstanciaDeTarea i, UsuarioAsignado u where i.idInstanciaDeTarea = u.id.instanciaDeTarea.idInstanciaDeTarea "
 			+ "and i.estadoDeTarea.nombreEstadoDeTarea =:nombreEstadoDeTarea and u.id.idUsuario =:idUsuario "),
 		
 	@NamedQuery(name="InstanciaDeTarea.getEstadosDeInstProcPorIdUsrNombreEstadoTarea", 
@@ -99,12 +100,12 @@ import cl.gob.scj.sgdp.config.Constantes;
 	// Query para buscar las instancias de tareas que se encuentren en espera de respuesta
 	@NamedQuery(name="InstanciaDeTarea.getInstanciasDeTareaPorIdUsrNombreEstadoTareaPorEsperaRespuesta", 
 	query=" SELECT i from InstanciaDeTarea i, UsuarioAsignado u, Tarea t "
-		+ " where i.idInstanciaDeTarea = u.id.instanciaDeTarea.idInstanciaDeTarea "
-		+ " and i.estadoDeTarea.nombreEstadoDeTarea =:nombreEstadoDeTarea "
-		+ " and u.id.idUsuario =:idUsuario "
-		+ " and t.idTarea = i.tarea.id "
-	    + " and t.esperarResp = :esperaRespuesta "
-		),
+				+ " where i.idInstanciaDeTarea = u.id.instanciaDeTarea.idInstanciaDeTarea "
+				+ " and i.estadoDeTarea.nombreEstadoDeTarea =:nombreEstadoDeTarea "
+				+ " and u.id.idUsuario =:idUsuario "
+				+ " and t.idTarea = i.tarea.id "
+			    + " and t.esperarResp = :esperaRespuesta "
+				),
 	
 	@NamedQuery(name="InstanciaDeTarea.getInstanciasDeTareaPorIdUsrIdRolNombreEstadoTarea", 
 				query="SELECT i from InstanciaDeTarea i, UsuarioAsignado u, Tarea t, TareaRol tr, UsuarioRol ur "
@@ -425,6 +426,10 @@ public class InstanciaDeTarea implements Serializable {
 	//bi-directional many-to-one association to ValorParametroDeTarea
 	@OneToMany(mappedBy="instanciaDeTarea", cascade={CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch=FetchType.LAZY)
 	private List<ValorParametroDeTarea> valorParametrosDeTarea;
+	
+	//bi-directional many-to-one association to HistoricoValorParametroDeTarea
+	@OneToMany(mappedBy="historicoDeInstDeTarea", cascade={CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch=FetchType.LAZY)
+	private List<HistoricoValorParametroDeTarea> historicosValorParametroDeTarea;
 		
 	public InstanciaDeTarea() {
 	}
@@ -697,8 +702,30 @@ public class InstanciaDeTarea implements Serializable {
 		valorParametrosDeTarea.setInstanciaDeTarea(null);
 
 		return valorParametrosDeTarea;
+	}	
+	
+	public List<HistoricoValorParametroDeTarea> getHistoricosValorParametroDeTarea() {
+		return historicosValorParametroDeTarea;
+	}
+
+	public void setHistoricosValorParametroDeTarea(List<HistoricoValorParametroDeTarea> historicosValorParametroDeTarea) {
+		this.historicosValorParametroDeTarea = historicosValorParametroDeTarea;
 	}
 	
+	public HistoricoValorParametroDeTarea addHistoricosValorParametroDeTarea(HistoricoValorParametroDeTarea historicoValorParametroDeTarea) {
+		getHistoricosValorParametroDeTarea().add(historicoValorParametroDeTarea);
+		historicoValorParametroDeTarea.setInstanciaDeTarea(this);
+
+		return historicoValorParametroDeTarea;
+	}
+
+	public HistoricoValorParametroDeTarea removeHistoricosValorParametroDeTarea(HistoricoValorParametroDeTarea historicoValorParametroDeTarea) {
+		getHistoricosValorParametroDeTarea().remove(historicoValorParametroDeTarea);
+		historicoValorParametroDeTarea.setInstanciaDeTarea(null);
+
+		return historicoValorParametroDeTarea;
+	}	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -731,7 +758,7 @@ public class InstanciaDeTarea implements Serializable {
 				+ fechaInicio + ", fechaVencimiento=" + fechaVencimiento
 				+ ", fechaVencimientoUsuario=" + fechaVencimientoUsuario 
 				+ ", idUsuarioQueAsigna=" + idUsuarioQueAsigna 
-				+ ", estadoDeTarea.IdEstadoDeTarea=" + estadoDeTarea.getIdEstadoDeTarea()
+				+ ", estadoDeTarea.IdEstadoDeTarea=" + estadoDeTarea.getIdEstadoDeTarea()			
 				+ "]";
 	}	
 		

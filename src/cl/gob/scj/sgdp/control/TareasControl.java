@@ -102,10 +102,10 @@ private static final Logger log = Logger.getLogger(TareasControl.class);
 	
 		Usuario usuario = (Usuario)request.getSession().getAttribute("usuario");
 		
-		KeyParametroPorContextoDTO keyParametroPorContextoDTOMuestraTareasEnEjecucion = new KeyParametroPorContextoDTO();
+		//KeyParametroPorContextoDTO keyParametroPorContextoDTOMuestraTareasEnEjecucion = new KeyParametroPorContextoDTO();
 		
-		keyParametroPorContextoDTOMuestraTareasEnEjecucion.setNombreParametro(Constantes.NOMBRE_PARAMETRO_POR_CONTEXTO_MUESTRA_TAREAS_EN_EJECUCION_POR_ID_ROL);				
-		keyParametroPorContextoDTOMuestraTareasEnEjecucion.setValorContexto(Long.toString(usuario.getRolDTO().getIdRol()));
+		//keyParametroPorContextoDTOMuestraTareasEnEjecucion.setNombreParametro(Constantes.NOMBRE_PARAMETRO_POR_CONTEXTO_MUESTRA_TAREAS_EN_EJECUCION_POR_ID_ROL);				
+		//keyParametroPorContextoDTOMuestraTareasEnEjecucion.setValorContexto(Long.toString(usuario.getRolDTO().getIdRol()));
 		
 		String permisoTareasEnEjecucion = usuario.getPermisos().get(permisoMuestraTareasEnEjecucionType.getNombrePermiso());
 		log.debug("permisoTareasEnEjecucion: " + permisoTareasEnEjecucion);
@@ -115,8 +115,8 @@ private static final Logger log = Logger.getLogger(TareasControl.class);
 		
 			if (permisoTareasEnEjecucion!=null && permisoTareasEnEjecucion.equals(permisoMuestraTareasEnEjecucionType.getNombrePermiso())) {
 				log.debug("Buscando parametroPorContextoDTO...");
-				log.debug(keyParametroPorContextoDTOMuestraTareasEnEjecucion.toString());
-				ParametroPorContextoDTO parametroPorContextoDTO = parametroPorContextoService.getParamPorContexto(keyParametroPorContextoDTOMuestraTareasEnEjecucion);
+				//log.debug(keyParametroPorContextoDTOMuestraTareasEnEjecucion.toString());
+				/*ParametroPorContextoDTO parametroPorContextoDTO = parametroPorContextoService.getParamPorContexto(keyParametroPorContextoDTOMuestraTareasEnEjecucion);
 				log.debug(parametroPorContextoDTO);
 				if (parametroPorContextoDTO!=null && parametroPorContextoDTO.getValorParametroChar().equals(Constantes.MUESTRA_TODAS_LAS_TAREAS_EN_EJECUCION)) {
 					log.debug("Buscando todas las instanciasDeTareasDTOEnEjecucion");
@@ -124,6 +124,14 @@ private static final Logger log = Logger.getLogger(TareasControl.class);
 				} else if (parametroPorContextoDTO!=null && parametroPorContextoDTO.getValorParametroChar().equals(Constantes.MUESTRA_LAS_TAREAS_DE_LA_UNIDAD)) {
 					log.debug("Buscando instanciasDeTareasDTOEnEjecucion por unidad");
 					instanciasDeTareasDTOEnEjecucion = bandejaDeEntradaService.getTodasInstanciasDeTareasEnEjecucionPorIdUnidad(usuario.getUnidadDTO().getIdUnidad(), instanciasDeTareasDTOEnEjecucion);
+				}*/
+				ParametroPorContextoDTO parametroPorContextoDTO = parametroPorContextoService.getParametroPorContextoDTOMuestraTodasLasTareaEjecucion(usuario);
+				if (parametroPorContextoDTO!=null) {
+					instanciasDeTareasDTOEnEjecucion = bandejaDeEntradaService.getTodasInstanciasDeTareasEnEjecucion(instanciasDeTareasDTOEnEjecucion);
+				} else {
+					//instanciasDeTareasDTOEnEjecucion = bandejaDeEntradaService.getTodasInstanciasDeTareasEnEjecucionPorIdUnidad(usuario.getUnidadDTO().getIdUnidad(), instanciasDeTareasDTOEnEjecucion);
+					instanciasDeTareasDTOEnEjecucion = bandejaDeEntradaService.getTodasInstanciasDeTareasEnEjecucionPorIdUnidades(usuario, instanciasDeTareasDTOEnEjecucion);
+					
 				}
 			}
 		

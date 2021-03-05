@@ -97,10 +97,10 @@ public class BandejaDeEntradaControl {
 	public String cargaBandejaDeEntrada(Model model, HttpServletRequest request) {
 					
 		try { 
-			
-			KeyParametroPorContextoDTO keyParametroPorContextoDTOMuestraTareasEnEjecucion = new KeyParametroPorContextoDTO();
-			keyParametroPorContextoDTOMuestraTareasEnEjecucion.setNombreParametro(Constantes.NOMBRE_PARAMETRO_POR_CONTEXTO_MUESTRA_TAREAS_EN_EJECUCION_POR_ID_ROL);				
-		
+
+			//KeyParametroPorContextoDTO keyParametroPorContextoDTOMuestraTareasEnEjecucion = new KeyParametroPorContextoDTO();
+			//keyParametroPorContextoDTOMuestraTareasEnEjecucion.setNombreParametro(Constantes.NOMBRE_PARAMETRO_POR_CONTEXTO_MUESTRA_TAREAS_EN_EJECUCION_POR_ID_ROL);				
+
 			boolean tareaEnEspera = false;
 			boolean trabajoInterno = false;
 			
@@ -133,9 +133,9 @@ public class BandejaDeEntradaControl {
 						
 			log.debug("estadoDeTareaType.getCodigoEstadoDeTarea(): " + estadoDeTareaAsignadaType.getCodigoEstadoDeTarea());
 			
-			keyParametroPorContextoDTOMuestraTareasEnEjecucion.setValorContexto(Long.toString(usuario.getRolDTO().getIdRol()));
+			//keyParametroPorContextoDTOMuestraTareasEnEjecucion.setValorContexto(Long.toString(usuario.getRolDTO().getIdRol()));
 			
-			log.debug(keyParametroPorContextoDTOMuestraTareasEnEjecucion);
+			//log.debug(keyParametroPorContextoDTOMuestraTareasEnEjecucion);
 			
 			List<InstanciaDeTareaDTO> instanciasDeTareasDTO = new ArrayList<InstanciaDeTareaDTO>();
 			//List<InstanciaDeTareaDTO> instanciasDeTareasDTOEnEjecucion = new ArrayList<InstanciaDeTareaDTO>();
@@ -397,7 +397,7 @@ public class BandejaDeEntradaControl {
 			UsuarioRolDTO usuarioRolDTO = new UsuarioRolDTO();
 			
 			usuarioRolDTO.setIdUsuario(usuario.getIdUsuario());
-			usuarioRolDTO.setIdRol(usuario.getIdRolUsuarioSeleccionado());
+			//usuarioRolDTO.setIdRol(usuario.getIdRolUsuarioSeleccionado());
 			usuarioRolDTO.setFueraDeOficina(checkBoxFueraDeOficina);
 			
 			usuarioRolService.actualizaFueraDeOficina(usuarioRolDTO);

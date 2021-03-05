@@ -2,7 +2,7 @@
  * 
  */
 
-function cargarRolesUsuario() {	
+/*function cargarRolesUsuario() {	
 	var idUsuario = $('#idUsuario').val();
 	console.log("idUsuario: ", idUsuario);	
 	$('#idRolUsuarioSeleccionado').empty();
@@ -44,17 +44,18 @@ function cargarRolesUsuario() {
             }            
 		}
 	}); 
-}
+}*/
 
 function enviarFormLogin() {
-	if ($( "#idRolUsuarioSeleccionado" ).val() == '' || $( "#idRolUsuarioSeleccionado" ).val() == undefined || $( "#idRolUsuarioSeleccionado" ).val() == null || $( "#idRolUsuarioSeleccionado" ).val() == "null") {
+	/*if ($( "#idRolUsuarioSeleccionado" ).val() == '' || $( "#idRolUsuarioSeleccionado" ).val() == undefined || $( "#idRolUsuarioSeleccionado" ).val() == null || $( "#idRolUsuarioSeleccionado" ).val() == "null") {
 		if ($('#idRolUsuarioSeleccionado').has('option').length <= 0) {
 			cargarRolesUsuario();	
 		}
 		$("#loginForm").validationEngine('validate');
 	} else {
 		$( "#loginForm" ).submit();
-	}
+	}*/
+	$( "#loginForm" ).submit();
 }
 
 $( document ).ready(

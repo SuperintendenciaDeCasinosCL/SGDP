@@ -16,6 +16,8 @@ public class FinalizaProcesoDTO implements Serializable {
 	private boolean recarga;
 	private String respuestaFinalizaProceso;
 	private boolean cierra;
+	private short horasOcupadas;
+	private short minutosOcupados;
 	
 	public long getIdInstanciaDeTarea() {
 		return idInstanciaDeTarea;
@@ -76,6 +78,18 @@ public class FinalizaProcesoDTO implements Serializable {
 	}
 	public void setCierra(boolean cierra) {
 		this.cierra = cierra;
+	}	
+	public short getHorasOcupadas() {
+		return horasOcupadas;
+	}
+	public void setHorasOcupadas(short horasOcupadas) {
+		this.horasOcupadas = horasOcupadas;
+	}
+	public short getMinutosOcupados() {
+		return minutosOcupados;
+	}
+	public void setMinutosOcupados(short minutosOcupados) {
+		this.minutosOcupados = minutosOcupados;
 	}
 	@Override
 	public String toString() {
@@ -89,6 +103,8 @@ public class FinalizaProcesoDTO implements Serializable {
 				+ ", recarga=" + recarga 
 				+ ", respuestaFinalizaProceso=" + respuestaFinalizaProceso
 				+ ", cierra=" + cierra
+				+ ", horasOcupadas=" + horasOcupadas
+				+ ", minutosOcupados=" + minutosOcupados
 				+ "]";
 	}	
 }

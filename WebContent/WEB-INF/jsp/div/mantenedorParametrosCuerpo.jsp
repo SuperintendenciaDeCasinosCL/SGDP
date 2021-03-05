@@ -92,7 +92,7 @@ function borrarParametro(idParametro) {
 	        var urlCargaParametros = "${pageContext.request.contextPath}" + "/cargaParametros";
             bootbox.confirm({
                 title: "Borrar par&aacute;metro",
-                message: "Desea eliminar el par&aacute;metro",
+                message: "¿Desea eliminar el par&aacute;metro?",
                 buttons: {
                     confirm: {
                         label: '<span class="glyphicon glyphicon-ok-circle font-icon-3"></span>',

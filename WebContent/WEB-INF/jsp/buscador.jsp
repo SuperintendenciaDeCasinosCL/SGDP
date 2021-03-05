@@ -16,7 +16,7 @@
 	<head>
 	
 		<title>Busqueda</title>
-
+		
 		<c:import url="/WEB-INF/jsp/objetos/cabeceraImportacion.jsp"></c:import>
 	
 	</head>
@@ -44,7 +44,7 @@
 						</c:otherwise>						
 					</c:choose> 
 					
-					<div id="divBackHeaderBuscador" class="row" style="background-color: ${colorBackHeaderBuscador}; color: #fff;">
+					<div id="divBackHeaderBuscador" class="row div-area-trabajo-cab" style="background-color: ${colorBackHeaderBuscador}; color: #fff;">
 			    	
 			    		<div class="col-sm-1"></div>
 			    	
@@ -206,7 +206,7 @@
 		<c:import url="/WEB-INF/jsp/modals/historialDeTareas.jsp"></c:import>
 		
 		<!-- Modal Detalle Documento-->
-	
+		
 	    <c:import url="/WEB-INF/jsp/modals/detalleDeDocumento.jsp"></c:import>
 		
 	</body>

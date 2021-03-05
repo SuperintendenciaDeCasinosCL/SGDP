@@ -44,7 +44,6 @@ public class FirmaAvanzadaInterServiceImpl implements FirmaAvanzadaInterService 
 		String serviceRestURLFirmaAvanzada = parametroDTO.getValorParametroChar();		
 		
 		log.info("serviceRestURLFirmaAvanzada: " + serviceRestURLFirmaAvanzada);
-		//log.debug(firmaAvanzadaRequest.toString());
 	 
 	    try {
 	    	URL url = new URL(serviceRestURLFirmaAvanzada);
@@ -96,10 +95,11 @@ public class FirmaAvanzadaInterServiceImpl implements FirmaAvanzadaInterService 
             	log.error("sb.toString(): " + sb.toString());
             	Exception e = new Exception(sb.toString());
             	throw e;
-            }   	
+            }   			
 			
-			
-	    } catch (Exception e) {
+	    }  catch (SgdpException e) {
+			throw e;
+		} catch (Exception e) {
 	    	StringWriter sw = new StringWriter();
 			e.printStackTrace(new PrintWriter(sw));
 			String exceptionAsString = sw.toString();
@@ -165,6 +165,8 @@ public class FirmaAvanzadaInterServiceImpl implements FirmaAvanzadaInterService 
             	throw e;
             } 		
 			
+		} catch (SgdpException e) {
+			throw e;
 		} catch (Exception e) {
 	    	StringWriter sw = new StringWriter();
 			e.printStackTrace(new PrintWriter(sw));

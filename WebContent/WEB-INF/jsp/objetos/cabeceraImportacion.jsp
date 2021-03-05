@@ -20,8 +20,6 @@
 <input type="hidden" id="urlGetResultadoBusqueda" value="<c:url value='/getResultadoBusqueda' />" />
 <input type="hidden" id="urlGetInstanciasDeTarea" value="<c:url value='/getInstanciasDeTarea' />" />
 <input type="hidden" id="urlCrearExpediente" value="<c:url value='/crearExpediente' />" />
-<input type="hidden" id="urlSubirArchivo" value="<c:url value='/subirArchivo' />" />
-<input type="hidden" id="urlMueveProceso" value="<c:url value='/mueveProceso' />" />
 <input type="hidden" id="urlGetTareasEnEjecucion" value="<c:url value='/getTareasEnEjecucion' />" />
 <input type="hidden" id="urlGetTablaHistorialDeProcesoPorIdExpediente" value="<c:url value='/getTablaHistorialDeProcesoPorIdExpediente' />" />
 <input type="hidden" id="urlGetTablaDetalleDeExpedientePorIdExpediente" value="<c:url value='/getTablaDetalleDeExpedientePorIdExpediente' />" />
@@ -49,10 +47,13 @@
 <input type='hidden' id="urlGetHistoricoFirmaDocumentoFEAPorIdInstanciaDeTareaIdUsuario" value="<c:url value='/getHistoricoFirmaDocumentoFEAPorIdInstanciaDeTareaIdUsuario' />" />
 <input type='hidden' id="urlActualizaFueraDeOficina" value="<c:url value='/actualizaFueraDeOficina' />" />
 <input type='hidden' id="urlGetDetalleDeExpedienteEnDistribucion" value="<c:url value='/getDetalleDeExpedienteEnDistribucion' />" />
-<input type='hidden' id="urlGetHistorialDeCondicionesDeSatisfaccionPorIdInstanciaDeTarea" value="<c:url value='/getHistorialDeCondicionesDeSatisfaccionPorIdInstanciaDeTarea' />" />
+<input type='hidden' id="urlGetHistorialDeCondicionesDeSatisfaccionPorIdHistoricoDeInstDeTarea" value="<c:url value='/getHistorialDeCondicionesDeSatisfaccionPorIdHistoricoDeInstDeTarea' />" />
 <input type='hidden' id="urlBorrarRegistroDeListaDeDistribucion" value="<c:url value='/borrarRegistroDeListaDeDistribucion' />" />
 <input type='hidden' id="urlCargaListaDeDistribucion" value="<c:url value='/cargaListaDeDistribucion' />" />
 <input type='hidden' id="urlGetTiposDeDocumentosDTOPorNombreExpediente" value="<c:url value='/getTiposDeDocumentosDTOPorNombreExpediente' />" />
+<input type='hidden' id="urlGetHistorialDeCondicionesDeSatisfaccionPorIdExpediente" value="<c:url value='/getHistorialDeCondicionesDeSatisfaccionPorIdExpediente' />" />
+<input type='hidden' id="urlGetCondicionesDeSatisfaccionPorIdInstanciaDeTarea" value="<c:url value='/getCondicionesDeSatisfaccionPorIdInstanciaDeTarea' />" />
+<input type='hidden' id="urlGetCondDeSatisParaMostrarPorIdInstanciaDeTarea" value="<c:url value='/getCondDeSatisParaMostrarPorIdInstanciaDeTarea' />" />
 
 <select id="correosDeDistribucionHiden" class="hide">
 
@@ -276,26 +277,30 @@
 <script type="text/javascript" src='<c:url value="/js/plugins/moment/datetime-moment.js" />'></script>
 <script type="text/javascript" src='<c:url value="/js/plugins/moment/moment.js" />'></script>
 
-<script>
-      $(function(){
-             $( document ).ajaxError(function( event, jqxhr, settings, thrownError ) {
-                    console.log(event);
-                    console.log(jqxhr);
-                    console.log(settings);
-                    console.log(thrownError);
-                    $.get("${sessionURL}", function(haySession){
-                           if(haySession){
-                                 bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-displeased don_sshi\"></i><p style=\"margin-top: 15px;\">¡Vaya!, algo no ha salido como se esperaba, por favor intente nuevamente o contacte a soporte. </p> <p>"+thrownError+"</p></div>");
-                           }else{
-                                 bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acción y hemos caducado tu sesión por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
-                                               , function(){
-                                                     window.open('${raizURL}', '_blank');
-                                               }
-                                               );
-                           }
-                    });
-             });
-      });
+<link href='<c:url value="/css/duration-picker/duration-picker.min.css"/>' rel="stylesheet">
+<script src='<c:url value="/js/plugins/duration-picker/duration-picker.min.js"/>'></script>
+
+
+<script>	
+     $(function(){
+            $( document ).ajaxError(function( event, jqxhr, settings, thrownError ) {
+                   console.log(event);
+                   console.log(jqxhr);
+                   console.log(settings);
+                   console.log(thrownError);
+                   $.get("${sessionURL}", function(haySession){
+                          if(haySession){
+                                bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-displeased don_sshi\"></i><p style=\"margin-top: 15px;\">¡Vaya!, algo no ha salido como se esperaba, por favor intente nuevamente o contacte a soporte. </p> <p>"+thrownError+"</p></div>");
+                          }else{
+                                bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acción y hemos caducado tu sesión por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+                                              , function(){
+                                                    window.open('${raizURL}', '_blank');
+                                              }
+                                              );
+                          }
+                   });
+            });
+     });     
 </script>
 
  <style>
@@ -355,4 +360,10 @@
 
 <!-- Solicitudes de creacion de expediente finalizadas-->
 
-<c:import url="/WEB-INF/jsp/modals/solicitudesDeCreacionDeExpedientesFinalizadas.jsp"></c:import>		
+<c:import url="/WEB-INF/jsp/modals/solicitudesDeCreacionDeExpedientesFinalizadas.jsp"></c:import>	
+
+<!-- Condiciones de satisfaccion-->
+
+<c:import url="/WEB-INF/jsp/modals/condDeSatisfaccion.jsp"></c:import>	
+
+<c:import url="/WEB-INF/jsp/modals/condDeSatisfaccionParaMostrar.jsp"></c:import>

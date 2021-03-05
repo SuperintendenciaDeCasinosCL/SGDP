@@ -175,4 +175,6 @@ public class Constantes {
 	public static final String CSS_INFO = "cssInfo";
 	public static final String CSS_SUCESS = "cssSucess";
 	
+	public static final long DIFERENCIA_MILISEGUNDOS_INICIAL_ERROR_ID_ARCHIVO_VALIDADOR = 60000l;
+	
 }

@@ -17,6 +17,8 @@ public class NoCacheFilter implements Filter {
 	
 	private static final Logger log = Logger.getLogger(NoCacheFilter.class);
 
+	private String excludePatterns;
+	
 	private FilterConfig filterConfig;
 	
     public FilterConfig getFilterConfig() {
@@ -35,7 +37,18 @@ public class NoCacheFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
+		
 		try {
+			
+			excludePatterns = filterConfig.getInitParameter("excludePatterns");
+			
+			/*String url = ((HttpServletRequest) request).getRequestURL().toString();
+			
+			if (!url.contains(excludePatterns)) {
+				
+			}*/
+			
+			
 			if (response instanceof HttpServletResponse) {
 				HttpServletResponse httpresponse = (HttpServletResponse)response ;
 				// Set the Cache-Control and Expires header

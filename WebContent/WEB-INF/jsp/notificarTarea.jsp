@@ -38,7 +38,7 @@
 						</c:otherwise>						
 					</c:choose> 
 					
-					<div id="divBackHeaderBuscador" class="row" style="background-color: ${colorBackHeaderBuscador}; color: #fff;">
+					<div id="divBackHeaderBuscador" class="row div-area-trabajo-cab" style="background-color: ${colorBackHeaderBuscador}; color: #fff;">
 			    	
 			    		<div class="col-sm-1"></div>
 			    	
@@ -51,9 +51,9 @@
 		      		<hr>
 			    
    					<div class="col-sm-12" id="notificarTareaCuerpo">
-				
+						
 						<c:import url="/WEB-INF/jsp/div/notificarTareaCuerpo.jsp"></c:import>
-				
+						
 					</div>  
 			    
 			    

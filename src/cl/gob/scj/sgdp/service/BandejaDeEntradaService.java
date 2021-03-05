@@ -2,7 +2,6 @@ package cl.gob.scj.sgdp.service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -13,7 +12,6 @@ import cl.gob.scj.sgdp.dto.EstadoDeProcesoDTO;
 import cl.gob.scj.sgdp.dto.FiltroExpedienteDTO;
 import cl.gob.scj.sgdp.dto.InstanciaDeTareaDTO;
 import cl.gob.scj.sgdp.dto.MacroProcesoDTO;
-import cl.gob.scj.sgdp.dto.ParametroDeTareaDTO;
 import cl.gob.scj.sgdp.dto.RespuestaMailDTO;
 import cl.gob.scj.sgdp.dto.SuggestionsDTO;
 import cl.gob.scj.sgdp.dto.TareaDTO;
@@ -58,18 +56,10 @@ public interface BandejaDeEntradaService {
 	
 	List<TareaDTO> getTareasPorIdProceso(long idProceso);
 	
-	List<TareaDTO> getTareasPorCodigoProceso(String codigoProceso);
-	
-	List<ParametroDeTareaDTO> getParametrosDeTareaDTOPorIdTarea(long idTarea);
-	
-	List<ParametroDeTareaDTO> getParametrosDeTareaPorIdInstanciaDeTarea(long idInstanciaDeTarea);
-	
-	//Map<String, String> getParametrosDeTareaMapPorIdInstanciaDeTarea(long idInstanciaDeTarea);	
-	
-	//Map<String, List<Map<String, String>>> getParametrosDeTareaMapTituloPorIdInstanciaDeTarea(long idInstanciaDeTarea);
+	List<TareaDTO> getTareasPorCodigoProceso(String codigoProceso);	
 	
 	List<TipoDeDocumentoDTO> getTodosLosTiposDeDocumentosPorIdTarea(long idTarea);
 	
-	Map<String, List<ParametroDeTareaDTO>> getMapParametrosDeTareaDTOTituloPorIdInstanciaDeTarea(long idInstanciaDeTarea);
+	List<InstanciaDeTareaDTO> getTodasInstanciasDeTareasEnEjecucionPorIdUnidades(Usuario usuario, List<InstanciaDeTareaDTO> instanciasDeTareasDTOEnEjecucion) throws IOException;
 
 }

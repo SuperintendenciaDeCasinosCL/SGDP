@@ -163,7 +163,6 @@ var inicializaFileUploadAdjuntarAntecedenteEtapaModal = function(){
         	$("#anadirAntecedenteTodaEtapaModal").on("hidden.bs.modal", function () {
         		flagRestablecerDocumentoFijo = 0;
         		contador = 0;
-        		console.log("entro");
         	});
 
 
@@ -328,7 +327,7 @@ var inicializaFileUploadAdjuntarAntecedenteEtapaModal = function(){
 		    }
 
 	    	bootbox.confirm({
-	    	    message: "Est&aacute; seguro que desea Guardar?",
+	    	    message: "¿Est&aacute; seguro que desea Guardar?",
 	    	    buttons: {
 	    	        confirm: {
 	    	            label: 'Si',

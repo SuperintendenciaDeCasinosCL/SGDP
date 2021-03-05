@@ -2,7 +2,9 @@ package cl.gob.scj.sgdp.control.ws.rest;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Properties;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
@@ -36,6 +38,9 @@ public class AsignacionNumeroDocRestControl {
 
 	@Autowired
 	RegistroDocumentoService registroDocumentoService;
+	
+	@Resource(name = "configProps")
+	private Properties configProps;
 
 	@RequestMapping(value = "GuardarAsignacionDocumento", method = RequestMethod.POST, produces = "application/json")
 	public @ResponseBody RespuestaAsignacionesNumerosDocDto guardarAsignacionDocumento(
@@ -108,6 +113,12 @@ public class AsignacionNumeroDocRestControl {
 		GeneraRegistroDocumentoResponseRest generaRegistroDocumentoResponseRest;
 		try {
 			log.info(generaRegistroDocumentoRequestRest.toString());
+			if (generaRegistroDocumentoRequestRest.getPass() == null || !generaRegistroDocumentoRequestRest.getPass().equals(configProps.getProperty("passRegistroDoc"))) {
+				generaRegistroDocumentoResponseRest = new GeneraRegistroDocumentoResponseRest();
+				generaRegistroDocumentoResponseRest.setEstado("1");
+				generaRegistroDocumentoResponseRest.setGlosa("ERROR - " + configProps.getProperty("passwordErronea")); 
+				return generaRegistroDocumentoResponseRest;
+			}
 		    Usuario usuario = new Usuario();
 		    usuario.setIdUsuario(generaRegistroDocumentoRequestRest.getUsuario());
 			generaRegistroDocumentoResponseRest = registroDocumentoService.generaRegistroDocumento(generaRegistroDocumentoRequestRest, usuario);

@@ -38,36 +38,7 @@ public class RequestLoggingInterceptor implements ClientHttpRequestInterceptor {
 				}							
 			}			
 		}
-		traceResponse(request, response);
-
-			/*if (!request.getURI().toString().contains("login.json?u=")) {
-			log.info(MessageFormat.format("request URI: {0}, request headers: {1}, response headers: {2}",
-
-					request.getURI(),
-		            request.getHeaders(),	          
-		            response.getHeaders()
-		            ));*/
-			/*log.info("===========================request begin================================================");
-	        log.info("URI         : " + request.getURI());
-	        log.info("Method      : " + request.getMethod());
-	        log.info("Headers     : " + request.getHeaders() );
-	        log.info("===========================request end==================================================");*/
-		/*} else if (request.getURI().toString().contains("login.json?u=")) {
-			String getUri = request.getURI().toString().substring(0, request.getURI().toString().indexOf("&pw="));
-			log.info("===========================request begin================================================");
-	        log.info("URI         : " + getUri);
-	        log.info("Method      : " + request.getMethod());
-	        log.info("Headers     : " + request.getHeaders() );
-	        log.info("Request body: " + new String(body, "UTF-8"));
-	        log.info("===========================request end==================================================");*/
-			/*log.info(MessageFormat.format("request URI: {0}, request headers: {1}, response headers: {2}, response body: {3}",
-					getUri,
-		            request.getHeaders(),	          
-		            response.getHeaders(),
-		            response.getBody()
-
-		            ));
-		}*/
+		traceResponse(request, response);			
 
         return response;
 	        
@@ -81,12 +52,6 @@ public class RequestLoggingInterceptor implements ClientHttpRequestInterceptor {
 		this.alfTicketCookie = alfTicketCookie;
 	}
 	
-	
-	//http://172.16.10.73:8080/alfresco/s/scj/subirArchivo
-	//http://172.16.10.73:8080/alfresco/service/api/node/content/workspace/SpacesStore/{id_archivo}/?alf_ticket={alf_ticket}
-	//http://172.16.160.221:8080/alfresco/service/api/login/ticket/{ticket_valida}?alf_ticket={alf_ticket}
-	///alfresco/s/scj/buscar
-	///alfresco/s/buscarRegistrosPaginados
 	
 	private void traceRequest(HttpRequest request, byte[] body) throws IOException {
 		if (request.getURI().toString().contains("/alfresco/service/api/login/ticket/")) {
@@ -102,7 +67,8 @@ public class RequestLoggingInterceptor implements ClientHttpRequestInterceptor {
         log.info(MessageFormat.format("URI         : {0}", getUri));
         log.info(MessageFormat.format("Method      : {0}", request.getMethod()));
         log.info(MessageFormat.format("Headers     : {0}", request.getHeaders()));
-        if (!request.getURI().toString().contains("/alfresco/s/scj/subirArchivo")) {
+        if (!request.getURI().toString().contains("/alfresco/s/scj/subirArchivo") &&
+        		!request.getURI().toString().contains("/Convert")) {
         	log.info(MessageFormat.format("Request body: {0}", new String(body, "UTF-8")));
         }        
         log.info("==========================request end==============================================");
@@ -120,7 +86,9 @@ public class RequestLoggingInterceptor implements ClientHttpRequestInterceptor {
         	&& 
         	!request.getURI().toString().contains("/alfresco/s/scj/buscar")
         	&& 
-        	!request.getURI().toString().contains("/alfresco/s/buscarRegistrosPaginados")) {
+        	!request.getURI().toString().contains("/alfresco/s/buscarRegistrosPaginados")
+        	&& 
+        	!request.getURI().toString().contains("/Convert")) {
         	StringBuilder inputStringBuilder = new StringBuilder();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(response.getBody(), "UTF-8"));
             String line = bufferedReader.readLine();

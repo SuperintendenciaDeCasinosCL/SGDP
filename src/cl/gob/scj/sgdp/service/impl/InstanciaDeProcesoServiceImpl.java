@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import cl.gob.scj.sgdp.auth.user.Usuario;
 import cl.gob.scj.sgdp.dao.HistoricoDeInstDeTareaDao;
 import cl.gob.scj.sgdp.dao.InstanciaDeProcesoDao;
+import cl.gob.scj.sgdp.dao.ParametroRelacionTareaDao;
 import cl.gob.scj.sgdp.dao.SeguimientoIntanciaProcesoDao;
 import cl.gob.scj.sgdp.dto.ElementoResultadoBusquedaDTO;
 import cl.gob.scj.sgdp.dto.EtapaDeInstanciaDeProcesoDTO;
@@ -30,6 +31,7 @@ import cl.gob.scj.sgdp.model.HistorialProceso;
 import cl.gob.scj.sgdp.model.HistoricoDeInstDeTarea;
 import cl.gob.scj.sgdp.model.HistoricoSeguimientoIntanciaProceso;
 import cl.gob.scj.sgdp.model.InstanciaDeProceso;
+import cl.gob.scj.sgdp.model.ParametroRelacionTarea;
 import cl.gob.scj.sgdp.model.SeguimientoIntanciaProceso;
 import cl.gob.scj.sgdp.model.SeguimientoIntanciaProcesoPK;
 import cl.gob.scj.sgdp.model.SolicitudCreacionExp;
@@ -50,6 +52,9 @@ public class InstanciaDeProcesoServiceImpl implements InstanciaDeProcesoService 
 	
 	@Autowired
 	private SeguimientoIntanciaProcesoDao seguimientoIntanciaProcesoDao;
+	
+	@Autowired
+	private ParametroRelacionTareaDao parametroRelacionTareaDao;
 	
 	@Override
 	public List<HistorialProcesoDTO> getHistorialDelProceso(String idExpediente) {
@@ -73,18 +78,12 @@ public class InstanciaDeProcesoServiceImpl implements InstanciaDeProcesoService 
 			EtapaDeInstanciaDeProcesoDTO etapaDeInstanciaDeProcesoDTO = new EtapaDeInstanciaDeProcesoDTO();
 			BeanUtils.copyProperties(etapaDeInstanciaDeProceso, etapaDeInstanciaDeProcesoDTO);			
 			agregaEtapaDeInstanciaDeProcesoDTO(etapaDeInstanciaDeProcesoDTO, etapasDeInstanciaDeProcesoDTO);
-		}
-		/*for (EtapaDeInstanciaDeProceso etapaDeInstanciaDeProceso : etapasDeInstanciaDeProceso) {
-			EtapaDeInstanciaDeProcesoDTO etapaDeInstanciaDeProcesoDTO = new EtapaDeInstanciaDeProcesoDTO();
-			BeanUtils.copyProperties(etapaDeInstanciaDeProceso, etapaDeInstanciaDeProcesoDTO);			
-			agregaEtapaDeInstanciaDeProcesoDTO(etapaDeInstanciaDeProcesoDTO, etapasDeInstanciaDeProcesoDTO);
-		}*/		
+		}		
 		return etapasDeInstanciaDeProcesoDTO;
 	}
 	
 	private void agregaEtapaDeInstanciaDeProcesoDTO(EtapaDeInstanciaDeProcesoDTO etapaDeInstanciaDeProcesoDTO, 
 			List<EtapaDeInstanciaDeProcesoDTO> etapasDeInstanciaDeProcesoDTO) {		
-		//Iterator<EtapaDeInstanciaDeProcesoDTO> it = etapasDeInstanciaDeProcesoDTO.iterator();
 		ListIterator<EtapaDeInstanciaDeProcesoDTO> it = etapasDeInstanciaDeProcesoDTO.listIterator();
 		boolean agrega = true;
 		if(it.hasNext() == false) {
@@ -95,10 +94,8 @@ public class InstanciaDeProcesoServiceImpl implements InstanciaDeProcesoService 
 				EtapaDeInstanciaDeProcesoDTO etapaDeInstanciaDeProcesoDTOF = (EtapaDeInstanciaDeProcesoDTO) it.next();
 				if (etapaDeInstanciaDeProcesoDTO.getNombreEtapa().equals(etapaDeInstanciaDeProcesoDTOF.getNombreEtapa())
 						&& etapaDeInstanciaDeProcesoDTO.getCodigoEstadoDeTarea() == 2){
-					//etapasDeInstanciaDeProcesoDTO.remove(etapaDeInstanciaDeProcesoDTOF);
 					it.remove();
 					it.add(etapaDeInstanciaDeProcesoDTO);
-					//etapasDeInstanciaDeProcesoDTO.add(etapaDeInstanciaDeProcesoDTO);
 					agrega = false;
 					log.debug("Removio y agrego");
 				} else if (etapaDeInstanciaDeProcesoDTO.getNombreEtapa().equals(etapaDeInstanciaDeProcesoDTOF.getNombreEtapa())
@@ -135,11 +132,16 @@ public class InstanciaDeProcesoServiceImpl implements InstanciaDeProcesoService 
 	public void cargaInstanciaDeProcesoDTOPorIdExpediente(String idExpediente, InstanciaDeProcesoDTO instanciaDeProcesoDTO){
 		InstanciaDeProceso instanciaDeProceso = instanciaDeProcesoDao.getInstanciaDeProcesoPorIdExpediente(idExpediente);	
 		SolicitudCreacionExp solicitudCreacionExp = instanciaDeProceso.getSolicitudCreacionExp();
+		instanciaDeProcesoDTO.setIdProceso(instanciaDeProceso.getProceso().getIdProceso());
+		List<ParametroRelacionTarea> parametrosRelacionTarea = parametroRelacionTareaDao.getParamTareaPorIdProc(instanciaDeProcesoDTO.getIdProceso());
+		if (parametrosRelacionTarea!=null && parametrosRelacionTarea.size()>0) {
+			instanciaDeProcesoDTO.setTieneParametroPorTarea(true);
+		}
 		if (solicitudCreacionExp!=null && solicitudCreacionExp.getComentario()!=null && !solicitudCreacionExp.getComentario().isEmpty()) {
 			instanciaDeProcesoDTO.setComentarioSolicitudCreacionExpediente(solicitudCreacionExp.getComentario());
 		}
 		instanciaDeProcesoDTO.setNombreDeProceso(instanciaDeProceso.getProceso().getNombreProceso());
-		BeanUtils.copyProperties(instanciaDeProceso, instanciaDeProcesoDTO);
+		BeanUtils.copyProperties(instanciaDeProceso, instanciaDeProcesoDTO);		
 		instanciaDeProcesoDTO.setDiasHabilesMaxDuracion(instanciaDeProceso.getProceso().getDiasHabilesMaxDuracion());		
 	}
 	

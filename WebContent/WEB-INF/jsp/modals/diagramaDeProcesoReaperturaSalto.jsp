@@ -467,7 +467,7 @@
 </head>
 <body>
 	<div class="col-sm-12" id="divDiagramaDeProcesoReaperturaSalto">
-		<c:import url="${urlDiagramaSubProceso}"></c:import>
+		<c:import url="${urlDiagramaSubProceso}"></c:import>  
 	</div>
 	
 	<!-- Reabre Instancia de SubProceso  -->

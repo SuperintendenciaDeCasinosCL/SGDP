@@ -21,7 +21,9 @@
 	
 		<title>Bandeja de entrada</title>
 
+		
 		<c:import url="/WEB-INF/jsp/objetos/cabeceraImportacion.jsp"></c:import>
+		
 	
 	</head>
 
@@ -31,8 +33,10 @@
 		
 			<div class="row content">
 			
-			    <div class="col-sm-2 sidenav">		      
-			      <c:import url="/WEB-INF/jsp/objetos/menu.jsp"></c:import>		      
+			    <div class="col-sm-2 sidenav">
+			    			      
+			      	<c:import url="/WEB-INF/jsp/objetos/menu.jsp"></c:import>
+			      			      
 			    </div>	
 			    	
 		    	<div class="col-sm-10">
@@ -60,11 +64,9 @@
 						</c:otherwise>						
 					</c:choose>
 					
-					<div id="divBackHeaderAreaDeTrabajo" class="row" style="background-color: ${colorBackHeaderAreaDeTrabajo}; color: #fff;">
+					<div id="divBackHeaderAreaDeTrabajo" class="row div-area-trabajo-cab" style="background-color: ${colorBackHeaderAreaDeTrabajo}; color: #fff;">			    		
 			    	
-			    		<div class="col-sm-1"></div>
-			    	
-			    		<div class="col-sm-9"><h2 id="h2MensajeAreaDeTrabajo">${mensajeAreaDeTrabajo}</h2></div>		
+			    		<div class="col-sm-10"><h2 id="h2MensajeAreaDeTrabajo">${mensajeAreaDeTrabajo}</h2></div>		
 			    		
 			    		<div class="col-sm-2"><c:import url="/WEB-INF/jsp/objetos/menuAyuda.jsp"></c:import></div>  
 			    	
@@ -103,8 +105,10 @@
 			            			<%-- <div class="col-sm-1"></div>--%>	            			
 							
 									<div class="col-sm-12" id="mensajeria">
-								
+									
+																		
 										<c:import url="/WEB-INF/jsp/div/mensajeria.jsp"></c:import>
+										
 								
 									</div>                   	
 			                   
@@ -256,7 +260,11 @@
 							   	<br>
 
 						   	<div class="row">
-						   		<div class="col-sm-12" id="tareasBandejaDeEntrada"><c:import url="/WEB-INF/jsp/div/tareasBandejaDeEntrada.jsp"></c:import></div>											
+						   		<div class="col-sm-12" id="tareasBandejaDeEntrada">
+						   			
+						   			<c:import url="/WEB-INF/jsp/div/tareasBandejaDeEntrada.jsp"></c:import>
+						   	
+						   		</div>											
 							</div>							
 							
 							<br><br> 
@@ -579,46 +587,35 @@
 			
 		</div>
 		
-		
-		<!-- Modal Continuar Proceso  -->
-		
-		<c:import url="/WEB-INF/jsp/modals/continuarProceso.jsp"></c:import>
-		
+		<!-- Modal Continuar Proceso  -->				
+		<c:import url="/WEB-INF/jsp/modals/continuarProceso.jsp"></c:import>	
 		<!-- Modal Subir Documento-->
 		
-		<c:import url="/WEB-INF/jsp/modals/subirDocumento.jsp"></c:import>		
-	
+		<c:import url="/WEB-INF/jsp/modals/subirDocumento.jsp"></c:import>
 		<!-- Modal Subir Adjunto  -->
 		
 		<c:import url="/WEB-INF/jsp/modals/subirAdjunto.jsp"></c:import>
-		
 		<!-- Modal Subir Documento Requerido  -->
-						
+					
 		<c:import url="/WEB-INF/jsp/modals/subirDocumentoRequerido.jsp"></c:import>
-		
 		<!-- Modal Subir Documento Adicional  -->
 				
 		<c:import url="/WEB-INF/jsp/modals/subirDocumentoAdicional.jsp"></c:import>
 		
 		<!-- Firma Avanzada-->
-		
 		<c:import url="/WEB-INF/jsp/modals/firmaAvanzada.jsp"></c:import>
 		
 		<!-- Dibujo de Proceso-->
-		
 		<c:import url="/WEB-INF/jsp/modals/dibujoDeProceso.jsp"></c:import>
 		
-			<!-- Dibujo de Proceso-->
-		
+		<!-- Dibujo de Proceso-->
 		<c:import url="/WEB-INF/jsp/modals/adjuntarAnteTodaEtapa.jsp"></c:import>
 		
 		<!-- Modal Detalle Documento-->
-	
 		<c:import url="/WEB-INF/jsp/modals/detalleDeDocumento.jsp"></c:import>
 		
 		<!-- Correo de Distribucion-->
-	
-		<c:import url="/WEB-INF/jsp/modals/correoDeDistribucion.jsp"></c:import>		
+		<c:import url="/WEB-INF/jsp/modals/correoDeDistribucion.jsp"></c:import>
 		
 		
 	</body>

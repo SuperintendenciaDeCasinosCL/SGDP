@@ -23,8 +23,22 @@
 	        <value> classpath:/cl/gob/scj/sgdp/config/excelViewResolver.xml</value>	        	     
 	   </property>
 	   <property name="order" value="0" />
-	</bean>    
-	    
+	</bean>	
+
+	<!-- Configuracion para SSO DesComentar -->
+	<!--<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<mvc:exclude-mapping path="/verificarSession" />
+			<mvc:exclude-mapping path="/serviciosDoc/**" />
+			<mvc:exclude-mapping path="/servicios/**" />
+			<mvc:exclude-mapping path="/mantenimiento/**" />
+			<mvc:exclude-mapping path="/lib2/*" />
+	    	<bean class="cl.gob.scj.sgdp.interceptor.UserDataHandlerInterceptor"></bean>
+    	</mvc:interceptor>
+    </mvc:interceptors>	   
+    -->
+	<!-- Configuracion para SSO DesComentar--> 
 	    
 	<mvc:annotation-driven></mvc:annotation-driven>
 	<mvc:resources location="/WEB-INF/" mapping="/**" />

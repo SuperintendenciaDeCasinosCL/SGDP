@@ -130,5 +130,12 @@ public class HistoricoDeInstDeTareaDaoImpl implements HistoricoDeInstDeTareaDao 
 		query.setLong("idInstanciaDeTareaDestino", idInstanciaDeTareaDestino);	
 		return query.list();
 	}
+
+	@Override
+	public List<HistoricoDeInstDeTarea> getEjecutacionesInstanciaDeTarea(long idInstanciaDeTarea) {
+		Query query = getSession().getNamedQuery("HistoricoDeInstDeTarea.getEjecutacionesInstanciaDeTarea");		
+		query.setLong("idInstanciaDeTarea", idInstanciaDeTarea);
+		return query.list();
+	}
 	
 }

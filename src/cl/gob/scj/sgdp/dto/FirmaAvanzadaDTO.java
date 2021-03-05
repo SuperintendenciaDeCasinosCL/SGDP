@@ -25,6 +25,7 @@ public class FirmaAvanzadaDTO implements Serializable {
 	private long idTipoDeDocumento;
 	private String tipoDeFirma;
 	private String nombreExpediente;
+	private String categoriaDeDocumento;
 	
 	public String getIdExpediente() {
 		return idExpediente;
@@ -152,6 +153,12 @@ public class FirmaAvanzadaDTO implements Serializable {
 	}
 	public void setNombreExpediente(String nombreExpediente) {
 		this.nombreExpediente = nombreExpediente;
+	}	
+	public String getCategoriaDeDocumento() {
+		return categoriaDeDocumento;
+	}
+	public void setCategoriaDeDocumento(String categoriaDeDocumento) {
+		this.categoriaDeDocumento = categoriaDeDocumento;
 	}
 	@Override
 	public String toString() {

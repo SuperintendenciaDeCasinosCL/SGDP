@@ -2,6 +2,7 @@ package cl.gob.scj.sgdp.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,13 +67,17 @@ public class ProcesoServiceImpl implements ProcesoService {
 			return getBuscarTodosProcesosPorVigencia(vigente);
 		} else {
 			List<ProcesoDTO> listaProcesoDto = new ArrayList<ProcesoDTO>();
-			log.debug("Buscando Procesos por id unidad: " + usuario.getUnidadDTO().getIdUnidad() );
-			List<Proceso> procesos = procesoDao.getProcesosPorIdUnidadYVigencia(usuario.getUnidadDTO().getIdUnidad(), vigente);
-			for (Proceso proceso : procesos) {
-				ProcesoDTO procesoDTO = new ProcesoDTO(proceso.getIdProceso(), proceso.getDescripcionProceso(), proceso.getNombreProceso(), proceso.getVigente(), 
-						proceso.getDiasHabilesMaxDuracion(),proceso.getMacroProceso().getNombreMacroProceso(), proceso.getCodigoProceso());
-				listaProcesoDto.add(procesoDTO);
-			}
+			//log.debug("Buscando Procesos por id unidad: " + usuario.getUnidadDTO().getIdUnidad() );
+			//List<Proceso> procesos = procesoDao.getProcesosPorIdUnidadYVigencia(usuario.getUnidadDTO().getIdUnidad(), vigente);
+			Set<Long> idUnidades = usuario.getIdUnidades();
+			for (Long idUnidad : idUnidades) {
+				List<Proceso> procesos = procesoDao.getProcesosPorIdUnidadYVigencia(idUnidad, vigente);
+				for (Proceso proceso : procesos) {
+					ProcesoDTO procesoDTO = new ProcesoDTO(proceso.getIdProceso(), proceso.getDescripcionProceso(), proceso.getNombreProceso(), proceso.getVigente(), 
+							proceso.getDiasHabilesMaxDuracion(),proceso.getMacroProceso().getNombreMacroProceso(), proceso.getCodigoProceso());
+					listaProcesoDto.add(procesoDTO);
+				}	
+			}	
 			return listaProcesoDto;
 		}			
 	}	

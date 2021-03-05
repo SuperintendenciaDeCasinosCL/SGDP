@@ -36,6 +36,7 @@
 						<th>Plazo Tarea</th>
 			        	<th>Plazo Total</th>
 			        	<th>Fecha Creaci&oacute;n Expediente</th>
+			        	<th>Materia</th>
 			        	<th>Acciones</th>
 			        	<%-- 
 				        	<c:if test = "${permisos[permisoReasignaTarea] eq permisoReasignaTarea}">
@@ -77,7 +78,8 @@
 					    		  <fmt:formatDate value="${instanciaDeTareaDTO.fechaInicioInstanciaDeProceso}" pattern="yyyy-MM-dd" /> 
 					    		</span>									
 								<fmt:formatDate pattern="${FORMATO_FECHA}" value="${instanciaDeTareaDTO.fechaInicioInstanciaDeProceso}" />
-							</td>							
+							</td>
+							<td class="view-message">${instanciaDeTareaDTO.instanciaDeProcesoDTO.asunto}</td>							
 							<td class="inbox-small-cells">							
 								<c:if test = "${permisos[permisoReasignaTarea] eq permisoReasignaTarea}">									
 									<a href="#" class="btn btn-success btn-sm" onclick="cargarDatosContinuarProcesoModal(${instanciaDeTareaDTO.idInstanciaDeTarea}, 
@@ -197,9 +199,9 @@
 	<%-- //////////////////////////////////////////////////////////  --%>	
 	
 	<%-- </div>--%>
-	
+	  
 	<c:import url="/WEB-INF/jsp/modals/usuariosAsignadosATarea.jsp"></c:import>	
-
+	
 <%-- </div>--%>
 
 <script>
@@ -301,6 +303,7 @@ function cerrarExpediente (idInstanciaDeProceso, nombreDeProceso) {
 	});
 }
 
+
 function formatTablaTareasEnEjecucion() {
 
 	var tablaTareasEnEjecucion = $('#tablaTareasEnEjecucion')
@@ -310,12 +313,20 @@ function formatTablaTareasEnEjecucion() {
 					extend : 'excelHtml5',
 					filename : 'TareasEnEjecucion.*',
 					exportOptions : {
-						columns : ':visible'
+						//columns : ':visible'
+						columns: [ 0, 1, 2, 3, 4, 5, 6, 7 ]
 					}
 				}, 'colvis' ],
 
 				"language" : languajeDataTableTareasEnEjecucion,
-				"pageLength": 8
+				"pageLength": 8,
+				
+				"columnDefs": [
+ 		             {
+ 		                 "targets": [ 7 ],
+ 		                 "visible": false				                       		                
+ 		             }
+ 		         ]
 				
 			});
 

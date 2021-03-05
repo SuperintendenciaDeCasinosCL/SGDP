@@ -38,7 +38,7 @@
 						</c:otherwise>						
 					</c:choose> 
 					
-					<div id="divBackHeaderMantenedorParametros" class="row" style="background-color: ${colorBackHeaderMantenedorParametros}; color: #fff;">
+					<div id="divBackHeaderMantenedorParametros" class="row div-area-trabajo-cab" style="background-color: ${colorBackHeaderMantenedorParametros}; color: #fff;">
 			    	
 			    		<div class="col-sm-1"></div>
 			    	
@@ -51,7 +51,9 @@
 		      		<hr>
 			    
    					<div class="col-sm-12" id="mantenedorParametrosCuerpo">
-				    	<c:import url="/WEB-INF/jsp/div/mantenedorParametrosCuerpo.jsp"></c:import>   	 		
+   						
+				    	<c:import url="/WEB-INF/jsp/div/mantenedorParametrosCuerpo.jsp"></c:import>
+				    	   	 		
 					</div>  
 			    
 			    

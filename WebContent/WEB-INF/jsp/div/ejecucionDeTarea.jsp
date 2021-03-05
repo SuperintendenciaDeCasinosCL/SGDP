@@ -8,6 +8,8 @@
 
 <c:set var="FORMATO_FECHA" value="<%=Constantes.FORMATO_FECHA_FORM%>" />
 
+<c:set var="requisitoStyle" value="" />
+
 <c:set var="tipoBifurcacionAND" value="<%=BifurcacionType.AND.getNombreTipoDeBifurcacion()%>"/>
 <c:set var="tipoBifurcacionOR" value="<%=BifurcacionType.OR.getNombreTipoDeBifurcacion()%>"/>
 
@@ -26,6 +28,7 @@
 
 <fmt:formatDate pattern="${FORMATO_FECHA}" value="${instanciaDeProcesoDTO.fechaVencimiento}" var="fechaPlazoInstProcesoFormat" />
 
+<input type="hidden" id="numeroDeIteracionDeLaInstanciaDeTarea" name="numeroDeIteracionDeLaInstanciaDeTarea" value="${numeroDeIteracionDeLaInstanciaDeTarea}" />
 	
 	<%--
 	<div class="col-sm-12">
@@ -209,23 +212,8 @@
 					</c:otherwise>			
 				</c:choose>
 			</div>			
-		</div>		
-			
-		<c:if test="${not empty instanciaDeTareaDTO.nombreTareaUltimaInstanciaDeTareaAnterior}">
-			<div class="row espacio-entre-row">
-				<div class="col-sm-12">
-					<font size="2"><strong>Condiciones de Satisfacci&oacute;n:</strong></font>
-					<button 
-			    				onclick="cargaCondicionesDeSatisfaccion('${instanciaDeTareaDTO.idUltimaInstanciaDeTareaAnterior}',
-			    				'${instanciaDeTareaDTO.nombreExpediente}',
-			    				'${instanciaDeTareaDTO.nombreTareaUltimaInstanciaDeTareaAnterior}')" 
-			    				type="button" title="Historial de Condiciones de Satisfacci&oacute;n" class="btn btn-primary btn-sm">
-									<span class="glyphicon glyphicon-eye-open"></span>
-								</button>
-				</div>
-			</div>
-		</c:if>
-						
+		</div>
+								
 		<br>
    	</div>   	
    	
@@ -276,7 +264,7 @@
 	 		</div>
  		</div>
    	
-   	</div>
+   	</div>   	
    	
    	<div class="col-sm-12">	
    	
@@ -327,6 +315,42 @@
    	
    	</div>
    	
+   	<div class="col-sm-12">	
+   	
+   		<c:if test="${instanciaDeProcesoDTO.tieneParametroPorTarea eq true}">
+			
+			<div class="row espacio-entre-row">
+				<div class="col-sm-6">
+					<button 
+			    				onclick="cargaHistorialDeCondicionesDeSatisfaccionPorIdExpediente('${instanciaDeTareaDTO.nombreExpediente}',
+			    				'${instanciaDeTareaDTO.idExpediente}')" 
+			    				type="button" title="Historial de Requisitos de Satisfacci&oacute;n y/o Salidas no Conformes" class="btn btn-info btn-block">
+									Historial de Requisitos de Satisfacci&oacute;n y/o Salidas no Conformes
+								</button>
+				</div>
+			</div>
+			
+			<c:if test="${tareaTieneParametros eq true }">
+			
+				<div class="row espacio-entre-row">
+					<div class="col-sm-6">
+						<button id="botonCargaCondicionesDeSatisfaccion"
+				    				onclick="cargaCondicionesDeSatisfaccion('${instanciaDeTareaDTO.idInstanciaDeTarea}'
+				    				, '${instanciaDeTareaDTO.nombreExpediente}'
+				    				, '${instanciaDeProcesoDTO.nombreDeProceso}')" 
+				    				type="button" title="Completar Requisitos de Satisfacci&oacute;n y/o Salidas no Conformes" class="btn btn-danger btn-block">
+										Completar Requisitos de Satisfacci&oacute;n y/o Salidas no Conformes
+									</button>
+					</div>
+				</div>
+			
+			</c:if>
+			
+			
+		</c:if>
+   	
+   	</div>
+   	
    	<div class="col-sm-12">	   	
    			
 		<div class="panel panel-primary">
@@ -347,15 +371,18 @@
   					
   					<div class="row"> 
   					 						
-  						<div class="col-sm-12" id="documentosDeSalidaDiv">  	
+  						<div class="col-sm-12" id="documentosDeSalidaDiv" data-idinstanciadetarea="${instanciaDeTareaDTO.idInstanciaDeTarea}">
+  							 	
   							<c:import url="/WEB-INF/jsp/div/documentosDeSalida.jsp"></c:import>
+  					
   						</div>
   					
   					</div>
  					
- 				</c:if>
- 				
-				<div class="row">
+ 				</c:if> 				
+ 						
+				<div class="row">					
+					
 					<div class="col-sm-12">	
 						<div class="pull-right">
 							<button type="button" title="An&#771;adir antecedente"
@@ -374,8 +401,8 @@
       			<label for="commentarioEjecucionTarea">Comentario:</label>
       			
   				<textarea class="form-control" rows="4" id="commentarioEjecucionTarea"></textarea> 
-  				
-  				<br>	
+
+  				<br> 							
   				
   				<div class="row">
 				
@@ -394,51 +421,18 @@
 					</div>
 				
 				</div>
-  				
-  				<br>	
-  				
-  				<div class="row">
 				
-					<div class="col-sm-12">
-						<c:if test="${not empty mapParametrosDeTareaDTOTitulo}"><h4>Condiciones de Satisfacci&oacute;n</h4></c:if>
+				<br>
+				
+				<div class="row"> 				
+ 					<div class="col-sm-12">
+						<label class="control-label">Tiempo dedicado:</label>
+						<input type="text" id="tiempoDedicado" name="tiempoDedicado">					
 					</div>
-				
-				</div>	
-				
-				<br>	
-				
-				<c:if test="${not empty mapParametrosDeTareaDTOTitulo}">
-				
-					<form name="parametrosForm" id="parametrosForm">
-				
-						<c:forEach items="${mapParametrosDeTareaDTOTitulo}" var="entry" varStatus="loop"> 					
-							<div class="row">					   
-							   	<div class="col-sm-12"><div class="col-sm-4"><strong>${entry.key}</strong></div><div class="col-sm-8"></div></div>							   	
-					   		</div>
-					   		
-					   		<br>
-					   		
-					   		<c:forEach items="${entry.value}" var="parametrosDeTareaDTOTitulo" varStatus="loopParametrosDeTareaDTOTitulo"> 
-					   		
-					   			<div class="row">					   
-							   		<div class="col-sm-12"><div class="col-sm-2">${parametrosDeTareaDTOTitulo.nombreParamTarea}</div>${parametrosDeTareaDTOTitulo.textoHtml}</div>							   	
-					   			</div>
-					   			
-					   			<div class="row">
-					   				&nbsp;
-					   			</div> 					   			
-					   		
-					   		</c:forEach>
-					   		
-					   		<div class="row">
-					   			&nbsp;
-					   		</div> 
-					   		<c:if test="${loop.last}"><br></c:if>
-						</c:forEach>
-					
-					</form>	
-				
-				</c:if>			
+
+ 				</div> 
+  				
+  				<br>
   				
   				<br>
   				
@@ -491,11 +485,39 @@
 							</c:if>
 									
 							<div class="col-sm-4">
-								<%--<input class="form-control" disabled type="text" class="form-control" id="${instanciasDeTareaDTOContinuanProceso.idInstanciaDeTarea}" value="${instanciasDeTareaDTOContinuanProceso.nombreDeTarea}" />--%>
-								<div class="well">${instanciasDeTareaDTOContinuanProceso.nombreDeTarea}</div>
+							
+								<c:if test = "${instanciasDeTareaDTOContinuanProceso.esRdsSnc eq true}">
+									<c:set var="requisitoStyle" value="subproceso-rds-snc" />
+								</c:if>
+															
+								<div class="well ${requisitoStyle}">
+								
+									<c:choose>
+										
+											<c:when test="${instanciasDeTareaDTOContinuanProceso.esRdsSnc eq true}">
+												${instanciasDeTareaDTOContinuanProceso.nombreDeTarea}&nbsp;&nbsp;
+												<button type="button" class="btn btn-warning"
+												onclick="cargaCondicionesDeSatisfaccionParaMostrar('${instanciasDeTareaDTOContinuanProceso.idInstanciaDeTarea}',
+				    																				'${instanciasDeTareaDTOContinuanProceso.nombreDeTarea}',
+				    																				'${instanciasDeTareaDTOContinuanProceso.nombreDeProceso}')" >
+													<spring:message code="tarea.esRDSNC"/>
+												</button>
+											</c:when>
+											
+											<c:otherwise>
+											
+												${instanciasDeTareaDTOContinuanProceso.nombreDeTarea}
+											
+											</c:otherwise>
+										
+									</c:choose>
+								
+								</div>
+								
+								<c:set var="requisitoStyle" value="" />
+								
 							</div>
-							<div class="col-sm-4">
-								<%--<input class="form-control" disabled type="text" class="form-control" id="rolSiguienteTarea${instanciasDeTareaDTOContinuanProceso.idInstanciaDeTarea}" value="${instanciasDeTareaDTOContinuanProceso.nombreRolQueEjecuta}" />--%>
+							<div class="col-sm-4">								
 								<div class="well">${instanciasDeTareaDTOContinuanProceso.nombreRolQueEjecuta}</div>
 							</div>
 							<c:choose>
@@ -628,13 +650,17 @@
 	</div>
 
 	<!-- Modal Subir Documento Adicional  -->
-				
+ 			
 	<c:import url="/WEB-INF/jsp/modals/subirDocumentoAdicional.jsp"></c:import>
-
+ 
+	
 	<c:url value="/verificarSession" var="sessionURL" />
 	<c:url value="/" var="raizURL" />
 	
 <script>
+
+var tareaTieneParametros = '${tareaTieneParametros}';
+
 var inicializaBotonNotificarInstanciaDeProceso = function (){
 	$("#botonNotificarInstanciaDeProceso").off('click').on('click', function () {
 	    var urlNotificarInstanciaDeProceso = "${urlNotificarInstanciaDeProceso}";
@@ -646,7 +672,7 @@ var inicializaBotonNotificarInstanciaDeProceso = function (){
               window.open(urlNotificarInstanciaDeProceso, "Notificar", 'width=750, height=720');
               console.log("Fin window.open");
           } else {
-                bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu última acción y hemos caducado tu sesión por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+                bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
                               , function(){
                                     window.open('${raizURL}', '_blank');
                               }
@@ -673,7 +699,7 @@ var inicializaBotonDevolverTarea = function(){
             console.log("haySession: " + haySession);
             if(!haySession) {
             	haySessionB = false;
-                bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu última acción y hemos caducado tu sesión por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+                bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
                     , function(){
                             window.open('${raizURL}', '_blank');                            
                     }
@@ -690,17 +716,33 @@ var inicializaBotonDevolverTarea = function(){
 			var comentario = $("#commentarioEjecucionTarea").val();
 			var idInstanciaDeTareaSeleccionada = $(this).attr("data-idinstanciadetarea");
 			var parametrosMapParaGuardarJSON = JSON.stringify($("#parametrosForm").serializeArray());
-			console.log('parametrosMapParaGuardarJSON: ' + parametrosMapParaGuardarJSON);	
-			console.log('comentario: ' + comentario);
-			console.log('idInstanciaDeTareaSeleccionada: ' + idInstanciaDeTareaSeleccionada);
+			var horasOcupadas = $("#duration-hours").val();
+			var minutosOcupados = $("#duration-minutes").val();	
+			if (horasOcupadas == "") {
+				horasOcupadas = 0;
+			}
+			if (minutosOcupados == "") {
+				minutosOcupados = 0;
+			}
+			if (horasOcupadas <= 0 && minutosOcupados <= 0) {
+				$("#duration-hours").validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');	
+				$("#duration-minutes").validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');
+				return;
+			}	
 			formData.append("comentario", comentario);
 			formData.append("idInstanciaDeTareaSeleccionada", idInstanciaDeTareaSeleccionada);
-			console.log('urlRetrocedeProceso: ' + urlRetrocedeProceso);
-			console.log('urlGetInstanciasDeTarea: ' + urlGetInstanciasDeTarea);
-			console.log('urlGetTareasEnEjecucion: ' + urlGetTareasEnEjecucion);				
+			formData.append("parametrosMapParaGuardarJSON", parametrosMapParaGuardarJSON);
+			formData.append("horasOcupadas", horasOcupadas);
+			formData.append("minutosOcupados", minutosOcupados);			
+			var mensajeConfirmacionRetrocederTarea = "";		    
+		    if (tareaTieneParametros == 'true') {
+		    	mensajeConfirmacionRetrocederTarea = "¿Desea retroceder la tarea?<br><br><div style='color:red'> Recuerde que esta tarea tiene requisitos de satisfacci&oacute;n y/o salidas no conformes que deben ser verificados</div>";	
+		    } else {
+		    	mensajeConfirmacionRetrocederTarea = "¿Desea retroceder la tarea?";		    	
+		    }			
 			bootbox.confirm({
 		    	title: "Retroceder tarea",
-		        message: "Desea retroceder la tarea?",
+		        message: mensajeConfirmacionRetrocederTarea,
 		        buttons: {
 		            confirm: {
 		                label: '<span class="glyphicon glyphicon-ok-circle font-icon-3"></span>',
@@ -735,17 +777,14 @@ var inicializaBotonDevolverTarea = function(){
 		            			console.log("DONE");
 		            		},
 		            		complete : function(returnData) {
-		            			console.log("COMPLETE -- retrocedeProceso: ", returnData.responseJSON );	            			           							
-		            			if (returnData.responseJSON.cssStatus == "alert alert-success") {		            					
-			            			//actualizaTareas("tareasBandejaDeEntrada", urlGetInstanciasDeTarea, true);	 
+		            			console.log("COMPLETE -- retrocedeProceso: ", returnData.responseJSON );
+		            			resetCondicioDeSatisFaccion();
+		            			if (returnData.responseJSON.cssStatus == "alert alert-success") {	
 		            				$.notify({
 		                     			message: returnData.responseJSON.resultadoRetrocedeProceso
 		                     		},{
 		                     			type: 'success'
-		                     		});	
-		            				/*$("#divTabsDetalleDeTarea").addClass('hide');
-		            				$("#contenedorBEPrincipal").find(".cargando").remove();	
-		            				$("html, body").animate({ scrollTop: 0 }, "slow");*/
+		                     		});
 		            				actualizaTareasConCallBack("tareasBandejaDeEntrada", urlGetInstanciasDeTarea, true, 
 				            				function() {
 				            					$("#divTabsDetalleDeTarea").addClass('hide');
@@ -758,11 +797,7 @@ var inicializaBotonDevolverTarea = function(){
 		                     		},{
 		                     			type: 'danger'
 		                     		});
-		            				if (returnData.responseJSON.recarga == true) {		                     			
-				            			/*actualizaTareas("tareasBandejaDeEntrada", urlGetInstanciasDeTarea, true);
-				            			$("#divTabsDetalleDeTarea").addClass('hide');
-				            			$("#contenedorBEPrincipal").find(".cargando").remove();	
-			            				$("html, body").animate({ scrollTop: 0 }, "slow");*/
+		            				if (returnData.responseJSON.recarga == true) {  
 		            					actualizaTareasConCallBack("tareasBandejaDeEntrada", urlGetInstanciasDeTarea, true, 
 					            				function() {
 					            					$("#divTabsDetalleDeTarea").addClass('hide');
@@ -782,6 +817,7 @@ var inicializaBotonDevolverTarea = function(){
 		}				
 	});
 };
+
 var inicializaBotonEnviarTarea = function(){
 	var urlMueveProceso = $("#urlMueveProceso").val();	
 	var urlGetInstanciasDeTarea = $("#urlGetInstanciasDeTarea").val();
@@ -792,7 +828,7 @@ var inicializaBotonEnviarTarea = function(){
             console.log("haySession: " + haySession);
             if(!haySession) {
             	haySessionB = false;
-                bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu última acción y hemos caducado tu sesión por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+                bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
                     , function(){
                             window.open('${raizURL}', '_blank');
                     }
@@ -837,7 +873,20 @@ var inicializaBotonEnviarTarea = function(){
 			var avanzaRetrocede= "avanzarProceso";
 			var idExpedienteContinuarProceso = $(this).attr("data-idexpediente");
 			var reasigna = false;				
-			var nombreExpediente = $(this).attr("data-nombreexpediente");						
+			var nombreExpediente = $(this).attr("data-nombreexpediente");			
+			var horasOcupadas = $("#duration-hours").val();
+			var minutosOcupados = $("#duration-minutes").val();
+			if (horasOcupadas == "") {
+				horasOcupadas = 0;
+			}
+			if (minutosOcupados == "") {
+				minutosOcupados = 0;
+			}
+			if (horasOcupadas <= 0 && minutosOcupados <= 0) {
+				$("#duration-hours").validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');	
+				$("#duration-minutes").validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');
+				return;
+			}
 		    $(".asignaciones-tareas").each(function (colIndex, c) {		    	
 		    	if ( (cantidadDeOption==0) || ( cantidadDeOption>0 && $(this).find(".div-radio-tarea input:radio:checked").val() == "on" ) )  {
 		    		if ($(this).find(".usuarios-asignados option:selected").text() != "") {
@@ -850,7 +899,7 @@ var inicializaBotonEnviarTarea = function(){
 			    }	   
 		    });   	    
 		    var asignacionesTareasJSON = JSON.stringify(asignacionesTareasArray);
-		    var parametrosMapParaGuardarJSON = JSON.stringify($("#parametrosForm").serializeArray());		    
+		    var parametrosMapParaGuardarJSON = JSON.stringify($("#parametrosForm").serializeArray());    
 		    formData.append("comentario", comentario);
 		    formData.append("idInstanciaDeTareaOrigen", idInstanciaDeTareaOrigen);
 		    formData.append("avanzaRetrocede", avanzaRetrocede);
@@ -858,9 +907,16 @@ var inicializaBotonEnviarTarea = function(){
 		    formData.append("reasigna", reasigna);
 		    formData.append("asignacionesTareasJSON", asignacionesTareasJSON);
 		    formData.append("parametrosMapParaGuardarJSON", parametrosMapParaGuardarJSON);
+		    formData.append("horasOcupadas", horasOcupadas);
+		    formData.append("minutosOcupados", minutosOcupados);
 		    var puedeAvanzarProcesoConAdvertenciaVisacion = $(this).attr("data-puedeavanzarprocesoconadvertenciavisacion");
-		    var puedeAvanzarProcesoConAdvertenciaFEA = $(this).attr("data-puedeavanzarprocesoconadvertenciafea");
-		    var mensajeConfirmacionEnviaTarea = "Desea enviar su tarea?";		 	    
+		    var puedeAvanzarProcesoConAdvertenciaFEA = $(this).attr("data-puedeavanzarprocesoconadvertenciafea");	    
+		    var mensajeConfirmacionEnviaTarea = "";		    
+		    if (tareaTieneParametros == 'true') {
+		    	mensajeConfirmacionEnviaTarea = "¿Desea enviar su tarea?<br><br><div style='color:red'> Recuerde que esta tarea tiene requisitos de satisfacci&oacute;n y/o salidas no conformes que deben ser verificados</div>";	
+		    } else {
+		    	mensajeConfirmacionEnviaTarea = "¿Desea enviar su tarea?";		    	
+		    }
 		    if (distribuye == "true" && $("#validoFormDistribucion").val()=="true") {			   
 		    	var correosDeDistribucionJSON = JSON.stringify($("#correosDeDistribucion").val());
 		    	var idArchivosADistribuirArray = [];
@@ -873,10 +929,13 @@ var inicializaBotonEnviarTarea = function(){
 		    	formData.append("idArchivosADistribuirJSON", idArchivosADistribuirJSON);		    	
 		    }	
 		    
-		    if (puedeAvanzarProcesoConAdvertenciaVisacion == "true") {
-		    	mensajeConfirmacionEnviaTarea = "Esta es una tarea de visación, pero no ha visado todos los documentos. <br> ¿Desea enviar la tarea de todos modos?";
+		    if (puedeAvanzarProcesoConAdvertenciaVisacion == "true" && tareaTieneParametros == 'true') {
+		    	mensajeConfirmacionEnviaTarea = "Esta es una tarea de visaci&oacuten, pero no ha visado todos los documentos. <br> ¿Desea enviar la tarea de todos modos?<br><br><div style='color:red'> Recuerde que esta tarea tiene requisitos de satisfacci&oacute;n y/o salidas no conformes que deben ser verificados</div>";
 		    	formData.append("avanzaProcesoConAdvertenciaVisacion", true);
-			} 
+			} else if (puedeAvanzarProcesoConAdvertenciaVisacion == "true") {
+				mensajeConfirmacionEnviaTarea = "Esta es una tarea de visaci&oacuten, pero no ha visado todos los documentos. <br> ¿Desea enviar la tarea de todos modos?";
+		    	formData.append("avanzaProcesoConAdvertenciaVisacion", true);
+			}
 
 		    bootbox.confirm({
 		    	title: "Enviar tarea",
@@ -916,17 +975,14 @@ var inicializaBotonEnviarTarea = function(){
 		            			console.log("DONE");
 		            		},
 		            		complete : function(returnData) {
-		            			console.log("COMPLETE -- mueveProceso: ", returnData.responseJSON );		    		            			
-		            			if (returnData.responseJSON.respuestaMueveProceso == "OK") {		    		            				
-			            			//actualizaTareas("tareasBandejaDeEntrada", urlGetInstanciasDeTarea, true);	
+		            			console.log("COMPLETE -- mueveProceso: ", returnData.responseJSON );
+		            			resetCondicioDeSatisFaccion();
+		            			if (returnData.responseJSON.respuestaMueveProceso == "OK") { 
 		            				$.notify({
 		                     			message: returnData.responseJSON.tareasUsuarios
 		                     		},{
 		                     			type: 'success'
-		                     		});	
-		            				/*$("#divTabsDetalleDeTarea").addClass('hide');
-		            				$("#contenedorBEPrincipal").find(".cargando").remove();	
-		            				$("html, body").animate({ scrollTop: 0 }, "slow");*/
+		                     		});			            				
 		            				actualizaTareasConCallBack("tareasBandejaDeEntrada", urlGetInstanciasDeTarea, true, 
 				            				function() {
 				            					$("#divTabsDetalleDeTarea").addClass('hide');
@@ -939,11 +995,7 @@ var inicializaBotonEnviarTarea = function(){
 		                     		},{
 		                     			type: 'danger'
 		                     		});
-		            				if (returnData.responseJSON.recarga == true) {					                     			
-				            			/*actualizaTareas("tareasBandejaDeEntrada", urlGetInstanciasDeTarea, true);
-				            			$("#divTabsDetalleDeTarea").addClass('hide');
-				            			$("#contenedorBEPrincipal").find(".cargando").remove();		
-			            				$("html, body").animate({ scrollTop: 0 }, "slow");*/
+		            				if (returnData.responseJSON.recarga == true) {
 			            				actualizaTareasConCallBack("tareasBandejaDeEntrada", urlGetInstanciasDeTarea, true, 
 					            				function() {
 					            					$("#divTabsDetalleDeTarea").addClass('hide');
@@ -985,7 +1037,7 @@ var inicializaBotonAnadirDocumentoOpcional = function() {
 	    		$("#fechaRecepcionDocumentoAdicionalModal").val(moment().format("DD/MM/YYYY"));
 		   		$("#subirDocumentoAdicionalModal").modal({backdrop: "static"});
 	       } else {
-	             bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu última acción y hemos caducado tu sesión por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+	             bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
 	             	, function(){ window.open('${raizURL}', '_blank');}
 	             );
 	       }
@@ -1002,7 +1054,7 @@ var inicializaBotonFinalizaProceso = function(){
             console.log("haySession: " + haySession);
             if(!haySession) {
             	haySessionB = false;
-                bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu última acción y hemos caducado tu sesión por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+                bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
                     , function(){
                             window.open('${raizURL}', '_blank');                            
                     }
@@ -1029,13 +1081,29 @@ var inicializaBotonFinalizaProceso = function(){
 		} else {
 			var idInstanciaDeTarea = $(this).attr("data-idinstanciadetarea");
 			var comentario = $("#commentarioEjecucionTarea").val();
-			var parametrosMapParaGuardarJSON = JSON.stringify($("#parametrosForm").serializeArray());		      
+			var parametrosMapParaGuardarJSON = JSON.stringify($("#parametrosForm").serializeArray());	
             var nombreExpediente = $(this).attr("data-nombreexpediente");
-            var idExpediente = $(this).attr("data-idexpediente");            
+            var idExpediente = $(this).attr("data-idexpediente");
+            var horasOcupadas = $("#duration-hours").val();
+            var minutosOcupados = $("#duration-minutes").val();
+            if (horasOcupadas == "") {
+				horasOcupadas = 0;
+			}
+			if (minutosOcupados == "") {
+				minutosOcupados = 0;
+			}
+			if (horasOcupadas <= 0 && minutosOcupados <= 0) {
+				$("#duration-hours").validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');	
+				$("#duration-minutes").validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');
+				return;
+			}
+			var parametrosMapParaGuardarJSON = JSON.stringify($("#parametrosForm").serializeArray());			
 	        var formData = new FormData();
 	        formData.append("idInstanciaDeTarea", idInstanciaDeTarea);
 	        formData.append("comentario", comentario);
 	        formData.append("parametrosMapParaGuardarJSON", parametrosMapParaGuardarJSON);
+	        formData.append("horasOcupadas", horasOcupadas);
+	        formData.append("minutosOcupados", minutosOcupados);
 	        var distribuye = $(this).attr("data-distribuye");
 	        if (distribuye == "true" && $("#validoFormDistribucion").val()=="true") {			   
                 var correosDeDistribucionJSON = JSON.stringify($("#correosDeDistribucion").val());
@@ -1047,10 +1115,16 @@ var inicializaBotonFinalizaProceso = function(){
                 formData.append("correosDeDistribucionJSON", correosDeDistribucionJSON);
                 formData.append("asuntoCorreoDistribucion", $("#asuntoCorreoDistribucion").val());
                 formData.append("idArchivosADistribuirJSON", idArchivosADistribuirJSON);		    	
-            }     
+            }
+	        var mensajeFinalizaTarea = "";		    
+		    if (tareaTieneParametros == 'true') {
+		    	mensajeFinalizaTarea = "¿Desea finalizar la tarea?<br><br><div style='color:red'> Recuerde que esta tarea tiene requisitos de satisfacci&oacute;n y/o salidas no conformes que deben ser verificados</div>";	
+		    } else {
+		    	mensajeFinalizaTarea = "¿Desea finalizar la tarea?";		    	
+		    }
 			bootbox.confirm({
-		    	title: "Finalizar Proceso",
-		        message: "Desea finalizar el proceso?",
+		    	title: "Finalizar Tarea",
+		        message: mensajeFinalizaTarea,
 		        buttons: {
 		            confirm: {
 		                label: '<span class="glyphicon glyphicon-ok-circle font-icon-3"></span>',
@@ -1087,11 +1161,8 @@ var inicializaBotonFinalizaProceso = function(){
 		            			console.log("DONE");
 		            		},
 		            		complete : function(returnData) {
-		            			console.log("COMPLETE -- finalizarProceso: ", returnData );		            			
-		            			/*actualizaTareas("tareasBandejaDeEntrada", urlGetInstanciasDeTarea, true);
-		            			$("#divTabsDetalleDeTarea").addClass('hide');
-		            			$("#contenedorBEPrincipal").find(".cargando").remove();	
-	            				$("html, body").animate({ scrollTop: 0 }, "slow");*/	
+		            			console.log("COMPLETE -- finalizarProceso: ", returnData );
+		            			resetCondicioDeSatisFaccion();
 		            			if (returnData.responseJSON.respuestaFinalizaProceso == "OK") {		            				
 		            				$.notify({
 		                     			message: 'Se finalizo correctamente!'
@@ -1168,7 +1239,7 @@ var inicializaBotonEditarDocumentoEnviadoEnEjecucionTarea = function(){
 					}
 			   }
 	       } else {
-	             bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu última acción y hemos caducado tu sesión por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+	             bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
 	             	, function(){ window.open('${raizURL}', '_blank');}
 	             );
 	       }
@@ -1187,7 +1258,7 @@ var inicializaBotonVerDiagramaEnNuevaVentanaET = function (){
               window.open(urlDiagramaSubProcesoBoton, "SubProceso", 'width=1700, height=900');
               console.log("Fin window.open");
           } else {
-                bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu última acción y hemos caducado tu sesión por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+                bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
                               , function(){
                                     window.open('${raizURL}', '_blank');
                               }
@@ -1249,7 +1320,7 @@ function abrirCorreoDeDistribucionModal(idExpediente, idInstanciaDeTarea, nombre
         				$("#detalleDeExpedienteEnDistribucionModal").find(".cargando").remove();        				
         	});	
         } else {
-              bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu última acción y hemos caducado tu sesión por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+              bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
                             , function(){
                                   window.open('${raizURL}', '_blank');
                             }
@@ -1258,10 +1329,100 @@ function abrirCorreoDeDistribucionModal(idExpediente, idInstanciaDeTarea, nombre
   });		
 }
 
+$("#condicionesDeSatisfaccionModal").on("hidden.bs.modal", function () {
+	$("#botonCargaCondicionesDeSatisfaccion").removeClass("btn-danger");
+	$("#botonCargaCondicionesDeSatisfaccion").addClass("btn-primary");	
+	cargoRDSSNC = true;
+});
+
+function cargaCondicionesDeSatisfaccion(idInstanciaDeTarea, nombreExpediente, nombreDeProceso) {
+
+	var urlSessionValida = $("#urlSessionValida").val();
+	var raizURL = $("#raizURL").val();
+
+	$.get(urlSessionValida, function(haySession) {
+	      console.log("haySession: " + haySession);
+	      if(haySession) {
+	   			var urlGetCondicionesDeSatisfaccionPorIdInstanciaDeTarea = $("#urlGetCondicionesDeSatisfaccionPorIdInstanciaDeTarea").val();
+	    		$("#condicionesDeSatisfaccionH4").empty();
+	    		$("#condicionesDeSatisfaccionH4").append('Requisitos de Satisfacci&oacute;n y/o Salidas no Conformes: ' + nombreDeProceso + ' ( ' + nombreExpediente + '  ) ');
+	    		$('#condicionesDeSatisfaccionModal').modal({backdrop: 'static', keyboard: false});
+	    		if (cargoRDSSNC == false) {
+	    			$('#condicionesDeSatisfaccionDiv').load(urlGetCondicionesDeSatisfaccionPorIdInstanciaDeTarea + "/" + idInstanciaDeTarea );
+	    		} else {	    			
+	    			$("#botonCargaCondicionesDeSatisfaccion").removeClass("btn-danger");
+	    			$("#botonCargaCondicionesDeSatisfaccion").addClass("btn-primary");
+	    			$("#estadoCargaCondicionesDeSatisfaccionModal").removeClass("glyphicon-ban-circle");
+	    			$("#estadoCargaCondicionesDeSatisfaccionModal").addClass("glyphicon-ok-circle");
+	    		}	    		
+	      }	else {
+	            bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acci&oacute;n y hemos caducado tu sesi&oacute;n por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+	                          , function(){
+	                                window.open(raizURL, '_blank');
+	                          }
+	             );
+	      }
+	      cargoRDSSNC = true;
+	}); 
+	
+}
+
+function seteaBotonCargaCondicionesDeSatisfaccion() {
+	if ($("#botonCargaCondicionesDeSatisfaccion").length > 0 && cargoRDSSNC == true) {
+		$("#botonCargaCondicionesDeSatisfaccion").removeClass("btn-danger");
+		$("#botonCargaCondicionesDeSatisfaccion").addClass("btn-primary");	
+	}
+}
+
+function inicializaTiempoDedicado() {
+	$("#tiempoDedicado").durationPicker({
+		  hours: {
+		    label: "h",
+		    min: 0
+		  },
+		  minutes: {
+		    label: "m",
+		    min: 0,
+		    max: 59
+		  },
+		  classname: 'form-control',
+		  type: 'number',
+		  responsive: true
+	});
+}
+
+function agregaValidityTiempoDedicado() {
+	$("#duration-hours").attr("oninput", "validity.valid||(value='');");
+	$("#duration-minutes").attr("oninput", "validity.valid||(value='');");
+}
+
+function getUltimoArchivoInstDeTareaFirmado(idInstanciaDeTarea) {	
+	var idInstanciaDeTareaSeleccionada = $('#documentosDeSalidaDiv').attr("data-idinstanciadetarea");	
+	if ($('#documentosDeSalidaDiv').length >=1 && idInstanciaDeTareaSeleccionada == idInstanciaDeTarea) {
+		//console.log('Ejecutando cada 3 segundos inicio');
+	    //console.log("idInstanciaDeTarea: " + idInstanciaDeTarea);
+	    var urlGetDocumentosDeSalida = $("#urlGetDocumentosDeSalida").val();
+	    $('#documentosDeSalidaDiv').load(urlGetDocumentosDeSalida + "?idInstanciaDeTarea=" + idInstanciaDeTarea );  
+	    //console.log('Ejecutando cada 3 segundos fin');
+	}
+}
+  
+function stopInterval(id) {
+    //console.log("Deteniendo despues de 1 minuto -- id: " + id);
+    clearInterval(id);
+}
+
+function consultaEstadoDocumentoFirmado(idInstanciaDeTarea) {	
+	var intervalID = setInterval(getUltimoArchivoInstDeTareaFirmado, 3000, idInstanciaDeTarea);	
+	//console.log('intervalID: ' + intervalID);
+	setTimeout(stopInterval, 60000, intervalID);
+}
+
 $(document).ready(function() {		
 	if( $('#botonDevolverTarea').length != 0 ) {
 		new Tippy('#botonDevolverTarea');
 	}
+	$(seteaBotonCargaCondicionesDeSatisfaccion);
 	$(inicializaDatePlazoSiguienteTarea);
 	$(inicializaBotonEnviarTarea);	
 	$(inicializaBotonDevolverTarea);
@@ -1269,25 +1430,30 @@ $(document).ready(function() {
 	$(inicializaBotonFinalizaProceso);
 	$(inicializaBotonEditarDocumentoEnviadoEnEjecucionTarea);
 	$(inicializaBotonNotificarInstanciaDeProceso);
-	$(inicializaBotonVerDiagramaEnNuevaVentanaET);	
+	$(inicializaBotonVerDiagramaEnNuevaVentanaET);
+	$(inicializaTiempoDedicado);
+	$(agregaValidityTiempoDedicado);
 });
+
+
+
 </script>
 	
-	<!-- Modal Subir Archivo-->
-	
-	<c:import url="/WEB-INF/jsp/modals/subirArchivo.jsp"></c:import>	
-	
-	<!-- Modal Retrocede Proceso-->
-	
-	<c:import url="/WEB-INF/jsp/modals/retrocedeProceso.jsp"></c:import>
-	
-	<!-- Modal Detalle Documento-->
-	
-	<%-- 
-	<c:import url="/WEB-INF/jsp/modals/detalleDeDocumento.jsp"></c:import>
-	--%>
-	<!-- Firma Avanzada-->
-	
-	<%-- <c:import url="/WEB-INF/jsp/modals/firmaAvanzada.jsp"></c:import>--%>
-	
-	<c:import url="/WEB-INF/jsp/modals/infoDeProceso.jsp"></c:import>
+<!-- Modal Subir Archivo-->
+
+<c:import url="/WEB-INF/jsp/modals/subirArchivo.jsp"></c:import>	
+
+<!-- Modal Retrocede Proceso-->
+
+<c:import url="/WEB-INF/jsp/modals/retrocedeProceso.jsp"></c:import>
+
+<!-- Modal Detalle Documento-->
+
+<%-- 
+<c:import url="/WEB-INF/jsp/modals/detalleDeDocumento.jsp"></c:import>
+--%>
+<!-- Firma Avanzada-->
+
+<%-- <c:import url="/WEB-INF/jsp/modals/firmaAvanzada.jsp"></c:import>--%>
+
+<c:import url="/WEB-INF/jsp/modals/infoDeProceso.jsp"></c:import>

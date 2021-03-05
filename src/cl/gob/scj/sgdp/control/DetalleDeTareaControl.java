@@ -28,7 +28,6 @@ import cl.gob.scj.sgdp.dto.ArchivosInstDeTareaDTO;
 import cl.gob.scj.sgdp.dto.AutorDTO;
 import cl.gob.scj.sgdp.dto.DetalleDeArchivoDTO;
 import cl.gob.scj.sgdp.dto.HistoricoDeInstDeTareaDTO;
-import cl.gob.scj.sgdp.dto.HistoricoValorParametroDeTareaDTO;
 import cl.gob.scj.sgdp.dto.InstanciaDeProcesoDTO;
 import cl.gob.scj.sgdp.dto.InstanciaDeTareaDTO;
 import cl.gob.scj.sgdp.dto.ListaDeDistribucionDTO;
@@ -40,12 +39,12 @@ import cl.gob.scj.sgdp.exception.SgdpException;
 import cl.gob.scj.sgdp.service.BandejaDeEntradaService;
 import cl.gob.scj.sgdp.service.GestorDeTagsService;
 import cl.gob.scj.sgdp.service.HistoricoDeInstDeTareaService;
-import cl.gob.scj.sgdp.service.HistoricoValorParametroDeTareaService;
 import cl.gob.scj.sgdp.service.InstanciaDeProcesoService;
 import cl.gob.scj.sgdp.service.InstanciaDeTareaService;
 import cl.gob.scj.sgdp.service.ListaDeDistribucionService;
 import cl.gob.scj.sgdp.service.MueveProcesoService;
 import cl.gob.scj.sgdp.service.ObtenerArchivosExpedienteService;
+import cl.gob.scj.sgdp.service.ParametroDeTareaService;
 import cl.gob.scj.sgdp.service.ParametroService;
 import cl.gob.scj.sgdp.service.TipoDeDocumentoService;
 import cl.gob.scj.sgdp.tipos.NotificacionType;
@@ -84,13 +83,13 @@ public class DetalleDeTareaControl {
 	private BandejaDeEntradaService bandejaDeEntradaService;
 	
 	@Autowired
-	private HistoricoValorParametroDeTareaService historicoValorParametroDeTareaService;
-	
-	@Autowired
 	private ListaDeDistribucionService listaDeDistribucionService;
 	
 	@Autowired
 	private HistoricoDeInstDeTareaService historicoDeInstDeTareaService;
+	
+	@Autowired
+	private ParametroDeTareaService parametroDeTareaService;
 	
 	@RequestMapping("/getDetalleDeTarea")
 	public String getDetalleDeTarea(Model model, HttpServletRequest request) {
@@ -132,7 +131,6 @@ public class DetalleDeTareaControl {
 				return "errorTareaNoEstaEnBE";
 			}
 			
-			//instanciasDeTareasDTOContinuanProceso = mueveProcesoService.getInstanciasDeTareasQueContinuanDeInstanciaDeTarea(usuario, Long.parseLong(request.getParameter("idInstanciaDeTarea")), true, instanciasDeTareasDTOContinuanProceso);
 			instanciasDeTareasDTOContinuanProceso = mueveProcesoService.getInstanciasDeTareasQueContinuanDeInstanciaDeTarea(usuario, 
 					instanciaDeTareaDTO, instanciasDeTareasDTOContinuanProceso);
 			
@@ -184,7 +182,9 @@ public class DetalleDeTareaControl {
 			}			
 		
 			List<AutorDTO> autoresDTO = bandejaDeEntradaService.getTodosLosAutores();
-			tiposDeDocumentosDTO = tipoDeDocumentoService.getTodosLosTiposDeDocumentos();
+			//tiposDeDocumentosDTO = tipoDeDocumentoService.getTodosLosTiposDeDocumentos();
+			tiposDeDocumentosDTO = tipoDeDocumentoService.getTiposDeDocumentosPorIdExpediente(instanciaDeTareaDTO.getIdExpediente());
+			tiposDeDocumentosDTO.add(tipoDeDocumentoService.getTipoDeDocumentoDTOPorIdTipoDeDocumento(Long.parseLong(configProps.getProperty("idTipoDeDocumentoAntecedente"))));
 			
 			instanciaDeProcesoService.cargaInstanciaDeProcesoDTOPorIdExpediente(instanciaDeTareaDTO.getIdExpediente(), instanciaDeProcesoDTO);				
 			log.debug(instanciaDeProcesoDTO.toString());
@@ -206,16 +206,16 @@ public class DetalleDeTareaControl {
 				}
 			}
 			
-			Map<String, List<ParametroDeTareaDTO>> mapParametrosDeTareaDTOTitulo = bandejaDeEntradaService.getMapParametrosDeTareaDTOTituloPorIdInstanciaDeTarea(instanciaDeTareaDTO.getIdInstanciaDeTarea());
+			//Map<String, List<ParametroDeTareaDTO>> mapParametrosDeTareaDTOTitulo = bandejaDeEntradaService.getMapParametrosDeTareaDTOTituloPorIdInstanciaDeTarea(instanciaDeTareaDTO.getIdInstanciaDeTarea());
 			
-			log.debug("Iterando mapParametrosDeTareaTitulo....");
+			/*log.debug("Iterando mapParametrosDeTareaTitulo....");
 			for (Map.Entry<String, List<ParametroDeTareaDTO>> entry : mapParametrosDeTareaDTOTitulo.entrySet()) {
 			    log.debug(entry.getKey() + ":  ");
 			    List<ParametroDeTareaDTO> listaDeMap = entry.getValue();			    
 			    for (ParametroDeTareaDTO parametroDeTareaDTO : listaDeMap) {
 			    	log.debug("   " + parametroDeTareaDTO.toString());
 			    }
-			}			
+			}*/			
 			
 			// ####################################################################################################################
 			// Seguimiento Instancia de proceso
@@ -285,6 +285,16 @@ public class DetalleDeTareaControl {
 				instanciasDeTareasDTOAnteriores = instanciaDeTareaService.getInstanciaDeTareaDTOAnteriores(instanciaDeTareaDTO);
 			}*/			
 			
+			List<ParametroDeTareaDTO> parametrosDeTareaDTO = parametroDeTareaService.getParametrosDeTareaDTOPorIdTarea(instanciaDeTareaDTO.getIdTarea());
+			
+			boolean tareaTieneParametros = false;
+			
+			if (parametrosDeTareaDTO != null && !parametrosDeTareaDTO.isEmpty()) {
+				tareaTieneParametros = true;
+			}
+			
+			int numeroDeIteracionDeLaInstanciaDeTarea = historicoDeInstDeTareaService.getCantidadDeEjecutacionesInstanciaDeTarea(instanciaDeTareaDTO.getIdInstanciaDeTarea());
+			
 			model.addAttribute("filtraFirmas", true);
 			model.addAttribute("permisos", usuario.getPermisos());
 			//model.addAttribute("historialProcesoDTO", historialProcesoDTO);  
@@ -300,9 +310,11 @@ public class DetalleDeTareaControl {
 			model.addAttribute("archivosInfoDTODeSalidaPorIdInstanciaDeTarea", archivosInfoDTODeSalidaPorIdInstanciaDeTarea);
 			model.addAttribute("detalleDeArchDTOObligatoriosDeInstDeTareaAntPorIdInstTarea", detalleDeArchDTOObligatoriosDeInstDeTareaAntPorIdInstTarea);
 			model.addAttribute("urlFuncPhp", parametroService.getParametroPorID(Constantes.ID_PARAM_URL_FUNC_PHP).getValorParametroChar());
-			model.addAttribute("mapParametrosDeTareaDTOTitulo", mapParametrosDeTareaDTOTitulo);
+			//model.addAttribute("mapParametrosDeTareaDTOTitulo", mapParametrosDeTareaDTOTitulo);
 			//model.addAttribute("instanciasDeTareasDTOAnteriores", instanciasDeTareasDTOAnteriores);
-			model.addAttribute("idArchivosInstTareasAnteriores", idArchivosInstTareasAnteriores);			
+			model.addAttribute("idArchivosInstTareasAnteriores", idArchivosInstTareasAnteriores);
+			model.addAttribute("tareaTieneParametros", tareaTieneParametros);
+			model.addAttribute("numeroDeIteracionDeLaInstanciaDeTarea", numeroDeIteracionDeLaInstanciaDeTarea);
 			
 			/*model.addAttribute("porcentajeDeAvanceInstanProc", porcentajeDeAvanceInstanProc);
 			model.addAttribute("porcentajeDeAvanceDeInstTarea", porcentajeDeAvanceDeInstTarea);
@@ -366,13 +378,12 @@ public class DetalleDeTareaControl {
 		Usuario usuario = (Usuario)request.getSession().getAttribute("usuario");				
 		log.debug("idInstanciaDeTarea: " + request.getParameter("idInstanciaDeTarea"));
 			instanciaDeTareaService.cargaInstanciaDeTareaPorIdInstanciaDeTarea(Long.parseLong(request.getParameter("idInstanciaDeTarea")), instanciaDeTareaDTO);
-		log.debug(instanciaDeTareaDTO.toString());
-		
+		log.debug(instanciaDeTareaDTO.toString());		
 		try {
 			List<ArchivoInfoDTO> archivosExpedienteDTO = obtenerArchivosExpedienteService.obtenerArchivosExpediente(usuario, 
 					instanciaDeTareaDTO.getIdExpediente(), true, instanciaDeTareaDTO.getPuedeVisarDocumentos(), instanciaDeTareaDTO.getPuedeAplicarFEA(),
 					Long.parseLong(request.getParameter("idInstanciaDeTarea"))
-					);			
+					);						
 			obtenerArchivosExpedienteService.cargaArchivosInfoDTODeSalidaPorIdInstanciaDeTarea(usuario, 
 					instanciaDeTareaDTO, 
 					archivosInfoDTODeSalidaPorIdInstanciaDeTarea,
@@ -468,16 +479,7 @@ public class DetalleDeTareaControl {
 		
 		return "div/documentoRequeridoFormulario";
 	}
-	
-	@RequestMapping(value="/getHistorialDeCondicionesDeSatisfaccionPorIdInstanciaDeTarea/{idInstanciaDeTarea}", method=RequestMethod.GET)
-	public String historialDeCondicionesDeSatisfaccionPorIdInstanciaDeTarea(@PathVariable("idInstanciaDeTarea") long idInstanciaDeTarea, Model model, HttpServletRequest request) {
-		log.debug("Inicio historialDeCondicionesDeSatisfaccionPorIdInstanciaDeTarea");
-		log.debug("idInstanciaDeTarea: " + idInstanciaDeTarea);
-		List<HistoricoValorParametroDeTareaDTO> historicoValorParametroDeTareaDTOList = historicoValorParametroDeTareaService.getHistoricoValorParametroDeTareaPorIdInstanciaDeTareaOrigen(idInstanciaDeTarea);
-		model.addAttribute("historicoValorParametroDeTareaDTOList", historicoValorParametroDeTareaDTOList);
-		return "div/historialDeCondicionesDeSatisfaccion";		
-	}
-	
+			
 	@RequestMapping("/getDetalleDeExpedienteEnDistribucion/{idExpediente}/{idInstanciaDeTarea}/{nombreExpediente}")
 	public String getDetalleDeExpedienteEnDistribucion(
 								@PathVariable("idExpediente") String idExpediente,

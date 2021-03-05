@@ -6,7 +6,9 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <c:set var="FORMATO_FECHA" value="<%=Constantes.FORMATO_FECHA_FORM%>" />
-                  
+
+<c:set var="requisitoStyle" value="" />
+         
 	<div class="table-responsive">	
 		<table id="tablaTareas" class="table table-striped table-bordered table-hover table-fixed">											
 		    <thead>
@@ -27,18 +29,54 @@
 				<c:forEach var="instanciaDeTareaDTO" items="${instanciasDeTareasDTO}" varStatus="status">
 					
 					<tr>
-							<td class="view-message">${instanciaDeTareaDTO.nombreExpediente}</td>
+							<td class="view-message">${instanciaDeTareaDTO.nombreExpediente}</td>						
 							
-							<td class="view-message">								
-								<a class="btn btn-link btn-wrap-break" id="${instanciaDeTareaDTO.idInstanciaDeTarea}LinkProceso" onclick='cargaDetalleDeTarea("${instanciaDeTareaDTO.nombreExpediente}","${instanciaDeTareaDTO.idInstanciaDeTarea}", "true", "${instanciaDeTareaDTO.idExpediente}", "${instanciaDeTareaDTO.urlControl}")'>${instanciaDeTareaDTO.nombreDeProceso}</a>
-							</td>
+							<c:choose>
 							
-							<td class="view-message">
+								<c:when test="${instanciaDeTareaDTO.procesoTieneRdsSnc eq true}">
+								
+									<td class="view-message subproceso-rds-snc">								
+										<a class="btn btn-link btn-wrap-break" id="${instanciaDeTareaDTO.idInstanciaDeTarea}LinkProceso" onclick='cargaDetalleDeTarea("${instanciaDeTareaDTO.nombreExpediente}","${instanciaDeTareaDTO.idInstanciaDeTarea}", "true", "${instanciaDeTareaDTO.idExpediente}", "${instanciaDeTareaDTO.urlControl}")'><spring:message code="bandejaDeEntrada.tabla.tareas.esRDSNC"/>&nbsp;${instanciaDeTareaDTO.nombreDeProceso}</a>
+									</td>
+								
+								</c:when>
+								
+								<c:otherwise>
+								
+									<td class="view-message">								
+										<a class="btn btn-link btn-wrap-break" id="${instanciaDeTareaDTO.idInstanciaDeTarea}LinkProceso" onclick='cargaDetalleDeTarea("${instanciaDeTareaDTO.nombreExpediente}","${instanciaDeTareaDTO.idInstanciaDeTarea}", "true", "${instanciaDeTareaDTO.idExpediente}", "${instanciaDeTareaDTO.urlControl}")'>${instanciaDeTareaDTO.nombreDeProceso}</a>
+									</td>
+								
+								</c:otherwise>
+							
+							</c:choose>
+							
+							<c:if test = "${instanciaDeTareaDTO.esRdsSnc eq true}">
+								<c:set var="requisitoStyle" value="tarea-rds-snc" />
+							</c:if>
+														
+							<td class="view-message ${requisitoStyle}">
 								<a type="button" class="btn btn-link btn-wrap-break" id="${instanciaDeTareaDTO.idInstanciaDeTarea}LinkTarea"
 									onclick='cargaDetalleDeTarea("${instanciaDeTareaDTO.nombreExpediente}","${instanciaDeTareaDTO.idInstanciaDeTarea}", "true", "${instanciaDeTareaDTO.idExpediente}", "${instanciaDeTareaDTO.urlControl}")'>
-									${instanciaDeTareaDTO.nombreDeTarea}
+									
+									<c:choose>
+									
+										<c:when test="${instanciaDeTareaDTO.esRdsSnc eq true}">
+											<spring:message code="bandejaDeEntrada.tabla.tareas.esRDSNC"/>&nbsp;${instanciaDeTareaDTO.nombreDeTarea}
+										</c:when>
+										
+										<c:otherwise>
+										
+											${instanciaDeTareaDTO.nombreDeTarea}
+										
+										</c:otherwise>
+									
+									</c:choose>
+								
 								</a>
 							</td>
+							
+							<c:set var="requisitoStyle" value="" />
 							
 							<td class="view-message tamano-asunto">${instanciaDeTareaDTO.asunto}</td>
 							

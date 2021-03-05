@@ -132,6 +132,9 @@ public class Proceso implements Serializable {
 	//bi-directional many-to-one association to HistoricoSolicitudCreacionExp
 	@OneToMany(mappedBy="proceso")
 	private List<HistoricoSolicitudCreacionExp> historicoSolicitudesCreacionExps;
+	
+	@Column(name="\"B_TIENE_PARAM_POR_TAREA\"")
+	private Boolean tieneRdsSnc;
 
 	public Proceso() {
 	}
@@ -294,6 +297,14 @@ public class Proceso implements Serializable {
 		historicoSolicitudCreacionExp.setProceso(null);
 
 		return historicoSolicitudCreacionExp;
-	}	
+	}
+
+	public Boolean getTieneRdsSnc() {
+		return tieneRdsSnc;
+	}
+
+	public void setTieneRdsSnc(Boolean tieneRdsSnc) {
+		this.tieneRdsSnc = tieneRdsSnc;
+	}		
 	
 }

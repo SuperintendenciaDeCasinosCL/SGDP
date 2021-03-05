@@ -19,6 +19,7 @@
 	            <th>Usuario Destino</th>
 	            <th>Tarea Destino</th>
 	            <th>Comentario</th>
+	            <th>Tiempo Dedicado</th>
 	            <th>Acciones</th>		       
 	        </tr>
 	    </thead>
@@ -38,18 +39,23 @@
 		    		<td class="view-message">${historicoDeInstDeTareaDTO.nombreTareaDeDestino}</td>
 					<td class="view-message">${historicoDeInstDeTareaDTO.comentario}</td>
 					<td class="view-message">
+		    			<c:if test = "${historicoDeInstDeTareaDTO.horasOcupadas ne null}">
+		    				${historicoDeInstDeTareaDTO.horasOcupadas} h : ${historicoDeInstDeTareaDTO.minutosOcupados} m
+		    			</c:if>		    			
+		    		</td>
+					<td class="view-message">
 						<c:if test = "${historicoDeInstDeTareaDTO.tieneHistoricoValorParametroDeTarea eq true}">
 		    			
 		    				<button 
-		    				onclick="cargaCondicionesDeSatisfaccion(${historicoDeInstDeTareaDTO.idInstanciaDeTareaDeOrigen},
+		    				onclick="cargaHistorialDeCondicionesDeSatisfaccionPorIdHistoricoDeInstDeTarea(${historicoDeInstDeTareaDTO.idHistoricoDeInstDeTarea},
 		    				'${historicoDeInstDeTareaDTO.nombreExpediente}',
 		    				'${historicoDeInstDeTareaDTO.nombreTareaDeOrigen}')" 
-		    				type="button" title="Historial de Condiciones de Satisfacci&oacute;n" class="btn btn-primary btn-sm">
+		    				type="button" title="Historial de Requisitos de Satisfacci&oacute;n y/o Salidas no Conformes:" class="btn btn-primary btn-sm">
 								<span class="glyphicon glyphicon-eye-open"></span>
 							</button>
 		    			
 		    			</c:if>
-		    		</td>
+		    		</td>		    		
 	    		</tr>
 	    	</c:forEach> 
 	    </tbody>
@@ -79,32 +85,6 @@ function formatTablaHistorialDeTareasPorIdExpediente() {
 	
 	tablaHistorialDeTareasPorIdExpediente.buttons().container().appendTo(
 	'#tablaHistorialDeTareasPorIdExpediente_wrapper .row:eq(0)');
-}
-
-function cargaCondicionesDeSatisfaccion(idInstanciaDeTarea, nombreExpediente, nombreTarea) {
-
-	var urlSessionValida = $("#urlSessionValida").val();
-	var raizURL = $("#raizURL").val();
-
-	$.get(urlSessionValida, function(haySession) {
-	      console.log("haySession: " + haySession);
-	      if(haySession) {
-	    	  var urlGetHistorialDeCondicionesDeSatisfaccionPorIdInstanciaDeTarea = $("#urlGetHistorialDeCondicionesDeSatisfaccionPorIdInstanciaDeTarea").val();
-	    		console.log("urlGetHistorialDeCondicionesDeSatisfaccionPorIdInstanciaDeTarea: " + urlGetHistorialDeCondicionesDeSatisfaccionPorIdInstanciaDeTarea);
-	    		console.log("idInstanciaDeTarea: " + idInstanciaDeTarea);
-	    		$("#historialCondicionesDeSatisfaccionH4").empty();
-	    		$("#historialCondicionesDeSatisfaccionH4").append('Historial de Condiciones de Satisfacci&oacute;n: ' + nombreTarea + " ( " + nombreExpediente + " ) ");
-	    		$('#historialCondDeSatisfaccionModal').modal({backdrop: 'static', keyboard: false});
-	    		$('#historialDeCondicionesDeSatisfaccionDiv').load(urlGetHistorialDeCondicionesDeSatisfaccionPorIdInstanciaDeTarea + "/" + idInstanciaDeTarea );
-	      }	else {
-	            bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acci&oacute;n y hemos caducado tu sesi&oacute;n por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
-	                          , function(){
-	                                window.open(raizURL, '_blank');
-	                          }
-	             );
-	      }
-	}); 
-	
 }
 
 $(document).ready(function() {

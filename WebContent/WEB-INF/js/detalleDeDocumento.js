@@ -3,12 +3,12 @@
  */
 function cargaDetalleDeDocumento(idArchivo, esVisable, aplicaFEA, aplicaFirmaApplet, idExpediente, nombreArchivo, mimeType, idInstanciaDeTarea) {
 	var urlSessionValida = $("#urlSessionValida").val();
-	var raizURL = $("#raizURL").val();	
-	
+	var raizURL = $("#raizURL").val();		
 	$.get(urlSessionValida, function(haySession) {
 		console.log("haySession: " + haySession);
 	    if(haySession) {
 	    	$("#detalleDeDocumentoModalTitulo").empty();
+			$('#detalleDeDocumentoDiv').empty();
 	    	$("#detalleDeDocumentoModalTitulo").html('Detalle de documento ' + nombreArchivo + '  <a href="#" id="linkRecargaDetalleDocumento" onclick="recargaDetalleDocumentoModal()"'
 	    			+ ' data-idarchivo='+idArchivo
 	    			+ ' data-esvisable='+esVisable
@@ -18,13 +18,11 @@ function cargaDetalleDeDocumento(idArchivo, esVisable, aplicaFEA, aplicaFirmaApp
 	    			+ ' data-idinstanciadetarea='+idInstanciaDeTarea
 	    			+ ' class="btn btn-primary btn-lg">'
 	    			+ ' <span class="glyphicon glyphicon-repeat"></span> '
-	    			+ ' </a>');
-	    	
+	    			+ ' </a>');	    	
 	    	$("#idExpedienteDetalleDeDocumentoModal").val(idExpediente);
 	    	$("#nombreArchivoDetalleDeDocumentoModal").val(nombreArchivo);
 	    	$("#mimeTypeDetalleDeDocumentoModal").val(mimeType);
-	    	$("#idDocumentoDetalleDeDocumentoModal").val(idArchivo);	
-
+	    	$("#idDocumentoDetalleDeDocumentoModal").val(idArchivo);
 	    	var urlGetDetalleDeDocumento = $('#urlGetDetalleDeDocumento').val()
 	    								+"/"+idArchivo
 	    								+"/"+esVisable
@@ -32,24 +30,26 @@ function cargaDetalleDeDocumento(idArchivo, esVisable, aplicaFEA, aplicaFirmaApp
 	    								+"/"+aplicaFirmaApplet
 	    								+"/"+idExpediente
 	    								+"/"+idInstanciaDeTarea
-	    								;
-	    	
-	    	console.log("urlGetDetalleDeDocumento: " + urlGetDetalleDeDocumento);	
-	    	
-	    	$('#detalleDeDocumentoModal').modal({backdrop: 'static', keyboard: false});	
-
-	    	$('#detalleDeDocumentoDiv').each(function(){        	 
+	    								;	    	
+	    	console.log("urlGetDetalleDeDocumento: " + urlGetDetalleDeDocumento);	    	
+	    	$('#detalleDeDocumentoModal').modal({backdrop: 'static', keyboard: false});
+			$('#detalleDeDocumentoDiv').load(urlGetDetalleDeDocumento);
+	    	/*$('#detalleDeDocumentoDiv').each(function() {        	 
 	    		$(this).fadeOut("slow").load(urlGetDetalleDeDocumento ).fadeIn('slow');	
-	    	}); 
+	    	});*/ 
 	    } else {
             bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acci&oacute;n y hemos caducado tu sesi&oacute;n por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
             		, function(){ window.open(raizURL, '_blank'); }
             );
-	    }
-		
-	});
-	
+	    }		
+	});	
 }
+
+$("#detalleDeDocumentoModal").on("hidden.bs.modal", function () {
+	if ($('#detalleDeDocumentoDiv').length >= 1) {
+		$('#detalleDeDocumentoDiv').empty();
+	}	
+});
 
 function modificarDatosDeDocumento(idArchivo) {
 	
@@ -396,8 +396,7 @@ function aplicarFirmaAvanzada() {
 	formData.append("idDocumento", idArchivo); 
 	formData.append("nombreArchivo", nombreArchivo);
 	formData.append("mimeType", mimeType);	
-	formData.append("rut", rutFirmaAvanzada);
-	//formData.append("proposito", $('#propositoFirmaAvanzada').val());
+	formData.append("rut", rutFirmaAvanzada);	
 	formData.append("proposito", encodeURIComponent($('#propositoFirmaAvanzada').val()));
 	formData.append("otp", $('#otpFirmaAvanzada').val());
 	formData.append("tipoDeDocumento", nombreTipoDeDocumento);	
@@ -429,8 +428,7 @@ function aplicarFirmaAvanzada() {
 	    },
 	    error : function(e) {
 	    	$("#contenedorBEPrincipal").find(".cargando").remove();
-			console.log("ERROR: ", e);	
-			//notifyFEA.close();
+			console.log("ERROR: ", e);
 			$.notify({
      			message: 'Error al firmar documento!'
      		},{
@@ -442,8 +440,15 @@ function aplicarFirmaAvanzada() {
 		},
 		complete : function(returnData) {
 			console.log("COMPLETE -- firmaAvanzadaDocumento: ", returnData.responseJSON );
-			//notifyFEA.close();
-			if (returnData.responseJSON.cssStatus == "alert alert-success") {				
+			console.log("COMPLETE -- firmaAvanzadaDocumento: ", returnData );
+			if (returnData.responseJSON == undefined ) {
+				$("#contenedorBEPrincipal").find(".cargando").remove();
+				$.notify({
+	     			message: 'Error al firmar documento!'	     			
+	     		},{
+	     			type: 'danger'
+	     		});
+			} else if (returnData.responseJSON.cssStatus == "alert alert-success") {				
 				$.notify({
 	     			message: 'Documento firmado!'
 	     		},{
@@ -453,28 +458,17 @@ function aplicarFirmaAvanzada() {
 				urlGetTablaHistorialDeDocumentoPorIdExpediente = 
 						urlGetTablaHistorialDeDocumentoPorIdExpediente + "/" + idExpediente
 						+ "/" + idInstanciaDeTarea
-						+ "/" + nombreExpediente;
-				console.log("urlGetTablaHistorialDeDocumentoPorIdExpediente: " + urlGetTablaHistorialDeDocumentoPorIdExpediente);
-				/*$('#divTablaHistorialDeDocumentos').each(function(){        	 
-							$(this).fadeOut("slow").load(urlGetTablaHistorialDeDocumentoPorIdExpediente).fadeIn('slow');
-					});
-				$('#divTablaHistorialDeDocumentos').load(urlGetTablaHistorialDeDocumentoPorIdExpediente);*/
-				var urlGetDetalleDeTarea = $("#urlGetDetalleDeTarea").val()+"?idInstanciaDeTarea="+idInstanciaDeTarea+"&muestraSoloDocumentosDeSalida="+true;
-				console.log("urlGetDetalleDeTarea: " + urlGetDetalleDeTarea);
-				/*$('#divDetalleDeTarea').each(function(){        	 
-						$(this).fadeOut("slow").load(urlGetDetalleDeTarea).fadeIn('slow');
-					});*/
+						+ "/" + nombreExpediente;			
+				var urlGetDetalleDeTarea = $("#urlGetDetalleDeTarea").val()+"?idInstanciaDeTarea="+idInstanciaDeTarea+"&muestraSoloDocumentosDeSalida="+true;				
 				$("#divDetalleDeTarea").load(urlGetDetalleDeTarea, function() {
 						$("#contenedorBEPrincipal").find(".cargando").remove();
 						if ($("#divTabsDetalleDeTarea").length>0) {
 	        			$('html, body').animate({scrollTop: $("#divTabsDetalleDeTarea").offset().top}, 2000);
 	        		}
-	 			});
-				//$('#firmaAvanzadaModal').modal('hide');
+	 			});				
 			} else {
 				$("#contenedorBEPrincipal").find(".cargando").remove();
-				$.notify({
-	     			//message: 'Error al firmar documento!'
+				$.notify({	     			
 	     			message: returnData.responseJSON.resultadoFirmarDocumentoConFEA
 	     		},{
 	     			type: 'danger'
@@ -562,8 +556,8 @@ function cargaModalFEA(idExpediente,
 	$.get(urlSessionValida, function(haySession) {
 	    console.log("haySession: " + haySession);
 	    if(haySession) {
-	        var urlEstaDocumentoFirmado = raizURL + "/estaDocumentoFirmado/" + idArchivo + "/" + idInstanciaDeTarea;
-	        console.log("urlEstaDocumentoFirmado: " + urlEstaDocumentoFirmado);
+	        var urlEstaDocumentoFirmado = raizURL + "estaDocumentoFirmado/" + idArchivo + "/" + idInstanciaDeTarea;
+	        //console.log("urlEstaDocumentoFirmado: " + urlEstaDocumentoFirmado);
         	$.get(urlEstaDocumentoFirmado, function(estaDocumentoFirmado) {
             	if (estaDocumentoFirmado == true) {
             		bootbox.confirm({
@@ -597,7 +591,48 @@ function cargaModalFEA(idExpediente,
         		        }
         		    });
                 } else {
-                	loadModalFEA(idExpediente,
+	
+					var urlValidaSiHayFirmaHoy = raizURL + "validaSiHayFirmaHoy/" + idTipoDeDocumento + "/" + idInstanciaDeTarea;
+					
+	        		$.get(urlValidaSiHayFirmaHoy, function(urlValidaSiHayFirmaHoy) { 
+		
+						if (urlValidaSiHayFirmaHoy == true) {
+							
+							bootbox.confirm({
+		        		    	title: "Firmar documento",
+		        		        message: "En esta tarea HOY ya se firm&oacute; un documento, ¿desea firmar nuevamente?",
+		        		        buttons: {
+		        		            confirm: {
+		        		                label: '<span class="glyphicon glyphicon-ok-circle font-icon-3"></span>',
+		        		                className: 'btn-success'
+		        		            },
+		        		            cancel: {
+		        		                label: '<span class="glyphicon glyphicon-remove-circle font-icon-3"></span>',
+		        		                className: 'btn-danger'
+		        		            }
+		        		        },
+		        		        callback: function (result) {        		            
+		        		            if (result == true) {
+		        		            	loadModalFEA(idExpediente,
+		        	                			idArchivo,
+		        	                			nombreArchivo,
+		        	                			mimeType,
+		        	                			idTipoDeDocumento,
+		        	                			nombreTipoDeDocumento,
+		        	                			cdr,
+		        	                			numeroDocumento,
+		        	                			cartaRelacionada,
+		        	                			emisor,
+		        	                			idInstanciaDeTarea,
+		        	                			nombreExpediente);
+		        				    }
+		        		        }
+	        		    	});
+							
+							
+						} else {
+							
+							loadModalFEA(idExpediente,
                 			idArchivo,
                 			nombreArchivo,
                 			mimeType,
@@ -609,6 +644,11 @@ function cargaModalFEA(idExpediente,
                 			emisor,
                 			idInstanciaDeTarea,
                 			nombreExpediente);
+							
+						}
+		
+	 				});
+                	
                 }
             });  
 	    } else {

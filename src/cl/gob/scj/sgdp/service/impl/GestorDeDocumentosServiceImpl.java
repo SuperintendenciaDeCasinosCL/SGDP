@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Date;
@@ -13,6 +12,7 @@ import java.util.Properties;
 import javax.annotation.Resource;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +37,7 @@ import cl.gob.scj.sgdp.dao.HistoricoFirmaDao;
 import cl.gob.scj.sgdp.dao.InstanciaDeProcesoDao;
 import cl.gob.scj.sgdp.dao.InstanciaDeTareaDao;
 import cl.gob.scj.sgdp.dao.TipoDeDocumentoDao;
+import cl.gob.scj.sgdp.dto.ArchivosInstDeTareaDTO;
 import cl.gob.scj.sgdp.dto.DetalleDeArchivoDTO;
 import cl.gob.scj.sgdp.dto.FirmaAvanzadaDTO;
 import cl.gob.scj.sgdp.dto.HistoricoFirmaDTO;
@@ -56,6 +57,7 @@ import cl.gob.scj.sgdp.model.InstanciaDeProceso;
 import cl.gob.scj.sgdp.model.InstanciaDeTarea;
 import cl.gob.scj.sgdp.model.TipoDeDocumento;
 import cl.gob.scj.sgdp.service.GestorDeDocumentosService;
+import cl.gob.scj.sgdp.service.HistoricoFirmaService;
 import cl.gob.scj.sgdp.service.ObtenerDetalleDeArchivoService;
 import cl.gob.scj.sgdp.service.ParametroPorContextoService;
 import cl.gob.scj.sgdp.service.ParametroService;
@@ -127,6 +129,9 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 	
 	@Autowired
 	private RegistroDocumentoService registroDocumentoService;
+	
+	@Autowired
+	private HistoricoFirmaService historicoFirmaService;
 	
 	private FirmaType firmaTypeVisacion = FirmaType.VISACION;
 	
@@ -260,13 +265,14 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
             	generaRegistroDocumentoRequestRest.setCodTipoDoc(tipoDeDocumento.getCodTipoDocumento());
             	generaRegistroDocumentoRequestRest.setCodDivisionUnidadSGDP((int)instanciaDeProceso.getProceso().getUnidad().getIdUnidad());
             	generaRegistroDocumentoRequestRest.setUser(configProps.getProperty("usrRegistroDoc"));
-            	generaRegistroDocumentoRequestRest.setPass(configProps.getProperty("passREgistroDoc"));
+            	generaRegistroDocumentoRequestRest.setPass(configProps.getProperty("passRegistroDoc"));
             	generaRegistroDocumentoResponseRest = registroDocumentoService.generaRegistroDocumento(generaRegistroDocumentoRequestRest, usuario);
             	
             	if (generaRegistroDocumentoResponseRest!=null) {
             		puedeBorrarRegistroDoc = true;
             		numeroDocRegistro = generaRegistroDocumentoResponseRest.getNumeroDoc();
             		firmaAvanzadaDTO.setNumeroDocumento(numeroDocRegistro.toString());
+            		firmaAvanzadaDTO.setCategoriaDeDocumento(generaRegistroDocumentoResponseRest.getNombreTipoDocumento());
             	} 
             	
             	/*Agrega cabecera en todas las paginas*/
@@ -298,14 +304,17 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
                     ColumnText.showTextAligned(overLogoSCJ, Element.ALIGN_LEFT, 
                     		new Phrase(generaRegistroDocumentoResponseRest.getNombreTipoDocumento() + " N\u00B0 " + generaRegistroDocumentoResponseRest.getNumeroDoc() + " / " + FechaUtil.simpleDateFormatYear.format(new Date()), fontCabeceraNumDoc), posXTipoDoc , Math.abs(posYNombreExpediente), 0);
                     ColumnText.showTextAligned(overLogoSCJ, Element.ALIGN_LEFT, new Phrase("P\u00E1gina " + i + " de " + reader.getNumberOfPages() , fontCabeceraNumPag), posXNumPag , Math.abs(posYNombreExpediente), 0);
-                    ColumnText.showTextAligned(overLogoSCJ, Element.ALIGN_LEFT, new Phrase("SANTIAGO, " + FechaUtil.simpleDateFormatForm.format(new Date()) , fontCabeceraNumDoc), posXFecha , Math.abs(posYFecha), 0);                
+                    ColumnText.showTextAligned(overLogoSCJ, Element.ALIGN_LEFT, new Phrase("SANTIAGO, " + FechaUtil.simpleDateFormatForm.format(new Date()) + " " + instanciaDeProceso.getNombreExpediente() , fontCabeceraNumDoc), posXFecha , Math.abs(posYFecha), 0);                
                 }  
                 
                 ColumnText.showTextAligned(over, Element.ALIGN_LEFT, new Phrase(textoVerificaValidezFea, font), 60 , 20, 0);            	
             
             } 
                   
-            ColumnText.showTextAligned(over, Element.ALIGN_LEFT, new Phrase(firmaAvanzadaDTO.getIdDocumento(), font), 60 , 30, 0);
+            //ColumnText.showTextAligned(over, Element.ALIGN_LEFT, new Phrase(firmaAvanzadaDTO.getIdDocumento(), font), 60 , 30, 0);
+            
+            long idDocumentoFirmado = historicoFirmaService.getIdDocumentoFirmado();
+            ColumnText.showTextAligned(over, Element.ALIGN_LEFT, new Phrase("ID: " + Long.toString(idDocumentoFirmado), font), 60 , 30, 0);
             
             Date fechaPieFea = new Date();
             
@@ -393,6 +402,14 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 						sgdpMultipartFile.setContentType(firmaAvanzadaDTO.getMimeType());
 						sgdpMultipartFile.setName(firmaAvanzadaDTO.getNombreArchivo());
 						sgdpMultipartFile.setOriginalFilename(firmaAvanzadaDTO.getNombreArchivo());
+						if (firmaAvanzadaDTO.getCategoriaDeDocumento()!=null) {								
+							String extensionDocumento = firmaAvanzadaDTO.getNombreArchivo().substring(firmaAvanzadaDTO.getNombreArchivo().lastIndexOf('.'), firmaAvanzadaDTO.getNombreArchivo().length());
+							sgdpMultipartFile.setName(URLEncoder.encode(firmaAvanzadaDTO.getCategoriaDeDocumento(), "UTF-8") + " " + "N%C2%B0 " + firmaAvanzadaDTO.getNumeroDocumento() + " " + FechaUtil.simpleDateFormatYear.format(new Date()) + " " + FechaUtil.simpleDateFormat.format(new Date()) + extensionDocumento);
+							sgdpMultipartFile.setOriginalFilename(URLEncoder.encode(firmaAvanzadaDTO.getCategoriaDeDocumento(), "UTF-8")  + " " + "N%C2%B0" + firmaAvanzadaDTO.getNumeroDocumento() + " " + FechaUtil.simpleDateFormatYear.format(new Date()) + " " + FechaUtil.simpleDateFormat.format(new Date()) + extensionDocumento);
+						} else {
+							sgdpMultipartFile.setName(firmaAvanzadaDTO.getNombreArchivo());
+							sgdpMultipartFile.setOriginalFilename(firmaAvanzadaDTO.getNombreArchivo());
+						}				
 						subirArhivoDTO.setArchivo(sgdpMultipartFile);						
 						subirArhivoDTO.setIdExpedienteSubirArchivo(firmaAvanzadaDTO.getIdExpediente());
 						subirArhivoDTO.setTipoDeDocumento(firmaAvanzadaDTO.getTipoDeDocumento());
@@ -409,6 +426,7 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 						historicoFirmaDTO.setIdUsuario(usuario.getIdUsuario());
 						historicoFirmaDTO.setTipoFirma(firmaTypeCentralizado);
 						historicoFirmaDTO.setIdTipoDeDocumento(firmaAvanzadaDTO.getIdTipoDeDocumento());
+						historicoFirmaDTO.setIdDocumentoFirmado(idDocumentoFirmado);
 						registraFirma(usuario.getIdUsuario(), historicoFirmaDTO);
 					} else {
 						log.info("checkSumGet.distinto(fileMinSegPres.getChecksum())");
@@ -446,7 +464,7 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 				borraRegistroDocumentoRequestRest.setMotivoAnulacion("Ocurrio un error durante la firma de segpres del documento en SGDP al usuario " + usuario.getIdUsuario());
 				borraRegistroDocumentoRequestRest.setMensajeException(e.getMessage());
 				borraRegistroDocumentoRequestRest.setUser(configProps.getProperty("usrRegistroDoc"));
-				borraRegistroDocumentoRequestRest.setPass(configProps.getProperty("passREgistroDoc"));
+				borraRegistroDocumentoRequestRest.setPass(configProps.getProperty("passRegistroDoc"));
 				try {
 					BorraRegistroDocumentoResponseRest borraRegistroDocumentoResponseREst = registroDocumentoService.borraRegistroDocumento(borraRegistroDocumentoRequestRest);
 					log.info(borraRegistroDocumentoResponseREst.toString());
@@ -505,6 +523,7 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 				idArchivoDefirma.setIdArchivo("0");
 			}			
 			String textoVerificaValidezFea = parametroService.getParametroPorID(Constantes.ID_PARAM_URL_VERIFICACION_DOC_FEA).getValorParametroChar();			
+			long idDocumentoFirmado = historicoFirmaService.getIdDocumentoFirmado();
 			log.info("urlCodeBaseJNLPFea: " + urlCodeBaseJNLPFea);
 			log.info("iddoc: " + iddoc);
 			log.info("ticket: " + ticket);
@@ -523,14 +542,13 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 			log.info("colocaImagenFea: " + colocaImagenFea);
 			log.info("textoVerificaValidezFea: " + textoVerificaValidezFea);
 			log.info("textoVerificaValrutidezFea: " + usuario.getRut());
+			log.info("idDocumentoFirmado: " + idDocumentoFirmado);
 			return "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +		       
 		         "<jnlp codebase=" + urlCodeBaseJNLPFea + " >\n" +
 		              "<information>\n"+
 		             		"<title>SWT Address Book</title>\n"+
 		             		"<vendor>Eclipse</vendor>\n"+
-		             		"<homepage href=\"http://www.eclipse.org\"/>\n"+
-		             		"<description kind=\"default\">A simple address book</description>\n"+
-		             		"<icon kind=\"default\" href=\"addressbook.jpg\"/>\n"+
+		             		"<homepage href=\"http://www.eclipse.org\"/>\n"+		             	
 		             		"<offline-allowed/>\n"+
 		              "</information>\n"+
 		              "<security>\n"+
@@ -573,6 +591,7 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 							"<argument>"+colocaImagenFea+"</argument>\n" +
 							"<argument>"+textoVerificaValidezFea+"</argument>\n" +
 							"<argument>"+usuario.getRut()+"</argument>\n" +
+							"<argument>"+idDocumentoFirmado+"</argument>\n" +
 		              "</application-desc>" +
 		              "</jnlp>";
 	}
@@ -590,6 +609,7 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 		historicoFirma.setInstanciaDeTarea(instanciaDeTarea);
 		historicoFirma.setTipoFirma(historicoFirmaDTO.getTipoFirma().getNombreFirma());
 		historicoFirma.setTipoDeDocumento(tipoDeDocumento);
+		historicoFirma.setIdDocumentoFirmado(historicoFirmaDTO.getIdDocumentoFirmado());
         switch (historicoFirmaDTO.getTipoFirma().getCodigoFirma()) {
         	/*VISACION*/
         	case 1: {
@@ -681,8 +701,10 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 		} else {				
 			nombreArchivo = subirArhivoDTO.getNombreDeArchivo();
 			nombreArchivo = URLEncoder.encode(nombreArchivo, "UTF-8");
-		}
-		log.debug("nombreArchivo: " + nombreArchivo);			
+		}	
+		//nombreArchivo = subirArhivoDTO.getNombreDeArchivo();
+		//nombreArchivo = URLEncoder.encode(nombreArchivo, "UTF-8");		
+		log.debug("nombreArchivo: " + nombreArchivo);
 		respuestaConversionArchivoDTO = convertirArchivoAPDFYSubirACMS(usuario, nombreArchivo, subirArhivoDTO);
 		/*try {
 			if (subirArhivoDTO.getArchivo()!=null && subirArhivoDTO.getArchivo().getOriginalFilename()!=null) {
@@ -706,5 +728,91 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 	public byte[] getContenidoArchivoDesdeUrlYVersion(DetalleDeArchivoDTO detalleDeArchivoDTO, String version, Usuario usuario) throws Exception {
 		return gestorDeDocumentosCMSService.getContenidoArchivoDesdeUrlYVersion(detalleDeArchivoDTO, version, usuario);
 	}
-
+	
+	/*@Override
+	public RespuestaSimpleDTO copiaArchivo(Usuario usuario, String idExpedienteOrigen, String idExpedienteDestino, String idArchivo, String nuevoNombre) throws Exception {
+		return gestorDeDocumentosCMSService.copiaArchivo(usuario, idExpedienteOrigen, idExpedienteDestino, idArchivo, nuevoNombre);
+	}*/
+	
+	@Override
+	public SubirArhivoDTO subirArchivoDesdeOtroCambiandoNombre(Usuario usuario, String nombreDeArchivo, SubirArhivoDTO sdto) throws SgdpException {
+		log.debug("Inicio subirArchivoDesdeOtro. idArchivo: " + sdto.getIdArchivoEnCMS());
+		byte[] byteArchivo;
+		DetalleDeArchivoDTO detalleDeArchivoDTO;
+		SgdpMultipartFile sgdpMultipartFile = new SgdpMultipartFile();
+		SubirArhivoDTO subirArhivoDTO = new SubirArhivoDTO();
+		try {
+			detalleDeArchivoDTO = obtenerDetalleDeArchivoService.obtenerDetalleDeArchivo(usuario, sdto.getIdArchivoEnCMS());
+			log.debug(detalleDeArchivoDTO.toString());	
+			nombreDeArchivo = URLEncoder.encode(nombreDeArchivo, "UTF-8");
+			log.debug("nombreDeArchivo: " + nombreDeArchivo);
+			byteArchivo = gestorDeDocumentosCMSService.getContenidoArchivo(sdto.getIdArchivoEnCMS(), usuario);			
+			sgdpMultipartFile.setBytes(byteArchivo);
+			sgdpMultipartFile.setContentType("application/pdf");
+			sgdpMultipartFile.setName(nombreDeArchivo);
+			sgdpMultipartFile.setOriginalFilename(nombreDeArchivo);
+			subirArhivoDTO.setArchivo(sgdpMultipartFile);						
+			subirArhivoDTO.setIdExpedienteSubirArchivo(detalleDeArchivoDTO.getIdExpedienteQueLoContiene());
+			subirArhivoDTO.setTipoDeDocumento(sdto.getTipoDeDocumento());
+			subirArhivoDTO.setNumeroDocumento(detalleDeArchivoDTO.getNumeroDocumento());
+			subirArhivoDTO.setEmisor(detalleDeArchivoDTO.getEmisor());
+			subirArhivoDTO.setCdr(detalleDeArchivoDTO.getCdr());
+			subirArhivoDTO.setDescripcion(detalleDeArchivoDTO.getDescripcion());
+			subirArhivoDTO.setCartaRelacionada(detalleDeArchivoDTO.getCartaRelacionada());
+			subirArhivoDTO.setEmisor(detalleDeArchivoDTO.getEmisor());
+			subirArhivoDTO.setOtro(detalleDeArchivoDTO.getResultadoObtenerDetalleDeArchivo());
+			subirArhivoDTO.setEsDocumentoOficial(sdto.getEsDocumentoOficial());	
+			subirArhivoDTO.setCategoriaDocumento(sdto.getCategoriaDocumento());
+			subirArhivoDTO.setIdInstanciaDeTareaSubirArchivo(sdto.getIdInstanciaDeTareaSubirArchivo());
+			subirArhivoDTO.setIdTipoDeDocumentoSubir(sdto.getIdTipoDeDocumentoSubir());
+			subirArhivoDTO.setEsRequerido(sdto.getEsRequerido());
+			SubirArchivoResponse subirArchivoResponse = subirArchivoCMSService.subirArchivo(usuario, subirArhivoDTO);
+			subirArhivoDTO.setIdArchivoEnCMS(subirArchivoResponse.getIdArchivo());
+			log.debug(subirArchivoResponse.toString());			
+			return subirArhivoDTO;
+		} catch (SgdpException e) {						
+			log.error("ERROR_AL_OBTENER_DETALLE_DE_ARCHIVO");
+			log.debug("Fin... subirArchivoDesdeOtroCambiandoNombre.. error");
+			throw new SgdpException("Error al subirArchivoDesdeOtroCambiandoNombre");
+		} /*catch (IOException e) {
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			String exceptionAsString = sw.toString();
+			log.error(exceptionAsString);		
+			log.info("Fin... subirArchivoDesdeOtro.. error");
+			throw new SgdpException("Error al subirArchivoDesdeOtro");
+		} */catch (Exception e) {
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			String exceptionAsString = sw.toString();
+			log.error(exceptionAsString);		
+			log.info("Fin... subirArchivoDesdeOtroCambiandoNombre.. error");
+			throw new SgdpException("Error al subirArchivoDesdeOtroCambiandoNombre");
+		}
+	}
+	
+	public ArchivosInstDeTareaDTO getUltimoArchivoInstDeTareaFirmado(long idInstanciaDeTarea, long idTipoDeDocumento, String idUsuario) {
+		ArchivosInstDeTareaDTO archivosInstDeTareaDTO = new ArchivosInstDeTareaDTO();
+		try {
+			ArchivosInstDeTarea archivosInstDeTarea = archivosInstDeTareaDao.getUltimoArchivoInstDeTareaFirmado(idInstanciaDeTarea, idTipoDeDocumento, idUsuario);		
+			if (archivosInstDeTarea!=null) {
+				archivosInstDeTareaDTO.setGlosa("OK");
+				BeanUtils.copyProperties(archivosInstDeTarea, archivosInstDeTareaDTO);
+				archivosInstDeTareaDTO.setIdInstanciaDeTarea(idInstanciaDeTarea);
+				archivosInstDeTareaDTO.setIdTipoDeDocumento(idTipoDeDocumento);	
+			} else {
+				archivosInstDeTareaDTO.setGlosa("ERROR");
+			}
+			return archivosInstDeTareaDTO;			
+		} catch (Exception e) {			
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			String exceptionAsString = sw.toString();
+			log.info(exceptionAsString);
+			archivosInstDeTareaDTO.setGlosa("ERROR");
+			return archivosInstDeTareaDTO;
+		}
+		
+	}
+	
 }

@@ -172,6 +172,11 @@ import cl.gob.scj.sgdp.config.Constantes;
 			+ "AND HA.instanciaDeTarea.idInstanciaDeTarea = :idInstanciaDeTarea "
 			+ "AND HA.tipoDeDocumento.idTipoDeDocumento = :idTipoDeDocumento"),
 	
+	@NamedQuery(name="ArchivosInstDeTarea.getArchivoPorIdInstanciaDeTareaIdTipoDeDocumento", 
+	query="SELECT HA FROM ArchivosInstDeTarea HA "					
+			+ "WHERE HA.instanciaDeTarea.idInstanciaDeTarea = :idInstanciaDeTarea "
+			+ "AND HA.tipoDeDocumento.idTipoDeDocumento = :idTipoDeDocumento"),
+	
 	@NamedQuery(name="ArchivosInstDeTarea.getTodosLosDocSubidosPorIdInstTarea", 
 	query="SELECT i.idInstanciaDeTarea as idInstanciaDeTarea, t.nombreTarea as nombreTarea, " 
 			+ "ai.idArchivoCms as idArchivoCms, ai.mimeType as mimeType, ai.nombreArchivo as nombreArchivo, ai.idUsuario as idUsuario, max(ai.fechaSubido) as fechaSubido, "
@@ -420,8 +425,28 @@ import cl.gob.scj.sgdp.config.Constantes;
 			+ "INNER JOIN ai.instanciaDeTarea.instanciaDeProceso ip "
 			+ "WHERE ip.idExpediente = :idExpediente "			
       + "GROUP BY i.idInstanciaDeTarea, t.nombreTarea, ai.idArchivoCms, ai.mimeType, ai.nombreArchivo, ai.estaFirmadoConFEAWebStart, ai.estaFirmadoConFEACentralizada, "
-      + "ai.idUsuario, td.idTipoDeDocumento, td.nombreDeTipoDeDocumento, t.puedeVisarDocumentos, t.puedeAplicarFEA, ip.idExpediente, t.idTarea ORDER BY fechaSubido DESC ")
+      + "ai.idUsuario, td.idTipoDeDocumento, td.nombreDeTipoDeDocumento, t.puedeVisarDocumentos, t.puedeAplicarFEA, ip.idExpediente, t.idTarea ORDER BY fechaSubido DESC "),
 	
+	@NamedQuery(name="ArchivosInstDeTarea.getUltimoArchivoInstDeTareaFirmado", 
+	query="SELECT HA FROM ArchivosInstDeTarea HA, HistoricoFirma HF "				
+			+ "WHERE HA.instanciaDeTarea.idInstanciaDeTarea = :idInstanciaDeTarea "
+			+ "AND HA.tipoDeDocumento.idTipoDeDocumento = :idTipoDeDocumento "
+			+ "AND HA.idUsuario = :idUsuario "
+			+ "AND HA.idArchivoCms = HF.idArchivoCMS "
+			+ "AND HA.instanciaDeTarea.idInstanciaDeTarea = HF.instanciaDeTarea.idInstanciaDeTarea "
+			+ "AND HA.tipoDeDocumento.idTipoDeDocumento = HF.tipoDeDocumento.idTipoDeDocumento "
+			+ "AND HA.idUsuario = HF.idUsuario "
+			+ "ORDER BY HF.fechaFirma DESC "			
+			+ ") "),
+	
+	@NamedQuery(name="ArchivosInstDeTarea.getArchivosInstDeTareaPorIdInstTareaIdUsuarioNombreTipoDocFechaSubidoMayorA", 
+	query="SELECT HA FROM ArchivosInstDeTarea HA "
+			+ "INNER JOIN HA.tipoDeDocumento D "					
+			+ "WHERE HA.instanciaDeTarea.idInstanciaDeTarea = :idInstanciaDeTarea "
+			+ "AND HA.idUsuario = :idUsuario "
+			+ "AND HA.fechaSubido >= :fechaSubido "
+			+ "AND levenshtein(upper(replace(D.nombreDeTipoDeDocumento, ' ', '')), upper(replace(:nombreDeTipoDeDocumento, ' ', ''))) <= (SELECT p.valorParametroNumerico FROM Parametro p where p.idParametro = 63)"),
+
 })
 public class ArchivosInstDeTarea {
 	

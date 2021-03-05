@@ -30,18 +30,20 @@ import cl.gob.scj.sgdp.config.Constantes;
 @NamedQueries({
 	@NamedQuery(name="ParametroDeTarea.findAll", query="SELECT p FROM ParametroDeTarea p"),
 	@NamedQuery(name="ParametroDeTarea.getParametroDeTareaPorIdParamTarea", 
-	query="SELECT p FROM ParametroDeTarea p "
+				query="SELECT p FROM ParametroDeTarea p "
 			+ "WHERE p.idParamTarea = :idParamTarea "),
 	@NamedQuery(name="ParametroDeTarea.getParametrosDeTareaPorIdTarea", 
 				query="SELECT p FROM ParametroDeTarea p, ParametroRelacionTarea pr "
 						+ "WHERE pr.id.parametroDeTarea.idParamTarea = p.idParamTarea "
 						+ "AND pr.id.tarea.idTarea = :idTarea "),
 	@NamedQuery(name="ParametroDeTarea.getParametrosDeTareaPorIdInstanciaDeTarea", 
-	query="SELECT p FROM ParametroDeTarea p, ParametroRelacionTarea pr, Tarea t, InstanciaDeTarea i "
+			query="SELECT p FROM ParametroDeTarea p, ParametroRelacionTarea pr, Tarea t, InstanciaDeTarea i "
 			+ "WHERE pr.id.parametroDeTarea.idParamTarea = p.idParamTarea "
 			+ "AND pr.id.tarea.idTarea = t.idTarea "
 			+ "AND t.idTarea = i.tarea.idTarea "
-			+ "AND i.idInstanciaDeTarea = :idInstanciaDeTarea ")
+			+ "AND i.idInstanciaDeTarea = :idInstanciaDeTarea "
+			+ "AND p.vigente = true "
+			+ "order by p.esSNC desc, p.nombreParamTarea asc")
 })
 public class ParametroDeTarea implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -81,6 +83,12 @@ public class ParametroDeTarea implements Serializable {
 	
 	@Column(name="\"A_TITULO\"")
 	private String titulo;
+	
+	@Column(name="\"B_VIGENTE\"")
+	private Boolean vigente;
+	
+	@Column(name="\"B_ES_SNC\"")
+	private Boolean esSNC;
 
 	public ParametroDeTarea() {
 	}
@@ -203,6 +211,22 @@ public class ParametroDeTarea implements Serializable {
 
 	public void setTitulo(String titulo) {
 		this.titulo = titulo;
+	}	
+
+	public Boolean getVigente() {
+		return vigente;
+	}
+
+	public void setVigente(Boolean vigente) {
+		this.vigente = vigente;
+	}
+
+	public Boolean getEsSNC() {
+		return esSNC;
+	}
+
+	public void setEsSNC(Boolean esSNC) {
+		this.esSNC = esSNC;
 	}
 
 	@Override

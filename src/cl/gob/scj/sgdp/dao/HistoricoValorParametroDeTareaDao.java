@@ -6,6 +6,10 @@ import cl.gob.scj.sgdp.model.HistoricoValorParametroDeTarea;
 
 public interface HistoricoValorParametroDeTareaDao extends GenericDao<HistoricoValorParametroDeTarea>  {
 	
-	List<HistoricoValorParametroDeTarea> getHistoricoValorParametroDeTareaPorIdInstanciaDeTareaOrigen(long idInstanciaDeTareaOrigen);
+	List<HistoricoValorParametroDeTarea> getHistoricoValorParametroDeTareaPorIdInstanciaDeTarea(long idInstanciaDeTarea);
+	
+	List<HistoricoValorParametroDeTarea> getHistoricoValorParametroDeTareaPorIdExpediente(String idExpediente);
+	
+	List<HistoricoValorParametroDeTarea> getHistoricoValorParametroDeTareaPorIdHistoricoInstanciaDeTarea(long idHistoricoDeInstDeTarea);
 
 }

@@ -4,9 +4,11 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
 	id="WebApp_ID" version="3.0">
 	<display-name>sgdp</display-name>
+	<!--  
 	<session-config>
 		<session-timeout>60</session-timeout>
 	</session-config>
+	-->
  	<distributable/>
 	<servlet>
 		<description></description>
@@ -23,12 +25,21 @@
 	</listener>
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
+		<!-- Configuracion para SSO Comentar -->		
 		<param-value>
 		       classpath:cl/gob/scj/sgdp/config/service-context.xml    
 		       classpath:cl/gob/scj/sgdp/config/persistence-context.xml    
 		       classpath:cl/gob/scj/sgdp/config/security-context.xml
 		       classpath:cl/gob/scj/sgdp/config/util-context.xml		       
 		</param-value>
+		<!-- Configuracion para SSO Comentar -->
+		
+		<!-- Configuracion para SSO DesComentar -->
+		<!--<param-value>
+		       classpath:cl/gob/scj/sgdp/config/service-context.xml    
+		       classpath:cl/gob/scj/sgdp/config/persistence-context.xml
+		       classpath:cl/gob/scj/sgdp/config/util-context.xml	       
+		</param-value>-->
 	</context-param>
 	<!-- Codificación -->
 	<filter>
@@ -59,10 +70,12 @@
 		<filter-name>encodingFilter</filter-name>
 		<url-pattern>/getSolicitudesCreaExpFinalizadas</url-pattern>
 	</filter-mapping>
+	
+	<!-- Configuracion para SSO Comentar -->
 	<filter-mapping>	
 		<filter-name>encodingFilter</filter-name>
 		<url-pattern>/j_spring_security_check</url-pattern>
-	</filter-mapping>	
+	</filter-mapping>	  	
 	<filter>
 		<display-name>springSecurityFilterChain</display-name>
 		<filter-name>springSecurityFilterChain</filter-name>
@@ -74,17 +87,57 @@
 	</filter-mapping>
 	<filter>
         <filter-name>NoCacheFilter</filter-name>
-        <filter-class>cl.gob.scj.sgdp.filter.NoCacheFilter</filter-class>
+        <filter-class>cl.gob.scj.sgdp.filter.NoCacheFilter</filter-class>         
     </filter>
     <filter-mapping>
         <filter-name>NoCacheFilter</filter-name>
         <url-pattern>/*</url-pattern>
-    </filter-mapping>
+    </filter-mapping> 
 	<listener>
 		<listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
-	</listener>	
+	</listener>
+	<!-- Configuracion para SSO Comentar -->
+	
+	<!-- Configuracion para SSO DesComentar -->
+	<!-- <security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Todo</web-resource-name>
+			<url-pattern>/*</url-pattern>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>user</role-name>
+		</auth-constraint>
+		<user-data-constraint>
+			<transport-guarantee>NONE</transport-guarantee>
+		</user-data-constraint>
+	</security-constraint>	
+	<security-constraint>
+	    <web-resource-collection>
+	        <web-resource-name>ValidaSesion</web-resource-name>
+	        <url-pattern>/verificarSession</url-pattern>
+	    </web-resource-collection>
+	</security-constraint>	
+	<security-constraint>
+	    <web-resource-collection>
+	        <web-resource-name>Servicios Web</web-resource-name>
+	        <url-pattern>/serviciosDoc/*</url-pattern>
+	        <url-pattern>/servicios/*</url-pattern>
+	        <url-pattern>/mantenimiento/*</url-pattern>
+	        <url-pattern>/lib2/*</url-pattern>
+	    </web-resource-collection>
+	</security-constraint>	
+	<login-config>
+		<auth-method>KEYCLOAK</auth-method>
+		<realm-name>this is ignored currently</realm-name>
+	</login-config>
+	<security-role>
+		<role-name>user</role-name>
+	</security-role> -->
+	<!-- Configuracion para SSO DesComentar-->
+			
     <error-page>
         <error-code>404</error-code>
         <location>/error404</location>
     </error-page>
+    
 </web-app>
