@@ -1,63 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xmlns:security="http://www.springframework.org/schema/security"
-	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-	
-	<security:http use-expressions="true">
-	
-		<security:intercept-url pattern="/" access="permitAll" />
-		<security:intercept-url pattern="/verificarSession" access="permitAll" /> 
-		<security:intercept-url pattern="/sessionTimeout" access="permitAll"  />
-		<security:intercept-url pattern="/login/getRolesUsuario" access="permitAll" />		
-		<security:intercept-url pattern="/*" access="isAuthenticated()" /> 
-		
-		<security:form-login login-page="/"
-			password-parameter="clave" username-parameter="idUsuario"		
-			authentication-failure-url="/?error=errorCredenciales"
-			authentication-success-handler-ref="authenticationSuccessHandlerImpl"
-			 />	
-		
-        <security:logout logout-url="/logout" invalidate-session="true" />	
-		
-		<security:access-denied-handler error-page="/?error=accesoDenegado" />	
-		
-	</security:http>
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xmlns:security="http://www.springframework.org/schema/security"
+        xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="authenticationSuccessHandlerImpl" class="cl.gob.scj.sgdp.config.AuthenticationSuccessHandlerImpl" >
-	</bean>
-	
-	<bean id="contextSource"
-		class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
-		<constructor-arg value="ldap://supercasino.cl:389/dc=supercasino,dc=cl">
-		</constructor-arg>
-		<property name="userDn" value="ldap@supercasino.cl"></property>
-		<property name="password" value="P@ssw0rd"></property>
-		<!-- <property name="anonymousReadOnly" value="true"/> -->		
-	</bean>
+        <security:http use-expressions="true">
 
-	<bean id="userSearch" class="org.springframework.security.ldap.search.FilterBasedLdapUserSearch">
-		<constructor-arg index="0" value=""></constructor-arg>
-		<constructor-arg index="1" value="(sAMAccountName={0})"></constructor-arg>
-		<constructor-arg index="2" ref="contextSource"></constructor-arg>
-	</bean>
+                <security:intercept-url pattern="/" access="permitAll" />
+                <security:intercept-url pattern="/verificarSession" access="permitAll" />
+                <security:intercept-url pattern="/sessionTimeout" access="permitAll"  />
+                <security:intercept-url pattern="/login/getRolesUsuario" access="permitAll" />        
+                <security:intercept-url pattern="/*" access="isAuthenticated()" />
 
-	<bean id="ldapAuthProvider"	class="org.springframework.security.ldap.authentication.LdapAuthenticationProvider">
-		<constructor-arg>
-			<bean
-				class="org.springframework.security.ldap.authentication.BindAuthenticator">
-				<constructor-arg ref="contextSource"></constructor-arg>
-				<property name="userSearch" ref="userSearch"></property>
-			</bean>
-		</constructor-arg>
-		<constructor-arg>
-			<bean class="cl.gob.scj.sgdp.config.LdapAuthoritiesPopulatorImpl">
-			</bean>
-		</constructor-arg>
-	</bean>
+                <security:form-login login-page="/"
+                        password-parameter="clave" username-parameter="idUsuario"               
+                        authentication-failure-url="/?error=errorCredenciales"
+                        authentication-success-handler-ref="authenticationSuccessHandlerImpl"
+                         />
 
-	<security:authentication-manager>
-		<security:authentication-provider ref="ldapAuthProvider"></security:authentication-provider>
-	</security:authentication-manager>
-	
+        <security:logout logout-url="/logout" invalidate-session="true" />
+
+                <security:access-denied-handler error-page="/?error=accesoDenegado" />
+
+        </security:http>
+
+        <bean id="authenticationSuccessHandlerImpl" class="cl.gob.scj.sgdp.config.AuthenticationSuccessHandlerImpl" >
+        </bean>
+
+        <bean id="contextSource"
+                class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
+                <constructor-arg value="ldap://54.94.29.51/dc=app,dc=local">
+                </constructor-arg>
+                <!-- <constructor-arg value="ldap://ld.tecnova.cl/dc=app,dc=local">
+                </constructor-arg>-->
+                <property name="userDn" value="cn=admin,dc=app,dc=local"></property>
+                <property name="password" value="gest1469"></property>
+        </bean>
+
+       <bean id="userSearch" class="org.springframework.security.ldap.search.FilterBasedLdapUserSearch">
+                <constructor-arg index="0" value=""></constructor-arg>
+                <!-- <constructor-arg index="1" value="(cn={0})"></constructor-arg>-->
+                <constructor-arg index="1" value="(uid={0})"></constructor-arg>
+                <constructor-arg index="2" ref="contextSource"></constructor-arg>
+        </bean>
+
+        <bean id="ldapAuthProvider"     class="org.springframework.security.ldap.authentication.LdapAuthenticationProvider">
+                <constructor-arg>
+                        <bean
+                                class="org.springframework.security.ldap.authentication.BindAuthenticator">
+                                <constructor-arg ref="contextSource"></constructor-arg>
+                                <property name="userSearch" ref="userSearch"></property>
+                        </bean>
+                </constructor-arg>
+                <constructor-arg>
+                        <bean class="cl.gob.scj.sgdp.config.LdapAuthoritiesPopulatorImpl">
+                        </bean>
+                </constructor-arg>
+        </bean>
+        <security:authentication-manager>
+                <security:authentication-provider ref="ldapAuthProvider"></security:authentication-provider>
+        </security:authentication-manager>
+
 </beans>
