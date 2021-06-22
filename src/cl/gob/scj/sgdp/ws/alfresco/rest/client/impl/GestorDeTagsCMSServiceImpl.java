@@ -50,15 +50,12 @@ public class GestorDeTagsCMSServiceImpl implements
 		
 		try {			
 			autenticacionService.validaSesion(usuario);
-			log.error(usuario.getAlfTicket());
-			log.error(Constantes.NOMBRE_PARAMETRO_ALF_TICKET);
-			log.error(parametrosURL);
 			parametrosURL.put(Constantes.NOMBRE_PARAMETRO_ALF_TICKET, usuario.getAlfTicket());
 			List<ClientHttpRequestInterceptor> listClientRequestInterceptor = restTemplate.getInterceptors();
 			for (ClientHttpRequestInterceptor clientHttpRequestInterceptor : listClientRequestInterceptor) {
 				if (clientHttpRequestInterceptor instanceof RequestLoggingInterceptor) {
 					RequestLoggingInterceptor requestLoggingInterceptor = (RequestLoggingInterceptor) clientHttpRequestInterceptor;
-					log.error("requestLoggingInterceptor.getAlfTicketCookie(): " + requestLoggingInterceptor.getAlfTicketCookie());
+					log.debug("requestLoggingInterceptor.getAlfTicketCookie(): " + requestLoggingInterceptor.getAlfTicketCookie());
 				}				
 			}
 			@SuppressWarnings("unchecked")

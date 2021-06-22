@@ -1,7 +1,6 @@
 package cl.gob.scj.sgdp.model;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,8 +13,6 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import cl.gob.scj.sgdp.config.Constantes;
 
@@ -26,22 +23,11 @@ import cl.gob.scj.sgdp.config.Constantes;
  */
 @Entity
 @Table(name="\"SGDP_HISTORICO_VALOR_PARAMETRO_DE_TAREA\"")
-@NamedQueries({	
-	
-	@NamedQuery(name="HistoricoValorParametroDeTarea.findAll", query="SELECT h FROM HistoricoValorParametroDeTarea h"),	
-	
-	@NamedQuery(name="HistoricoValorParametroDeTarea.getHistoricoValorParametroDeTareaPorIdInstanciaDeTarea", 
-		query="SELECT DISTINCT v FROM HistoricoValorParametroDeTarea v "
-				+ "WHERE v.instanciaDeTarea.idInstanciaDeTarea = :idInstanciaDeTarea"),	
-	
-	@NamedQuery(name="HistoricoValorParametroDeTarea.getHistoricoValorParametroDeTareaPorIdExpediente", 
-		query="SELECT DISTINCT v FROM HistoricoValorParametroDeTarea v "
-				+ "WHERE v.instanciaDeTarea.instanciaDeProceso.idExpediente = :idExpediente"),	
-	
-	@NamedQuery(name="HistoricoValorParametroDeTarea.getHistoricoValorParametroDeTareaPorIdHistoricoInstanciaDeTarea", 
-		query="SELECT DISTINCT v FROM HistoricoValorParametroDeTarea v "
-				+ "WHERE v.historicoDeInstDeTarea.idHistoricoDeInstDeTarea = :idHistoricoDeInstDeTarea")	
-	
+@NamedQueries({
+	@NamedQuery(name="HistoricoValorParametroDeTarea.findAll", query="SELECT h FROM HistoricoValorParametroDeTarea h"),
+	@NamedQuery(name="HistoricoValorParametroDeTarea.getHistoricoValorParametroDeTareaPorIdInstanciaDeTareaOrigen", 
+		query="SELECT v FROM HistoricoValorParametroDeTarea v "
+				+ "WHERE v.historicoDeInstDeTarea.instanciaDeTareaDeOrigen.idInstanciaDeTarea = :idInstanciaDeTareaOrigen")
 })
 public class HistoricoValorParametroDeTarea implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -55,7 +41,7 @@ public class HistoricoValorParametroDeTarea implements Serializable {
 	@Column(name="\"A_VALOR\"")
 	private String valor;
 
-	//bi-directional many-to-one association to HistoricoDeInstDeTarea
+	//bi-directional many-to-one association to InstanciasDeTarea
 	@ManyToOne
 	@JoinColumn(name="\"ID_HISTORICO_DE_INST_DE_TAREA\"")
 	private HistoricoDeInstDeTarea historicoDeInstDeTarea;
@@ -65,20 +51,8 @@ public class HistoricoValorParametroDeTarea implements Serializable {
 	@JoinColumn(name="\"ID_PARAM_TAREA\"")
 	private ParametroDeTarea parametroDeTarea;
 	
-	//bi-directional many-to-one association to InstanciasDeTarea
-	@ManyToOne
-	@JoinColumn(name="\"ID_INSTANCIA_DE_TAREA\"")
-	private InstanciaDeTarea instanciaDeTarea;
-	
 	@Column(name="\"A_COMENTARIO\"")
 	private String comentario;
-	
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name="\"D_FECHA\"")
-	private Date fecha;
-	
-	@Column(name="\"ID_USUARIO\"")	
-	private String idUsuario;
 
 	public HistoricoValorParametroDeTarea() {
 	}
@@ -121,30 +95,6 @@ public class HistoricoValorParametroDeTarea implements Serializable {
 
 	public void setComentario(String comentario) {
 		this.comentario = comentario;
-	}
-
-	public InstanciaDeTarea getInstanciaDeTarea() {
-		return instanciaDeTarea;
-	}
-
-	public void setInstanciaDeTarea(InstanciaDeTarea instanciaDeTarea) {
-		this.instanciaDeTarea = instanciaDeTarea;
-	}
-
-	public Date getFecha() {
-		return fecha;
-	}
-
-	public void setFecha(Date fecha) {
-		this.fecha = fecha;
-	}
-
-	public String getIdUsuario() {
-		return idUsuario;
-	}
-
-	public void setIdUsuario(String idUsuario) {
-		this.idUsuario = idUsuario;
 	}
 
 }

@@ -20,6 +20,5 @@
 	<context:component-scan base-package="cl.gob.scj.sgdp.ws.rest.service"></context:component-scan>
 	<context:component-scan base-package="cl.gob.scj.sgdp.ws.email.rest.client"></context:component-scan>
 	<context:component-scan base-package="cl.gob.scj.sgdp.excel"></context:component-scan>
-    <context:component-scan base-package="cl.gob.scj.sgdp.ws.rest.client"></context:component-scan>    
-    
+    <context:component-scan base-package="cl.gob.scj.sgdp.ws.rest.client"></context:component-scan>
 </beans>

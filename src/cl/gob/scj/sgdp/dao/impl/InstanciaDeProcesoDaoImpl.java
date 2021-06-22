@@ -1,5 +1,6 @@
 package cl.gob.scj.sgdp.dao.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -13,15 +14,18 @@ import org.springframework.stereotype.Repository;
 
 import cl.gob.scj.sgdp.auth.user.Usuario;
 import cl.gob.scj.sgdp.dao.InstanciaDeProcesoDao;
+import cl.gob.scj.sgdp.dto.EnviarArchivoNacionalDTO;
 import cl.gob.scj.sgdp.dto.FechaEstadoInstanciaProcesoDTO;
 import cl.gob.scj.sgdp.dto.rest.ConsultaEstadoProceso;
 import cl.gob.scj.sgdp.dto.rest.MensajeJson;
 import cl.gob.scj.sgdp.dto.rest.RespuestaConsultaAvanzadaEstadoProceso;
 import cl.gob.scj.sgdp.dto.rest.RespuestaConsultaBasicaEstadoProceso;
+import cl.gob.scj.sgdp.model.ArchivosInstDeTarea;
 import cl.gob.scj.sgdp.model.EtapaDeInstanciaDeProceso;
 import cl.gob.scj.sgdp.model.HistorialProceso;
 import cl.gob.scj.sgdp.model.HistoricoSeguimientoIntanciaProceso;
 import cl.gob.scj.sgdp.model.InstanciaDeProceso;
+import cl.gob.scj.sgdp.model.InstanciaDeTarea;
 import cl.gob.scj.sgdp.model.SeguimientoIntanciaProceso;
 
 
@@ -148,6 +152,30 @@ public class InstanciaDeProcesoDaoImpl implements InstanciaDeProcesoDao {
 		Query query = getSession().getNamedQuery("InstanciaDeProceso.getInstanciaDeProcesoPorNombreExpediente");	
 		query.setString("nombreExpediente", nombreExpediente);			
 		return (InstanciaDeProceso) query.uniqueResult();
+	}
+
+	@Override
+	public List<InstanciaDeProceso> getMetadataListaExpediente(EnviarArchivoNacionalDTO enviarDTO) {
+		Query query = getSession().getNamedQuery("InstanciaDeProceso.getMetadataListaExpediente");	
+		query.setString("nombreProceso", enviarDTO.getNombreSerie());
+		query.setString("fechaTransferirInicio", enviarDTO.getFechaTransferirInicio());
+		query.setString("fechaTransferirTermino", enviarDTO.getFechaTransferirTermino());
+		List<InstanciaDeProceso> list = query.list();
+		// se quitan aquellas tareas que no tienen tipo
+		for (InstanciaDeProceso inst: list) {
+			List<InstanciaDeTarea> tareas = inst.getInstanciasDeTareas();
+			for (InstanciaDeTarea tar: tareas) {
+				List<ArchivosInstDeTarea> archivosInstDeTarea = tar.getArchivosInstDeTarea();
+				List<ArchivosInstDeTarea> copiaArchivos = new ArrayList<ArchivosInstDeTarea>();
+				for (ArchivosInstDeTarea arch: archivosInstDeTarea) {
+					if (arch.getArchivosInstDeTareaMetadata().getTipo()!=null) {
+						copiaArchivos.add(arch);
+					}
+				}
+				tar.setArchivosInstDeTarea(copiaArchivos);
+			}
+		}
+		return list;
 	}
 	
 }

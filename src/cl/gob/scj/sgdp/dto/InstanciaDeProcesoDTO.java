@@ -21,8 +21,7 @@ public class InstanciaDeProcesoDTO implements Serializable {
 	private int diasHabilesMaxDuracion;
 	private String asunto;
 	private String comentarioSolicitudCreacionExpediente;
-	private boolean tieneParametroPorTarea;
-	private long idProceso;
+	private String idTipo;
 	
 	public long getIdInstanciaDeProceso() {
 		return idInstanciaDeProceso;
@@ -114,19 +113,12 @@ public class InstanciaDeProcesoDTO implements Serializable {
 	public void setComentarioSolicitudCreacionExpediente(String comentarioSolicitudCreacionExpediente) {
 		this.comentarioSolicitudCreacionExpediente = comentarioSolicitudCreacionExpediente;
 	}
-	public boolean isTieneParametroPorTarea() {
-		return tieneParametroPorTarea;
+	public String getIdTipo() {
+		return idTipo;
 	}
-	public void setTieneParametroPorTarea(boolean tieneParametroPorTarea) {
-		this.tieneParametroPorTarea = tieneParametroPorTarea;
-	}	
-	public long getIdProceso() {
-		return idProceso;
+	public void setIdTipo(String idTipo) {
+		this.idTipo = idTipo;
 	}
-	public void setIdProceso(long idProceso) {
-		this.idProceso = idProceso;
-	}
-		
 	@Override
 	public String toString() {
 		return "InstanciaDeProcesoDTO [idInstanciaDeProceso=" + idInstanciaDeProceso + ", nombreExpediente="
@@ -134,12 +126,9 @@ public class InstanciaDeProcesoDTO implements Serializable {
 				+ ", fechaVencimientoUsuario=" + fechaVencimientoUsuario + ", fechaVencimiento=" + fechaVencimiento
 				+ ", idExpediente=" + idExpediente + ", idUsuarioInicia=" + idUsuarioInicia + ", idUsuarioTermina="
 				+ idUsuarioTermina + ", tieneDocumentosEnCMS=" + tieneDocumentosEnCMS + ", emisor=" + emisor
-				+ ", nombreDeProceso=" + nombreDeProceso
-				+ ", diasHabilesMaxDuracion=" + diasHabilesMaxDuracion
-				+ ", asunto=" + asunto 
-				+ ", comentarioSolicitudCreacionExpediente=" + comentarioSolicitudCreacionExpediente 
-				+ ", tieneParametroPorTarea=" + tieneParametroPorTarea
-				+ ", idProceso=" + idProceso
-				+ "]";
+				+ ", nombreDeProceso=" + nombreDeProceso + ", diasHabilesMaxDuracion=" + diasHabilesMaxDuracion
+				+ ", asunto=" + asunto + ", comentarioSolicitudCreacionExpediente="
+				+ comentarioSolicitudCreacionExpediente + ", idTipo=" + idTipo + "]";
 	}
+
 }

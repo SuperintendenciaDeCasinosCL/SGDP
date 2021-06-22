@@ -1,9 +1,18 @@
 package cl.gob.scj.sgdp.util;
 
+import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.http.client.HttpRequestRetryHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.HttpContext;
+import org.apache.poi.util.SystemOutLogger;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -27,7 +36,9 @@ public class SingleObjectFactory {
 		
 		if (restTemplate == null) {	
 		    
-			restTemplate = new RestTemplate(new BufferingClientHttpRequestFactory(clientHttpRequestFactory()));			
+			BufferingClientHttpRequestFactory bufferingClientHttpRequestFactory = new BufferingClientHttpRequestFactory(clientHttpRequestFactory());
+			
+			restTemplate = new RestTemplate(bufferingClientHttpRequestFactory);			
 			//restTemplate.setRequestFactory(clientHttpRequestFactory());
 			
 			
@@ -40,11 +51,10 @@ public class SingleObjectFactory {
 	        
 	        List<ClientHttpRequestInterceptor> listClientRequestInterceptor = new ArrayList<ClientHttpRequestInterceptor>();
 	        listClientRequestInterceptor.add(new RequestLoggingInterceptor());
-	       
+	        
 	        restTemplate.setInterceptors(listClientRequestInterceptor);	                
 	        
 		}		
-		
 		return restTemplate;
 		
 	}
@@ -54,10 +64,28 @@ public class SingleObjectFactory {
 	}
 	
 	
-   private static  ClientHttpRequestFactory clientHttpRequestFactory() {
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setReadTimeout(2500000);
-        factory.setConnectTimeout(2500000);
+	@SuppressWarnings("deprecation")
+	private static  ClientHttpRequestFactory clientHttpRequestFactory() {
+		DefaultHttpClient httpClient = new DefaultHttpClient();
+	   	httpClient.setHttpRequestRetryHandler(new HttpRequestRetryHandler() {
+		    @Override
+		    public boolean retryRequest(IOException exception, int executionCount, 
+		                                HttpContext context) {
+		        if (executionCount > 3) {
+		           System.out.println("Maximum tries reached for client http pool ");
+		            return false;
+		        }
+		        if (exception instanceof org.apache.http.NoHttpResponseException) {
+		        	System.out.println("No response from server on " + executionCount + " call");
+		            return true;
+		        }
+		        return false;
+		      }
+		   }); 
+	   	HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(httpClient);
+		//HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+        factory.setReadTimeout(20000);
+        factory.setConnectTimeout(22000);
         return factory;
     }
 	

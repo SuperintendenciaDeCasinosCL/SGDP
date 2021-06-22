@@ -100,11 +100,11 @@ public class GestionDocumentosControl {
 		
 		KeyParametroPorContextoDTO keyParametroPorContextoDTOTipoDocFeaPorMimeTypeEnCMS = new KeyParametroPorContextoDTO();
 		
-		/*SubirArhivoDTO subirArhivoDTO = new SubirArhivoDTO();
+		SubirArhivoDTO subirArhivoDTO = new SubirArhivoDTO();
 		subirArhivoDTO.setIdArchivoEnCMS(firmaAvanzadaDTO.getIdDocumento());
 		subirArhivoDTO.setIdTipoDeDocumentoSubir(firmaAvanzadaDTO.getIdTipoDeDocumento());
 		subirArhivoDTO.setIdInstanciaDeTareaSubirArchivo(firmaAvanzadaDTO.getIdInstanciaDeTarea());
-		subirArhivoDTO.setEsRequerido(true);*/
+		subirArhivoDTO.setEsRequerido(true);
 		
 		Usuario usuario = (Usuario)request.getSession().getAttribute("usuario");
 			

@@ -241,10 +241,7 @@ public class GestorDeDocumentosCMSServiceImpl implements GestorDeDocumentosCMSSe
 		}
 		if (detalleDeArchivoDTO.getCategoriaDocumento()!=null && !detalleDeArchivoDTO.getCategoriaDocumento().isEmpty()) {
 			mvm.add("categoriaDocumento", URLEncoder.encode(detalleDeArchivoDTO.getCategoriaDocumento(), "UTF-8"));
-		}
-		/*if (detalleDeArchivoDTO.getActualizaNombre() !=null && !detalleDeArchivoDTO.getActualizaNombre().isEmpty()) {
-			mvm.add("nombreDocumento", URLEncoder.encode(detalleDeArchivoDTO.getActualizaNombre(), "UTF-8"));
-		}*/
+		}		
 		
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -387,50 +384,5 @@ public class GestorDeDocumentosCMSServiceImpl implements GestorDeDocumentosCMSSe
 	
 	}
 	
-	/*@Override
-	public RespuestaSimpleDTO copiaArchivo(Usuario usuario, String idExpedienteOrigen, String idExpedienteDestino, String idArchivo, String nuevoNombre) throws Exception {
-		
-		log.debug("copiaArchivo... inicio");
-		
-			RestTemplate restTemplate = SingleObjectFactory.getRestTemplateInstance();
-		
-		//ParametroDTO parametroDTO = parametroService.getParametroPorID(Constantes.ID_PARAM_CMS_REST_URL_ACTUALIZA_METADATA_DE_DOCUMENTO);
-		//StringBuilder serviceRestURLcopiaArchivo = new StringBuilder(parametroDTO.getValorParametroChar());
-		StringBuilder serviceRestURLcopiaArchivo = new StringBuilder("http://172.16.10.73:8080/alfresco/s//scj/copiarArchivo");
-		
-		serviceRestURLcopiaArchivo.append("?alf_ticket=");
-				
-		LinkedMultiValueMap<String, Object> mvm = new LinkedMultiValueMap<String, Object>();
-				
-		mvm.add("idExpedienteOrigen", parametroService.getParametroPorID(Constantes.ID_PARAM_CMS_PREFIJO_WP_ST).getValorParametroChar() + idExpedienteOrigen);
-		mvm.add("idExpedienteDestino", parametroService.getParametroPorID(Constantes.ID_PARAM_CMS_PREFIJO_WP_ST).getValorParametroChar() + idExpedienteDestino);
-		mvm.add("idDeArchivo", parametroService.getParametroPorID(Constantes.ID_PARAM_CMS_PREFIJO_WP_ST).getValorParametroChar() + idArchivo);
-
-		if (nuevoNombre!=null && !nuevoNombre.isEmpty()) {
-			mvm.add("nuevoNombre", URLEncoder.encode(nuevoNombre, "UTF-8"));
-		}
-		
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-		HttpEntity<LinkedMultiValueMap<String, Object>> request = new HttpEntity<LinkedMultiValueMap<String, Object>>(mvm, headers);
-		
-		try {
-			autenticacionService.validaSesion(usuario);
-			serviceRestURLcopiaArchivo.append(usuario.getAlfTicket());
-			log.debug("serviceRestURLActualizaMetadataDeDocumento.toString(): " + serviceRestURLcopiaArchivo.toString());
-			ResponseEntity<RespuestaSimpleDTO> respuestaSimpleDTO = restTemplate.postForEntity(serviceRestURLcopiaArchivo.toString(), request , RespuestaSimpleDTO.class );
-			log.debug(respuestaSimpleDTO);			
-			log.debug("actualizaMetaDataDeDocumento... fin");	
-			return respuestaSimpleDTO.getBody();
-		} catch (HttpClientErrorException e) {
-			HttpStatus status = e.getStatusCode();
-			log.error(status.getReasonPhrase() + "/" + status.value());
-			log.error(e);
-			log.error("actualizaMetaDataDeDocumento... fin");	
-			throw e;
-		} catch (Exception e) {
-			throw e;
-		}
-	}*/	
 
 }

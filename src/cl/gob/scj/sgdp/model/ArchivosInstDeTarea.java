@@ -172,11 +172,6 @@ import cl.gob.scj.sgdp.config.Constantes;
 			+ "AND HA.instanciaDeTarea.idInstanciaDeTarea = :idInstanciaDeTarea "
 			+ "AND HA.tipoDeDocumento.idTipoDeDocumento = :idTipoDeDocumento"),
 	
-	@NamedQuery(name="ArchivosInstDeTarea.getArchivoPorIdInstanciaDeTareaIdTipoDeDocumento", 
-	query="SELECT HA FROM ArchivosInstDeTarea HA "					
-			+ "WHERE HA.instanciaDeTarea.idInstanciaDeTarea = :idInstanciaDeTarea "
-			+ "AND HA.tipoDeDocumento.idTipoDeDocumento = :idTipoDeDocumento"),
-	
 	@NamedQuery(name="ArchivosInstDeTarea.getTodosLosDocSubidosPorIdInstTarea", 
 	query="SELECT i.idInstanciaDeTarea as idInstanciaDeTarea, t.nombreTarea as nombreTarea, " 
 			+ "ai.idArchivoCms as idArchivoCms, ai.mimeType as mimeType, ai.nombreArchivo as nombreArchivo, ai.idUsuario as idUsuario, max(ai.fechaSubido) as fechaSubido, "
@@ -386,7 +381,7 @@ import cl.gob.scj.sgdp.config.Constantes;
 	@NamedQuery(name="ArchivosInstDeTarea.getTodosLosDocSubidosPorIdExpediente", 
 	query="SELECT i.idInstanciaDeTarea as idInstanciaDeTarea, t.nombreTarea as nombreTarea, " 
 			+ "ai.idArchivoCms as idArchivoCms, ai.mimeType as mimeType, ai.nombreArchivo as nombreArchivo, ai.idUsuario as idUsuario, max(ai.fechaSubido) as fechaSubido, "
-			+ "td.idTipoDeDocumento as idTipoDeDocumento, td.nombreDeTipoDeDocumento as nombreDeTipoDeDocumento, "
+			+ "td.idTipoDeDocumento as idTipoDeDocumento, td.nombreDeTipoDeDocumento as nombreDeTipoDeDocumento, aim.flagEnvio as flagEnvio, "
 			+ "( "
 			+ " SELECT h.comentario from HistoricoDeInstDeTarea h "
 			+ "WHERE h.instanciaDeTareaDeOrigen.idInstanciaDeTarea = i.idInstanciaDeTarea "
@@ -418,35 +413,46 @@ import cl.gob.scj.sgdp.config.Constantes;
 			+ "WHERE l.instanciaDeTarea.idInstanciaDeTarea = i.idInstanciaDeTarea AND l.idArchivoCms = ai.idArchivoCms "
 			+ "AND l.idArchivosInstDeTarea = ( SELECT MAX(l2.idArchivosInstDeTarea) FROM ArchivosInstDeTarea l2 WHERE l2.instanciaDeTarea.idInstanciaDeTarea = i.idInstanciaDeTarea AND l2.idArchivoCms = ai.idArchivoCms ) "
 			+ ") as estaFirmadoConFEACentralizada "
+//			+ " aim.flagEnvio as flagEnvioArchivoNacional"
 			+ "FROM ArchivosInstDeTarea ai "
 			+ "INNER JOIN ai.instanciaDeTarea i "
+			+ "INNER JOIN ai.archivosInstDeTareaMetadata aim "
 			+ "INNER JOIN i.tarea t "
             + "INNER JOIN ai.tipoDeDocumento td " 
 			+ "INNER JOIN ai.instanciaDeTarea.instanciaDeProceso ip "
 			+ "WHERE ip.idExpediente = :idExpediente "			
       + "GROUP BY i.idInstanciaDeTarea, t.nombreTarea, ai.idArchivoCms, ai.mimeType, ai.nombreArchivo, ai.estaFirmadoConFEAWebStart, ai.estaFirmadoConFEACentralizada, "
-      + "ai.idUsuario, td.idTipoDeDocumento, td.nombreDeTipoDeDocumento, t.puedeVisarDocumentos, t.puedeAplicarFEA, ip.idExpediente, t.idTarea ORDER BY fechaSubido DESC "),
+      + "ai.idUsuario, td.idTipoDeDocumento, td.nombreDeTipoDeDocumento, aim.flagEnvio, t.puedeVisarDocumentos, t.puedeAplicarFEA, ip.idExpediente, t.idTarea ORDER BY fechaSubido DESC "),
+	@NamedQuery(name="ArchivosInstDeTarea.getArchivosInstDeTareaPorIdSerie", 
+	query="SELECT DISTINCT HA FROM ArchivosInstDeTarea HA "
+			+ " INNER JOIN HA.instanciaDeTarea  IT "
+			+ " INNER JOIN HA.archivosInstDeTareaMetadata  HAM "
+			+ " INNER JOIN IT.instanciaDeProceso  IP "
+			+ " INNER JOIN IP.estadoDeProceso  EP "
+			+ " INNER JOIN IP.proceso P "
+			+ " INNER JOIN HA.tipoDeDocumento TD " // fix cduran
+			+ " WHERE P.idProceso = :idProceso "
+			+ " AND EP.idEstadoDeProceso = :idEstadoProceso "
+			+ " AND HAM.flagEnvio = :estadoDocumento "
+			+ " AND HA.tipoDeDocumento.idTipoDeDocumento <> 46 " // TIPO DOCUMENTO ANTECEDENTE
+			+ " AND HAM.tipo is not null " // fix cduran
+			+ " AND HA.fechaDocumento BETWEEN TO_DATE(:fechaTransferirInicio, 'DD-MM-YYYY') AND TO_DATE(:fechaTransferirTermino, 'DD-MM-YYYY') " ),
+	@NamedQuery(name="ArchivosInstDeTarea.getArchivosInstDeTareaPorNombreSerie", 
+	query="SELECT DISTINCT HA FROM ArchivosInstDeTarea HA "
+			+ " INNER JOIN HA.instanciaDeTarea  IT "
+			+ " INNER JOIN HA.archivosInstDeTareaMetadata  HAM "
+			+ " INNER JOIN IT.instanciaDeProceso  IP "
+			+ " INNER JOIN IP.estadoDeProceso  EP "
+			+ " INNER JOIN HA.tipoDeDocumento TD " // fix cduran
+			+ " INNER JOIN IP.proceso P "
+			+ " WHERE P.nombreProceso = :nombreSerie "
+			+ " AND EP.idEstadoDeProceso = 3 " //FINALIZADO
+			+ " AND HA.tipoDeDocumento.idTipoDeDocumento <> 46 " // TIPO DOCUMENTO ANTECEDENTE
+			+ " AND HAM.flagEnvio = 0 " //NO ENVIADO
+			+ " AND HAM.tipo is not null " // fix cduran
+			+ " AND HA.fechaDocumento BETWEEN TO_DATE(:fechaTransferirInicio, 'DD-MM-YYYY') AND TO_DATE(:fechaTransferirTermino, 'DD-MM-YYYY') "  
+			+ " AND HAM.tipo.idTipo = 2") // DOCUMENTO
 	
-	@NamedQuery(name="ArchivosInstDeTarea.getUltimoArchivoInstDeTareaFirmado", 
-	query="SELECT HA FROM ArchivosInstDeTarea HA, HistoricoFirma HF "				
-			+ "WHERE HA.instanciaDeTarea.idInstanciaDeTarea = :idInstanciaDeTarea "
-			+ "AND HA.tipoDeDocumento.idTipoDeDocumento = :idTipoDeDocumento "
-			+ "AND HA.idUsuario = :idUsuario "
-			+ "AND HA.idArchivoCms = HF.idArchivoCMS "
-			+ "AND HA.instanciaDeTarea.idInstanciaDeTarea = HF.instanciaDeTarea.idInstanciaDeTarea "
-			+ "AND HA.tipoDeDocumento.idTipoDeDocumento = HF.tipoDeDocumento.idTipoDeDocumento "
-			+ "AND HA.idUsuario = HF.idUsuario "
-			+ "ORDER BY HF.fechaFirma DESC "			
-			+ ") "),
-	
-	@NamedQuery(name="ArchivosInstDeTarea.getArchivosInstDeTareaPorIdInstTareaIdUsuarioNombreTipoDocFechaSubidoMayorA", 
-	query="SELECT HA FROM ArchivosInstDeTarea HA "
-			+ "INNER JOIN HA.tipoDeDocumento D "					
-			+ "WHERE HA.instanciaDeTarea.idInstanciaDeTarea = :idInstanciaDeTarea "
-			+ "AND HA.idUsuario = :idUsuario "
-			+ "AND HA.fechaSubido >= :fechaSubido "
-			+ "AND levenshtein(upper(replace(D.nombreDeTipoDeDocumento, ' ', '')), upper(replace(:nombreDeTipoDeDocumento, ' ', ''))) <= (SELECT p.valorParametroNumerico FROM Parametro p where p.idParametro = 63)"),
-
 })
 public class ArchivosInstDeTarea {
 	
@@ -500,6 +506,11 @@ public class ArchivosInstDeTarea {
 	@Column(name="\"D_FECHA_RECEPCION\"")
 	private Date fechaRecepcion;
 
+	//bi-directional many-to-one association to Unidad
+	@ManyToOne
+	@JoinColumn(name="\"ID_ARCHIVOS_INST_DE_TAREA_METADATA\"")
+	private ArchivosInstDeTareaMetadata archivosInstDeTareaMetadata;
+	
 	public ArchivosInstDeTarea() {
 		super();
 	}
@@ -616,17 +627,25 @@ public class ArchivosInstDeTarea {
 		this.fechaRecepcion = fechaRecepcion;
 	}
 
+	public ArchivosInstDeTareaMetadata getArchivosInstDeTareaMetadata() {
+		return archivosInstDeTareaMetadata;
+	}
+
+	public void setArchivosInstDeTareaMetadata(ArchivosInstDeTareaMetadata archivosInstDeTareaMetadata) {
+		this.archivosInstDeTareaMetadata = archivosInstDeTareaMetadata;
+	}
+
 	@Override
 	public String toString() {
-		return "ArchivosInstDeTarea [idArchivosInstDeTarea=" + idArchivosInstDeTarea + ", idArchivoCms=" + idArchivoCms
+		return "ArchivosInstDeTarea [idArchivosInstDeTarea=" + idArchivosInstDeTarea + ", instanciaDeTarea="
+				+ instanciaDeTarea + ", tipoDeDocumento=" + tipoDeDocumento + ", idArchivoCms=" + idArchivoCms
 				+ ", mimeType=" + mimeType + ", nombreArchivo=" + nombreArchivo + ", version=" + version
-				+ ", idUsuario=" + idUsuario + ", fechaSubido=" + fechaSubido 
-				+ ", estaVisado=" + estaVisado 
-				+ ", estaFirmadoConFEAWebStart=" + estaFirmadoConFEAWebStart 
-				+ ", estaFirmadoConFEACentralizada=" + estaFirmadoConFEACentralizada 
-				+ ", fechaDocumento=" + fechaDocumento 
-				+ ", fechaRecepcion=" + fechaRecepcion 
-				+ "]";
-	}	
+				+ ", idUsuario=" + idUsuario + ", fechaSubido=" + fechaSubido + ", estaVisado=" + estaVisado
+				+ ", estaFirmadoConFEAWebStart=" + estaFirmadoConFEAWebStart + ", estaFirmadoConFEACentralizada="
+				+ estaFirmadoConFEACentralizada + ", fechaDocumento=" + fechaDocumento + ", fechaRecepcion="
+				+ fechaRecepcion + ", archivosInstDeTareaMetadata=" + archivosInstDeTareaMetadata + "]";
+	}
+
+
 
 }

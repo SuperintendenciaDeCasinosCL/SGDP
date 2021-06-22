@@ -2,16 +2,19 @@ package cl.gob.scj.sgdp.service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
 import cl.gob.scj.sgdp.auth.user.Usuario;
+import cl.gob.scj.sgdp.dto.AccesoDTO;
 import cl.gob.scj.sgdp.dto.AnadirAntecedenteDTO;
 import cl.gob.scj.sgdp.dto.AutorDTO;
 import cl.gob.scj.sgdp.dto.EstadoDeProcesoDTO;
 import cl.gob.scj.sgdp.dto.FiltroExpedienteDTO;
 import cl.gob.scj.sgdp.dto.InstanciaDeTareaDTO;
 import cl.gob.scj.sgdp.dto.MacroProcesoDTO;
+import cl.gob.scj.sgdp.dto.ParametroDeTareaDTO;
 import cl.gob.scj.sgdp.dto.RespuestaMailDTO;
 import cl.gob.scj.sgdp.dto.SuggestionsDTO;
 import cl.gob.scj.sgdp.dto.TareaDTO;
@@ -40,6 +43,8 @@ public interface BandejaDeEntradaService {
 	
 	List<AutorDTO> getTodosLosAutores();
 
+	List<AccesoDTO> getTodosLosAccesos();
+	
 	//List<TipoDeDocumentoDTO> getTodosLosTiposDeDocumentos(List<TipoDeDocumentoDTO> tiposDeDocumentosDTO);	
 	
 	List<InstanciaDeTareaDTO> getInstanciasDeTareaEnEjecucion(Usuario usuario, long idEstadoFinalizada, List<InstanciaDeTareaDTO> instanciasDeTareasDTOEnEjecucion) throws IOException;
@@ -56,10 +61,18 @@ public interface BandejaDeEntradaService {
 	
 	List<TareaDTO> getTareasPorIdProceso(long idProceso);
 	
-	List<TareaDTO> getTareasPorCodigoProceso(String codigoProceso);	
+	List<TareaDTO> getTareasPorCodigoProceso(String codigoProceso);
+	
+	List<ParametroDeTareaDTO> getParametrosDeTareaDTOPorIdTarea(long idTarea);
+	
+	List<ParametroDeTareaDTO> getParametrosDeTareaPorIdInstanciaDeTarea(long idInstanciaDeTarea);
+	
+	//Map<String, String> getParametrosDeTareaMapPorIdInstanciaDeTarea(long idInstanciaDeTarea);	
+	
+	//Map<String, List<Map<String, String>>> getParametrosDeTareaMapTituloPorIdInstanciaDeTarea(long idInstanciaDeTarea);
 	
 	List<TipoDeDocumentoDTO> getTodosLosTiposDeDocumentosPorIdTarea(long idTarea);
 	
-	List<InstanciaDeTareaDTO> getTodasInstanciasDeTareasEnEjecucionPorIdUnidades(Usuario usuario, List<InstanciaDeTareaDTO> instanciasDeTareasDTOEnEjecucion) throws IOException;
+	Map<String, List<ParametroDeTareaDTO>> getMapParametrosDeTareaDTOTituloPorIdInstanciaDeTarea(long idInstanciaDeTarea);
 
 }

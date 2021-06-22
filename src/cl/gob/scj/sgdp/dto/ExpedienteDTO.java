@@ -2,6 +2,7 @@ package cl.gob.scj.sgdp.dto;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 public class ExpedienteDTO implements Serializable {
 
@@ -12,6 +13,7 @@ public class ExpedienteDTO implements Serializable {
 	private String creador;
 	private String materia;
 	private String idAutor;
+	private String idAcceso;
 	private Long idPerspectiva;
 	private Long idMacroProceso;
 	private Long idProceso;
@@ -24,7 +26,27 @@ public class ExpedienteDTO implements Serializable {
 	private Date fechaDeInicioInstProc;
 	private String idUsuarioCrea;
 	private String codigoProceso;
+	private Long tipo;
+	private String titulo;
+	private String fechaCreacion;
+	private String nombreInteresado;
+	private String apellidoPaterno;
+	private String apellidoMaterno;
+	private String rutInterasado;
+	private List<String> etiquetasExpediente;
+	private String region;
+	private String comuna;
+	private String fechaExpiracion;
+	private List<CustomMetadata> listaMetadata;
 	
+	public List<CustomMetadata> getListaMetadata() {
+		return listaMetadata;
+	}
+
+	public void setListaMetadata(List<CustomMetadata> listaMetadata) {
+		this.listaMetadata = listaMetadata;
+	}
+
 	public Long getIdMacroProceso() {
 		return idMacroProceso;
 	}
@@ -161,22 +183,111 @@ public class ExpedienteDTO implements Serializable {
 		this.codigoProceso = codigoProceso;
 	}
 
+	public String getIdAcceso() {
+		return idAcceso;
+	}
+
+	public void setIdAcceso(String idAcceso) {
+		this.idAcceso = idAcceso;
+	}
+
 	@Override
 	public String toString() {
-		return "ExpedienteDTO [idExpediente=" + idExpediente
-				+ ", nombreExpediente=" + nombreExpediente + ", creador="
-				+ creador + ", materia=" + materia + ", idAutor=" + idAutor
-				+ ", idPerspectiva=" + idPerspectiva + ", idMacroProceso="
-				+ idMacroProceso + ", idProceso=" + idProceso
-				+ ", nombreAutor=" + nombreAutor + ", nombrePerpectiva="
-				+ nombrePerpectiva 
-				+ ", nombreMacroProceso="	+ nombreMacroProceso 
-				+ ", nombreProceso=" + nombreProceso 
-				+ ", esConfidencial=" + esConfidencial
-				+ ", fechaDeInicioInstProc=" + fechaDeInicioInstProc
-				+ ", idUsuarioCrea=" + idUsuarioCrea
-				+ ", codigoProceso=" + codigoProceso
-				+ "]";
+		return "ExpedienteDTO [idExpediente=" + idExpediente + ", nombreExpediente=" + nombreExpediente + ", creador="
+				+ creador + ", materia=" + materia + ", idAutor=" + idAutor + ", idAcceso=" + idAcceso
+				+ ", idPerspectiva=" + idPerspectiva + ", idMacroProceso=" + idMacroProceso + ", idProceso=" + idProceso
+				+ ", nombreAutor=" + nombreAutor + ", nombrePerpectiva=" + nombrePerpectiva + ", nombreMacroProceso="
+				+ nombreMacroProceso + ", nombreProceso=" + nombreProceso + ", idInstanciaDeTareaSalida="
+				+ idInstanciaDeTareaSalida + ", esConfidencial=" + esConfidencial + ", fechaDeInicioInstProc="
+				+ fechaDeInicioInstProc + ", idUsuarioCrea=" + idUsuarioCrea + ", codigoProceso=" + codigoProceso + "]";
+	}
+
+	public String getTitulo() {
+		return titulo;
+	}
+
+	public void setTitulo(String titulo) {
+		this.titulo = titulo;
+	}
+
+	public String getFechaCreacion() {
+		return fechaCreacion;
+	}
+
+	public void setFechaCreacion(String fechaCreacion) {
+		this.fechaCreacion = fechaCreacion;
+	}
+
+	public String getNombreInteresado() {
+		return nombreInteresado;
+	}
+
+	public void setNombreInteresado(String nombreInteresado) {
+		this.nombreInteresado = nombreInteresado;
+	}
+
+	public String getApellidoPaterno() {
+		return apellidoPaterno;
+	}
+
+	public void setApellidoPaterno(String apellidoPaterno) {
+		this.apellidoPaterno = apellidoPaterno;
+	}
+
+	public String getApellidoMaterno() {
+		return apellidoMaterno;
+	}
+
+	public void setApellidoMaterno(String apellidoMaterno) {
+		this.apellidoMaterno = apellidoMaterno;
+	}
+
+	public String getRutInterasado() {
+		return rutInterasado;
+	}
+
+	public void setRutInterasado(String rutInterasado) {
+		this.rutInterasado = rutInterasado;
+	}
+
+	public List<String> getEtiquetasExpediente() {
+		return etiquetasExpediente;
+	}
+
+	public void setEtiquetasExpediente(List<String> etiquetasExpediente) {
+		this.etiquetasExpediente = etiquetasExpediente;
+	}
+
+	public String getRegion() {
+		return region;
+	}
+
+	public void setRegion(String region) {
+		this.region = region;
+	}
+
+	public String getComuna() {
+		return comuna;
+	}
+
+	public void setComuna(String comuna) {
+		this.comuna = comuna;
+	}
+
+	public Long getTipo() {
+		return tipo;
+	}
+
+	public void setTipo(Long tipo) {
+		this.tipo = tipo;
+	}
+
+	public String getFechaExpiracion() {
+		return fechaExpiracion;
+	}
+
+	public void setFechaExpiracion(String fechaExpiracion) {
+		this.fechaExpiracion = fechaExpiracion;
 	}
 		
 }

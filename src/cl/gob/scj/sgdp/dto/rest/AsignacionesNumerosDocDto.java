@@ -11,8 +11,7 @@ public class AsignacionesNumerosDocDto implements Serializable  {
 	private String idUsuario;
 	private long idInstanciaDeTarea;
 	private String alfTicket;
-	private long idDocumentoFirmado;
-	
+
 	// Valores de entrada Accion Modificar
 
 	private long idAsignacionNumeroDocEntada;
@@ -131,14 +130,6 @@ public class AsignacionesNumerosDocDto implements Serializable  {
 		this.alfTicket = alfTicket;
 	}
 
-	public long getIdDocumentoFirmado() {
-		return idDocumentoFirmado;
-	}
-
-	public void setIdDocumentoFirmado(long idDocumentoFirmado) {
-		this.idDocumentoFirmado = idDocumentoFirmado;
-	}
-
 	@Override
 	public String toString() {
 		return "AsignacionesNumerosDocDto [tipoDeDocumento=" + tipoDeDocumento + ", idArchivo=" + idArchivo
@@ -148,7 +139,6 @@ public class AsignacionesNumerosDocDto implements Serializable  {
 				+ UltimoNumeroDocumentoExtraido + ", idAsignacionNumeroDoc=" + idAsignacionNumeroDoc + ", estado="
 				+ estado 
 				+ ", alfTicket=" + alfTicket
-				+ ", idDocumentoFirmado=" + idDocumentoFirmado
 				+ "]";
 	}
 	

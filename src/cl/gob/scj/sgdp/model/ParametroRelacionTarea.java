@@ -10,12 +10,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="\"SGDP_PARAMETRO_RELACION_TAREA\"")
-@NamedQueries({
-	@NamedQuery(name="ParametroRelacionTarea.findAll", query="SELECT p FROM ParametroRelacionTarea p"),
-	@NamedQuery(name="ParametroRelacionTarea.getParamTareaPorIdProc", 
-	query="SELECT pr FROM ParametroRelacionTarea pr "
-			+ "WHERE pr.id.tarea.proceso.idProceso = :idProceso")
-})
+@NamedQuery(name="ParametroRelacionTarea.findAll", query="SELECT p FROM ParametroRelacionTarea p")
 public class ParametroRelacionTarea implements Serializable {
 	private static final long serialVersionUID = 1L;
 

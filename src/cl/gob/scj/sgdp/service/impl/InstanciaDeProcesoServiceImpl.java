@@ -1,5 +1,7 @@
 package cl.gob.scj.sgdp.service.impl;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -7,6 +9,9 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Properties;
+
+import javax.annotation.Resource;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeanUtils;
@@ -17,32 +22,42 @@ import org.springframework.transaction.annotation.Transactional;
 import cl.gob.scj.sgdp.auth.user.Usuario;
 import cl.gob.scj.sgdp.dao.HistoricoDeInstDeTareaDao;
 import cl.gob.scj.sgdp.dao.InstanciaDeProcesoDao;
-import cl.gob.scj.sgdp.dao.ParametroRelacionTareaDao;
 import cl.gob.scj.sgdp.dao.SeguimientoIntanciaProcesoDao;
+import cl.gob.scj.sgdp.dto.ArchivoExpedienteDTO;
 import cl.gob.scj.sgdp.dto.ElementoResultadoBusquedaDTO;
+import cl.gob.scj.sgdp.dto.EnviarArchivoNacionalDTO;
 import cl.gob.scj.sgdp.dto.EtapaDeInstanciaDeProcesoDTO;
+import cl.gob.scj.sgdp.dto.ExpedienteArchNacDTO;
 import cl.gob.scj.sgdp.dto.FechaEstadoInstanciaProcesoDTO;
 import cl.gob.scj.sgdp.dto.HistorialProcesoDTO;
 import cl.gob.scj.sgdp.dto.InstanciaDeProcesoDTO;
 import cl.gob.scj.sgdp.dto.ResultadoBusquedaDTO;
 import cl.gob.scj.sgdp.dto.rest.MensajeJson;
+import cl.gob.scj.sgdp.exception.ArchivoNacionalException;
+import cl.gob.scj.sgdp.model.ArchivosInstDeTarea;
+import cl.gob.scj.sgdp.model.ArchivosInstDeTareaMetadata;
 import cl.gob.scj.sgdp.model.EtapaDeInstanciaDeProceso;
 import cl.gob.scj.sgdp.model.HistorialProceso;
 import cl.gob.scj.sgdp.model.HistoricoDeInstDeTarea;
 import cl.gob.scj.sgdp.model.HistoricoSeguimientoIntanciaProceso;
 import cl.gob.scj.sgdp.model.InstanciaDeProceso;
-import cl.gob.scj.sgdp.model.ParametroRelacionTarea;
+import cl.gob.scj.sgdp.model.InstanciaDeTarea;
 import cl.gob.scj.sgdp.model.SeguimientoIntanciaProceso;
 import cl.gob.scj.sgdp.model.SeguimientoIntanciaProcesoPK;
 import cl.gob.scj.sgdp.model.SolicitudCreacionExp;
 import cl.gob.scj.sgdp.service.InstanciaDeProcesoService;
 import cl.gob.scj.sgdp.tipos.AccionType;
+import cl.gob.scj.sgdp.util.FechaUtil;
+import cl.gob.scj.sgdp.util.UtilArchivosTarea;
 
 @Service
 @Transactional(rollbackFor = Throwable.class)
 public class InstanciaDeProcesoServiceImpl implements InstanciaDeProcesoService {
 
 	private static final Logger log = Logger.getLogger(InstanciaDeProcesoServiceImpl.class);
+	
+	@Resource(name = "configProps")
+	private Properties configProps;
 	
 	@Autowired
 	private InstanciaDeProcesoDao instanciaDeProcesoDao;
@@ -52,9 +67,9 @@ public class InstanciaDeProcesoServiceImpl implements InstanciaDeProcesoService 
 	
 	@Autowired
 	private SeguimientoIntanciaProcesoDao seguimientoIntanciaProcesoDao;
-	
-	@Autowired
-	private ParametroRelacionTareaDao parametroRelacionTareaDao;
+
+//	@Autowired
+//	private GestorDeDocumentosCMSService gestorDeDocumentosCMSService;
 	
 	@Override
 	public List<HistorialProcesoDTO> getHistorialDelProceso(String idExpediente) {
@@ -78,12 +93,18 @@ public class InstanciaDeProcesoServiceImpl implements InstanciaDeProcesoService 
 			EtapaDeInstanciaDeProcesoDTO etapaDeInstanciaDeProcesoDTO = new EtapaDeInstanciaDeProcesoDTO();
 			BeanUtils.copyProperties(etapaDeInstanciaDeProceso, etapaDeInstanciaDeProcesoDTO);			
 			agregaEtapaDeInstanciaDeProcesoDTO(etapaDeInstanciaDeProcesoDTO, etapasDeInstanciaDeProcesoDTO);
-		}		
+		}
+		/*for (EtapaDeInstanciaDeProceso etapaDeInstanciaDeProceso : etapasDeInstanciaDeProceso) {
+			EtapaDeInstanciaDeProcesoDTO etapaDeInstanciaDeProcesoDTO = new EtapaDeInstanciaDeProcesoDTO();
+			BeanUtils.copyProperties(etapaDeInstanciaDeProceso, etapaDeInstanciaDeProcesoDTO);			
+			agregaEtapaDeInstanciaDeProcesoDTO(etapaDeInstanciaDeProcesoDTO, etapasDeInstanciaDeProcesoDTO);
+		}*/		
 		return etapasDeInstanciaDeProcesoDTO;
 	}
 	
 	private void agregaEtapaDeInstanciaDeProcesoDTO(EtapaDeInstanciaDeProcesoDTO etapaDeInstanciaDeProcesoDTO, 
 			List<EtapaDeInstanciaDeProcesoDTO> etapasDeInstanciaDeProcesoDTO) {		
+		//Iterator<EtapaDeInstanciaDeProcesoDTO> it = etapasDeInstanciaDeProcesoDTO.iterator();
 		ListIterator<EtapaDeInstanciaDeProcesoDTO> it = etapasDeInstanciaDeProcesoDTO.listIterator();
 		boolean agrega = true;
 		if(it.hasNext() == false) {
@@ -94,8 +115,10 @@ public class InstanciaDeProcesoServiceImpl implements InstanciaDeProcesoService 
 				EtapaDeInstanciaDeProcesoDTO etapaDeInstanciaDeProcesoDTOF = (EtapaDeInstanciaDeProcesoDTO) it.next();
 				if (etapaDeInstanciaDeProcesoDTO.getNombreEtapa().equals(etapaDeInstanciaDeProcesoDTOF.getNombreEtapa())
 						&& etapaDeInstanciaDeProcesoDTO.getCodigoEstadoDeTarea() == 2){
+					//etapasDeInstanciaDeProcesoDTO.remove(etapaDeInstanciaDeProcesoDTOF);
 					it.remove();
 					it.add(etapaDeInstanciaDeProcesoDTO);
+					//etapasDeInstanciaDeProcesoDTO.add(etapaDeInstanciaDeProcesoDTO);
 					agrega = false;
 					log.debug("Removio y agrego");
 				} else if (etapaDeInstanciaDeProcesoDTO.getNombreEtapa().equals(etapaDeInstanciaDeProcesoDTOF.getNombreEtapa())
@@ -132,17 +155,16 @@ public class InstanciaDeProcesoServiceImpl implements InstanciaDeProcesoService 
 	public void cargaInstanciaDeProcesoDTOPorIdExpediente(String idExpediente, InstanciaDeProcesoDTO instanciaDeProcesoDTO){
 		InstanciaDeProceso instanciaDeProceso = instanciaDeProcesoDao.getInstanciaDeProcesoPorIdExpediente(idExpediente);	
 		SolicitudCreacionExp solicitudCreacionExp = instanciaDeProceso.getSolicitudCreacionExp();
-		instanciaDeProcesoDTO.setIdProceso(instanciaDeProceso.getProceso().getIdProceso());
-		List<ParametroRelacionTarea> parametrosRelacionTarea = parametroRelacionTareaDao.getParamTareaPorIdProc(instanciaDeProcesoDTO.getIdProceso());
-		if (parametrosRelacionTarea!=null && parametrosRelacionTarea.size()>0) {
-			instanciaDeProcesoDTO.setTieneParametroPorTarea(true);
-		}
 		if (solicitudCreacionExp!=null && solicitudCreacionExp.getComentario()!=null && !solicitudCreacionExp.getComentario().isEmpty()) {
 			instanciaDeProcesoDTO.setComentarioSolicitudCreacionExpediente(solicitudCreacionExp.getComentario());
 		}
 		instanciaDeProcesoDTO.setNombreDeProceso(instanciaDeProceso.getProceso().getNombreProceso());
-		BeanUtils.copyProperties(instanciaDeProceso, instanciaDeProcesoDTO);		
-		instanciaDeProcesoDTO.setDiasHabilesMaxDuracion(instanciaDeProceso.getProceso().getDiasHabilesMaxDuracion());		
+		BeanUtils.copyProperties(instanciaDeProceso, instanciaDeProcesoDTO);
+		instanciaDeProcesoDTO.setDiasHabilesMaxDuracion(instanciaDeProceso.getProceso().getDiasHabilesMaxDuracion());
+		if (instanciaDeProceso.getTipo() != null) {
+			instanciaDeProcesoDTO.setIdTipo(Long.toString(instanciaDeProceso.getTipo().getIdTipo()));
+		}
+		
 	}
 	
 	@Override
@@ -276,6 +298,119 @@ public class InstanciaDeProcesoServiceImpl implements InstanciaDeProcesoService 
 		}			
 		resultadoBusquedaDTO.getElementosResultadoBusquedaDTO().clear();
 		resultadoBusquedaDTO.getElementosResultadoBusquedaDTO().addAll(listaElementoResultadoBusquedaDTO);		
+	}
+
+	@Override
+	public List<ExpedienteArchNacDTO> getMetadataListaExpediente(EnviarArchivoNacionalDTO enviarDTO, Usuario usuario)
+			throws ArchivoNacionalException {
+		List<ExpedienteArchNacDTO> list = new ArrayList<ExpedienteArchNacDTO>();
+		ExpedienteArchNacDTO dto = null;
+		try {
+			List<InstanciaDeProceso> instProcesoList = this.instanciaDeProcesoDao.getMetadataListaExpediente(enviarDTO);
+			// aca se deberian filtrar
+			for (InstanciaDeProceso ins: instProcesoList) {
+				//log.info("ID expediente:"+ins.getIdExpediente());
+				List<InstanciaDeTarea> instanciasDeTareas = ins.getInstanciasDeTareas();
+				List<ArchivosInstDeTarea> archivosTotales = new ArrayList<ArchivosInstDeTarea>();
+				for (InstanciaDeTarea tar: instanciasDeTareas) {
+					List<ArchivosInstDeTarea> archivosInstDeTarea = tar.getArchivosInstDeTarea();
+					if (archivosInstDeTarea!=null && !archivosInstDeTarea.isEmpty())
+						archivosTotales.addAll(archivosInstDeTarea);
+					//tar.setArchivosInstDeTarea(new ArrayList<ArchivosInstDeTarea>());
+				}
+				
+				List<ArchivosInstDeTarea> masiveFix = UtilArchivosTarea.masiveFix(archivosTotales);
+				ins.setArchivosInstancia(masiveFix);
+				//instanciasDeTareas.get(0).setArchivosInstDeTarea(masiveFix);
+			}
+			
+			for (InstanciaDeProceso entity : instProcesoList) {
+				
+				dto = new ExpedienteArchNacDTO();
+	
+				if (entity.getAcceso() != null) {
+					dto.setNivelAcceso(entity.getAcceso().getValorAccesoChar());
+				}
+				if (entity.getInstanciaProcesoMetadata() != null) {
+					dto.setApellidoMaternoInteresado(entity.getInstanciaProcesoMetadata().getApellidoMaterno());
+					dto.setApellidoPaternoInteresado(entity.getInstanciaProcesoMetadata().getApellidoPaterno());
+					dto.setComuna(entity.getInstanciaProcesoMetadata().getComuna());
+					dto.setEtiquetas(entity.getInstanciaProcesoMetadata().getEtiquetas());
+					dto.setFechaCreacionExpediente(FechaUtil.toFormat(entity.getInstanciaProcesoMetadata().getFechaCreacion(), FechaUtil.simpleDateFormatForm));
+					//Que como la fecha de finalizacion de la instancia
+					dto.setFechaFinalizacionExpediente(FechaUtil.toFormat(entity.getFechaFin(), FechaUtil.simpleDateFormatForm));
+					dto.setNombreInteresado(entity.getInstanciaProcesoMetadata().getNombreInteresado());
+					dto.setRegion(entity.getInstanciaProcesoMetadata().getRegion());
+					dto.setRutInteresado(entity.getInstanciaProcesoMetadata().getRut());
+					dto.setTituloExpediente(entity.getInstanciaProcesoMetadata().getTitulo());
+					dto.setVolumenExpediente(0);
+				}
+				
+				if (entity.getArchivosInstancia() != null && !entity.getArchivosInstancia().isEmpty()) {
+					List<ArchivoExpedienteDTO> listaArchivos = new ArrayList<ArchivoExpedienteDTO>();
+					ArchivoExpedienteDTO archivoDTO = null;
+					
+					for (ArchivosInstDeTarea archivo : entity.getArchivosInstancia()) {
+						if (archivo.getArchivosInstDeTareaMetadata() != null) {
+							archivoDTO = new ArchivoExpedienteDTO();
+							archivoDTO.setIdArchivoCms(archivo.getIdArchivoCms());
+							
+							archivoDTO.setAutor(archivo.getArchivosInstDeTareaMetadata().getAutor());
+							archivoDTO.setDestinatario(archivo.getArchivosInstDeTareaMetadata().getDestinatarios());
+							archivoDTO.setDocumentoDigitalizado(archivo.getArchivosInstDeTareaMetadata().getDigitalizado().toString());
+							archivoDTO.setFormato(archivo.getMimeType());
+							archivoDTO.setIdentificador(archivo.getIdArchivoCms());
+							archivoDTO.setFechaDocumento(FechaUtil.toFormat(archivo.getFechaDocumento(), FechaUtil.simpleDateFormatForm));
+							archivoDTO.setNombreArchivo(
+									"/" + entity.getNombreExpediente() + "/" + archivo.getNombreArchivo());
+							archivoDTO.setTitulo(archivo.getArchivosInstDeTareaMetadata().getTitulo());
+							listaArchivos.add(archivoDTO);
+						}
+					}
+					
+					dto.setListaArchivos(listaArchivos);
+				}
+				
+				/*if (entity.getInstanciasDeTareas() != null && !entity.getInstanciasDeTareas().isEmpty()) {
+					List<ArchivoExpedienteDTO> listaArchivos = new ArrayList<ArchivoExpedienteDTO>();
+					ArchivoExpedienteDTO archivoDTO = null;
+					//Recorre lista de tareas del proceso
+					for (InstanciaDeTarea instTarea : entity.getInstanciasDeTareas()) {
+						if (instTarea.getArchivosInstDeTarea() != null && !instTarea.getArchivosInstDeTarea().isEmpty()) {
+							//Recorre lista de archivos de cada tarea
+							for (ArchivosInstDeTarea archivo : instTarea.getArchivosInstDeTarea()) {
+								if (archivo.getArchivosInstDeTareaMetadata() != null) {
+									archivoDTO = new ArchivoExpedienteDTO();
+									archivoDTO.setIdArchivoCms(archivo.getIdArchivoCms());
+									
+									archivoDTO.setAutor(archivo.getArchivosInstDeTareaMetadata().getAutor());
+									archivoDTO.setDestinatario(archivo.getArchivosInstDeTareaMetadata().getDestinatarios());
+									archivoDTO.setDocumentoDigitalizado(archivo.getArchivosInstDeTareaMetadata().getDigitalizado().toString());
+									archivoDTO.setFormato(archivo.getMimeType());
+									archivoDTO.setIdentificador(archivo.getIdArchivoCms());
+									archivoDTO.setFechaDocumento(FechaUtil.toFormat(archivo.getFechaDocumento(), FechaUtil.simpleDateFormatForm));
+									archivoDTO.setNombreArchivo(
+											"/" + entity.getNombreExpediente() + "/" + archivo.getNombreArchivo());
+									archivoDTO.setTitulo(archivo.getArchivosInstDeTareaMetadata().getTitulo());
+									listaArchivos.add(archivoDTO);
+								}
+							}
+						}
+					}
+					dto.setListaArchivos(listaArchivos);
+				}*/
+				
+				list.add(dto);
+			}
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			String exceptionAsString = sw.toString();
+			log.error(exceptionAsString);
+			throw new ArchivoNacionalException(this.configProps.getProperty("errorAlObtenerExpedientes"));
+		}
+		return list;
 	}
 
 }

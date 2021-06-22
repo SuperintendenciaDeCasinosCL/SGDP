@@ -1,6 +1,5 @@
 package cl.gob.scj.sgdp.dao.impl;
 
-import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -245,34 +244,28 @@ public class ArchivosInstDeTareaDaoImpl implements ArchivosInstDeTareaDao {
 		query.setString("idExpediente", idExpediente);
         query.setResultTransformer(Transformers.aliasToBean(ArchivosInstDeTareaDTO.class));
 		return query.list();
-	}	
-	
-	@Override
-	public ArchivosInstDeTarea getArchivoPorIdInstanciaDeTareaIdTipoDeDocumento(long idInstanciaDeTarea, long idTipoDeDocumento) {
-		Query query = getSession().getNamedQuery("ArchivosInstDeTarea.getArchivoPorIdInstanciaDeTareaIdTipoDeDocumento");	
-		query.setLong("idInstanciaDeTarea", idInstanciaDeTarea);
-		query.setLong("idTipoDeDocumento", idTipoDeDocumento);
-		return (ArchivosInstDeTarea) query.uniqueResult();
 	}
-	
+
 	@Override
-	public ArchivosInstDeTarea getUltimoArchivoInstDeTareaFirmado(long idInstanciaDeTarea, long idTipoDeDocumento, String idUsuario) {
-		Query query = getSession().getNamedQuery("ArchivosInstDeTarea.getUltimoArchivoInstDeTareaFirmado");	
-		query.setLong("idInstanciaDeTarea", idInstanciaDeTarea);
-		query.setLong("idTipoDeDocumento", idTipoDeDocumento);
-		query.setString("idUsuario", idUsuario);
-		query.setFirstResult(0);
-        query.setMaxResults(1);
-		return (ArchivosInstDeTarea) query.uniqueResult();
+	public List<ArchivosInstDeTarea> getArchivosInstDeTareaPorIdSerie(long idSerie, Long idEstadoProceso, Long estadoDocumento, String fechaTransferirInicio, String fechaTransferirTermino) {
+		Query query = getSession().getNamedQuery("ArchivosInstDeTarea.getArchivosInstDeTareaPorIdSerie");		
+		query.setLong("idProceso", idSerie);
+		query.setLong("idEstadoProceso", idEstadoProceso);
+		query.setLong("estadoDocumento", estadoDocumento);
+		query.setString("fechaTransferirInicio", fechaTransferirInicio);
+		query.setString("fechaTransferirTermino", fechaTransferirTermino);
+		return query.list();	
 	}
-	
+
 	@Override
-	public List<ArchivosInstDeTarea> getArchivosInstDeTareaPorIdInstTareaIdUsuarioNombreTipoDocFechaSubidoMayorA(Long idInstanciaDeTarea, String idUsuario, String nombreDeTipoDeDocumento, Date fechaSubido) {
-		Query query = getSession().getNamedQuery("ArchivosInstDeTarea.getArchivosInstDeTareaPorIdInstTareaIdUsuarioNombreTipoDocFechaSubidoMayorA");		
-		query.setLong("idInstanciaDeTarea", idInstanciaDeTarea);
-		query.setString("idUsuario", idUsuario);
-		query.setString("nombreDeTipoDeDocumento", nombreDeTipoDeDocumento);
-		query.setTimestamp("fechaSubido", fechaSubido);
+	public List<ArchivosInstDeTarea> getArchivosInstDeTareaPorNombreSerie(String nombreSerie, String fechaTransferirInicio, String fechaTransferirTermino) {
+		Query query = getSession().getNamedQuery("ArchivosInstDeTarea.getArchivosInstDeTareaPorNombreSerie");	
+		String sqlString = query.getQueryString();
+		log.info("QUERY?????:"+query);
+		query.setString("nombreSerie", nombreSerie);
+		query.setString("fechaTransferirInicio", fechaTransferirInicio);
+		query.setString("fechaTransferirTermino", fechaTransferirTermino);
+		
 		return query.list();	
 	}
 	

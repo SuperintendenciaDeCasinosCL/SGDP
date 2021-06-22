@@ -11,12 +11,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.Column;
+
 import org.apache.log4j.Logger;
-import org.springframework.beans.BeanUtils;
 
 import cl.gob.scj.sgdp.model.DocumentoDeSalidaDeTarea;
 import cl.gob.scj.sgdp.model.InstanciaDeTarea;
-import cl.gob.scj.sgdp.model.ParametroRelacionTarea;
 import cl.gob.scj.sgdp.model.UsuarioAsignado;
 import cl.gob.scj.sgdp.util.FechaUtil;
 
@@ -80,15 +80,11 @@ public class InstanciaDeTareaDTO extends RespuestaDTO  implements Serializable{
 	private String nombreTareaUltimaInstanciaDeTareaAnterior;
 	private String usuarioAnterior;
 	private List<String> posiblesIdUsuariosFueraDeOficina;
-	private boolean esRdsSnc;
-	private boolean procesoTieneRdsSnc;
-	private InstanciaDeProcesoDTO instanciaDeProcesoDTO;
 	
 	public InstanciaDeTareaDTO() {
 		idUsuariosAsignados = new ArrayList<String>();
 		posiblesIdUsuarios = new ArrayList<String>();
 		posiblesIdUsuariosFueraDeOficina = new ArrayList<String>();
-		instanciaDeProcesoDTO = new InstanciaDeProcesoDTO();
 	}
 	
 	public long getIdInstanciaDeTarea() {
@@ -536,31 +532,7 @@ public class InstanciaDeTareaDTO extends RespuestaDTO  implements Serializable{
 		this.posiblesIdUsuariosFueraDeOficina = posiblesIdUsuariosFueraDeOficina;
 	}
 
-	public boolean isEsRdsSnc() {
-		return esRdsSnc;
-	}
-
-	public void setEsRdsSnc(boolean esRdsSnc) {
-		this.esRdsSnc = esRdsSnc;
-	}	
-
-	public boolean isProcesoTieneRdsSnc() {
-		return procesoTieneRdsSnc;
-	}
-
-	public void setProcesoTieneRdsSnc(boolean procesoTieneRdsSnc) {
-		this.procesoTieneRdsSnc = procesoTieneRdsSnc;
-	}
-	
-	public InstanciaDeProcesoDTO getInstanciaDeProcesoDTO() {
-		return instanciaDeProcesoDTO;
-	}
-
-	public void setInstanciaDeProcesoDTO(InstanciaDeProcesoDTO instanciaDeProcesoDTO) {
-		this.instanciaDeProcesoDTO = instanciaDeProcesoDTO;
-	}
-
-	public void cargaInstanciaDeTareaDTO(InstanciaDeTarea instanciaDeTarea) {
+	public void cargaInstanciaDeTareaDTO(InstanciaDeTarea instanciaDeTarea ) {
 		log.debug("Inicio cargaInstanciaDeTareaDTO");		
 		if (instanciaDeTarea.getInstanciaDeProceso().getInstanciaDeProcesoPadre()!= null) {
 			this.origen = instanciaDeTarea.getInstanciaDeProceso().getInstanciaDeProcesoPadre().getProceso().getUnidad().getCodigoUnidad();
@@ -599,14 +571,6 @@ public class InstanciaDeTareaDTO extends RespuestaDTO  implements Serializable{
 		this.setIdTarea(instanciaDeTarea.getTarea().getIdTarea());
 		this.distribuye = instanciaDeTarea.getTarea().getDistribuye() == null ? false : instanciaDeTarea.getTarea().getDistribuye().booleanValue();
 		
-		List<ParametroRelacionTarea> parametrosRelacionTarea = instanciaDeTarea.getTarea().getParametroRelacionTareas();
-		
-		if (parametrosRelacionTarea!=null && !parametrosRelacionTarea.isEmpty()) {
-			this.setEsRdsSnc(true);
-		}
-		
-		this.procesoTieneRdsSnc = instanciaDeTarea.getTarea().getProceso().getTieneRdsSnc() == null ? false : instanciaDeTarea.getTarea().getProceso().getTieneRdsSnc().booleanValue();
-		
 		if (instanciaDeTarea.getFechaVencimiento()!=null) {
 			try {
 				this.fechaVencimientoInstanciaDeTareaJavaScript = FechaUtil.toFormat(instanciaDeTarea.getFechaVencimiento(), FechaUtil.simpleDateFormatShortDate);			
@@ -625,7 +589,6 @@ public class InstanciaDeTareaDTO extends RespuestaDTO  implements Serializable{
 				tiposDeDocumentosDeSalida.put(documentoDeSalidaDeTarea.getId().getTipoDeDocumento().getNombreDeTipoDeDocumento(), tipoDeDocumentoDTO);
 			}
 		}
-		BeanUtils.copyProperties(instanciaDeTarea.getInstanciaDeProceso(), this.instanciaDeProcesoDTO);
 	}
 	
 	public void cargaUsuariosAsignadosString(String caracterSeparadorDeUsuarios) {

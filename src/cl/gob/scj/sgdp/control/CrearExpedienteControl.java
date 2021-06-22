@@ -53,39 +53,31 @@ public class CrearExpedienteControl {
 	@RequestMapping(value = "/crearExpediente", method = RequestMethod.POST)
 	public @ResponseBody RespuestaCrearExpedienteDTO crearExpediente(@RequestBody ExpedienteDTO expedienteDTO, Model model, HttpServletRequest request) {		 
 
-		RespuestaCrearExpedienteDTO respuestaCrearExpedienteDTO = new RespuestaCrearExpedienteDTO();
-		log.error(respuestaCrearExpedienteDTO);
-		log.error(expedienteDTO.toString());
+		RespuestaCrearExpedienteDTO respuestaCrearExpedienteDTO = new RespuestaCrearExpedienteDTO();	
+		log.info(expedienteDTO.toString());
 		try {
-			log.error("expedienteDTO.getIdMacroProceso(): " + expedienteDTO.getIdMacroProceso());
-			log.error("a");
+			log.debug("expedienteDTO.getIdMacroProceso(): " + expedienteDTO.getIdMacroProceso());
 			Usuario usuario = (Usuario)request.getSession().getAttribute("usuario");
-			log.error("b");
 			crearExpedienteService.crearExpediente(expedienteDTO, usuario);
-			log.error("c");
 			respuestaCrearExpedienteDTO.setIdInstanciaDeTareaSalida(expedienteDTO.getIdInstanciaDeTareaSalida());
-			log.error("d");
 			respuestaCrearExpedienteDTO.setIdExpediente(expedienteDTO.getIdExpediente());
-			log.error("e");
 			respuestaCrearExpedienteDTO.setMensajeRespuesta(configProps.getProperty("expedienteCreado") + " " + expedienteDTO.getNombreExpediente());
-			log.error("f");
 			respuestaCrearExpedienteDTO.setMensajeError("OK");
-			log.error("g");
 			respuestaCrearExpedienteDTO.setNombreExpediente(expedienteDTO.getNombreExpediente());
-			log.error(respuestaCrearExpedienteDTO.toString());
+			log.info(respuestaCrearExpedienteDTO.toString());
 			return respuestaCrearExpedienteDTO;				
 		} catch (SgdpException sgdpe) {
 			//log.error("ERROR al crear el expediente: ", sgdpe);
-			log.error(sgdpe.getNivelLog(), sgdpe);
+			log.log(sgdpe.getNivelLog(), sgdpe);
 			respuestaCrearExpedienteDTO.setMensajeError("ERROR");
 			respuestaCrearExpedienteDTO.setMensajeRespuesta(sgdpe.getMessage());
-			log.error(respuestaCrearExpedienteDTO.toString());
+			log.info(respuestaCrearExpedienteDTO.toString());
 			return respuestaCrearExpedienteDTO;					
 		} catch (Exception e) {
 			log.error("ERROR al crear el expediente: ", e);
 			respuestaCrearExpedienteDTO.setMensajeRespuesta(configProps.getProperty("errorAlCrearExpEnCMS"));	
 			respuestaCrearExpedienteDTO.setMensajeError("ERROR");
-			log.error(respuestaCrearExpedienteDTO.toString());
+			log.info(respuestaCrearExpedienteDTO.toString());
 			return respuestaCrearExpedienteDTO;	
 		}		
 	}	

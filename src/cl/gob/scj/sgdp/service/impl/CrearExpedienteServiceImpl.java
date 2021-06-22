@@ -2,6 +2,8 @@ package cl.gob.scj.sgdp.service.impl;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -16,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import cl.gob.scj.sgdp.auth.user.Usuario;
 import cl.gob.scj.sgdp.dao.AccionesHistInstDeTareaDao;
 import cl.gob.scj.sgdp.dao.AutorDao;
@@ -26,6 +30,7 @@ import cl.gob.scj.sgdp.dao.HistoricoDeInstDeTareaDao;
 import cl.gob.scj.sgdp.dao.HistoricoUsuariosAsignadosATareaDao;
 import cl.gob.scj.sgdp.dao.InstanciaDeProcesoDao;
 import cl.gob.scj.sgdp.dao.InstanciaDeTareaDao;
+import cl.gob.scj.sgdp.dao.InstanciaProcesoMetadataDao;
 import cl.gob.scj.sgdp.dao.MacroProcesoDao;
 import cl.gob.scj.sgdp.dao.ProcesoDao;
 import cl.gob.scj.sgdp.dao.ResponsabilidadTareaDao;
@@ -34,17 +39,21 @@ import cl.gob.scj.sgdp.dao.UsuarioResponsabilidadDao;
 import cl.gob.scj.sgdp.dto.ExpedienteDTO;
 import cl.gob.scj.sgdp.dto.MacroProcesoDTO;
 import cl.gob.scj.sgdp.dto.ProcesoDTO;
+import cl.gob.scj.sgdp.enums.TipoEnum;
 import cl.gob.scj.sgdp.exception.SgdpException;
+import cl.gob.scj.sgdp.model.Acceso;
 import cl.gob.scj.sgdp.model.EstadoDeProceso;
 import cl.gob.scj.sgdp.model.HistoricoDeInstDeTarea;
 import cl.gob.scj.sgdp.model.HistoricoUsuariosAsignadosATarea;
 import cl.gob.scj.sgdp.model.HistoricoUsuariosAsignadosATareaPK;
 import cl.gob.scj.sgdp.model.InstanciaDeProceso;
 import cl.gob.scj.sgdp.model.InstanciaDeTarea;
+import cl.gob.scj.sgdp.model.InstanciaProcesoMetadata;
 import cl.gob.scj.sgdp.model.MacroProceso;
 import cl.gob.scj.sgdp.model.Proceso;
 import cl.gob.scj.sgdp.model.ResponsabilidadTarea;
 import cl.gob.scj.sgdp.model.Tarea;
+import cl.gob.scj.sgdp.model.Tipo;
 import cl.gob.scj.sgdp.model.UsuarioAsignado;
 import cl.gob.scj.sgdp.model.UsuarioAsignadoPK;
 import cl.gob.scj.sgdp.model.UsuarioResponsabilidad;
@@ -55,6 +64,7 @@ import cl.gob.scj.sgdp.tipos.EstadoDeProcesoType;
 import cl.gob.scj.sgdp.tipos.EstadoDeTareaType;
 import cl.gob.scj.sgdp.tipos.PermisoType;
 import cl.gob.scj.sgdp.util.FechaUtil;
+import cl.gob.scj.sgdp.util.SingleObjectFactory;
 import cl.gob.scj.sgdp.ws.alfresco.rest.client.CrearExpedienteCMSService;
 
 @Service
@@ -83,6 +93,9 @@ public class CrearExpedienteServiceImpl implements CrearExpedienteService {
 	
 	@Autowired
 	private InstanciaDeTareaDao instanciaDeTareaDao;
+	
+	@Autowired
+	private InstanciaProcesoMetadataDao instanciaProcesoMetadataDao;
 	
 	@Autowired
 	private AutorDao autorDao;
@@ -156,21 +169,63 @@ public class CrearExpedienteServiceImpl implements CrearExpedienteService {
 		
 		//Proceso proceso = procesoDao.getProcesoPorIdProceso(expedienteDTO.getIdProceso());
 		
-		String nombreAutor = autorDao.getAutorPorIdAutor(Long.parseLong(expedienteDTO.getIdAutor())).getNombreAutor();
+		//String nombreAutor = autorDao.getAutorPorIdAutor(Long.parseLong(expedienteDTO.getIdAutor())).getNombreAutor();
 			
 		InstanciaDeProceso instanciaDeProceso = new InstanciaDeProceso();	
+		
+		if (TipoEnum.EXPEDIENTE.getId().equals(expedienteDTO.getTipo())) {
+			InstanciaProcesoMetadata instanciaProcesoMetadata = new InstanciaProcesoMetadata();
+			instanciaProcesoMetadata.setTitulo(expedienteDTO.getTitulo());
+			try {
+				instanciaProcesoMetadata.setFechaCreacion(new SimpleDateFormat("dd/MM/yyyy").parse(expedienteDTO.getFechaCreacion()));
+			} catch (ParseException e) {
+				instanciaProcesoMetadata.setFechaCreacion(new Date());
+			}
+		 
+			instanciaProcesoMetadata.setNombreInteresado(expedienteDTO.getNombreInteresado());
+			instanciaProcesoMetadata.setApellidoPaterno(expedienteDTO.getApellidoPaterno());
+			instanciaProcesoMetadata.setApellidoMaterno(expedienteDTO.getApellidoMaterno());
+			instanciaProcesoMetadata.setRut(expedienteDTO.getRutInterasado());
+			if (expedienteDTO.getEtiquetasExpediente()!= null && !expedienteDTO.getEtiquetasExpediente().isEmpty()) {
+				instanciaProcesoMetadata.setEtiquetas(expedienteDTO.getEtiquetasExpediente().toString().replace("[", "").replace("]", ""));
+			}
+			instanciaProcesoMetadata.setRegion(expedienteDTO.getRegion());
+			instanciaProcesoMetadata.setComuna(expedienteDTO.getComuna());
+			
+			if (expedienteDTO.getListaMetadata() != null && !expedienteDTO.getListaMetadata().isEmpty()) {
+				try {
+					instanciaProcesoMetadata.setMetadataCustom(SingleObjectFactory.getMapper().writeValueAsString(expedienteDTO.getListaMetadata()));
+				} catch (JsonProcessingException e) {
+					log.info("Error al parsear metada custom " + e.getMessage());
+					instanciaProcesoMetadata.setMetadataCustom(null);
+				}
+			}
+			
+			instanciaProcesoMetadataDao.insertInstanciaProcesoMetadata(instanciaProcesoMetadata);	
+			instanciaDeProceso.setInstanciaProcesoMetadata(instanciaProcesoMetadata);
+		}
+		instanciaDeProceso.setTipo(new Tipo());
+		instanciaDeProceso.getTipo().setIdTipo(expedienteDTO.getTipo());
+		instanciaDeProceso.setAcceso(new Acceso());
+		instanciaDeProceso.getAcceso().setIdAcceso(Long.parseLong(expedienteDTO.getIdAcceso()));
 		instanciaDeProceso.setEstadoDeProceso(estadoDeProcesoNuevo);		
 		instanciaDeProceso.setIdUsuarioInicia(usuarioSGDP);		
 		instanciaDeProceso.setFechaInicio(new Date());
 		instanciaDeProceso.setTieneDocumentosEnCMS(false);
 		instanciaDeProceso.setProceso(proceso);
 		instanciaDeProceso.setFechaVencimiento(FechaUtil.getFechaHabil(calModInstProc, fechaFeriadoDao, proceso.getDiasHabilesMaxDuracion()).getTime());
-		instanciaDeProceso.setEmisor(nombreAutor);
+		instanciaDeProceso.setEmisor(usuarioSGDP);
 		instanciaDeProceso.setAsunto(expedienteDTO.getMateria());
 		instanciaDeProceso.setUnidad(proceso.getUnidad());
-		
+		try {
+			if (expedienteDTO.getFechaExpiracion() != null && !expedienteDTO.getFechaExpiracion().isEmpty()) {
+				instanciaDeProceso.setFechaExpiracion(FechaUtil.simpleDateFormatForm.parse(expedienteDTO.getFechaExpiracion()));	
+			}
+		} catch (ParseException e) {
+			instanciaDeProceso.setFechaExpiracion(new Date());
+		}
 		expedienteDTO.setCreador(usuarioSGDP);
-		expedienteDTO.setNombreAutor(nombreAutor);
+		expedienteDTO.setNombreAutor(usuarioSGDP);
 		expedienteDTO.setNombrePerpectiva(instanciaDeProceso.getProceso().getMacroProceso().getPerspectiva().getNombrePerspectiva());
 		expedienteDTO.setNombreMacroProceso(instanciaDeProceso.getProceso().getMacroProceso().getNombreMacroProceso());
 		expedienteDTO.setNombreProceso(instanciaDeProceso.getProceso().getNombreProceso());

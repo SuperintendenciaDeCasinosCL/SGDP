@@ -3,13 +3,11 @@ package cl.gob.scj.sgdp.service;
 import org.springframework.stereotype.Service;
 
 import cl.gob.scj.sgdp.auth.user.Usuario;
-import cl.gob.scj.sgdp.dto.ArchivosInstDeTareaDTO;
 import cl.gob.scj.sgdp.dto.DetalleDeArchivoDTO;
 import cl.gob.scj.sgdp.dto.FirmaAvanzadaDTO;
 import cl.gob.scj.sgdp.dto.HistoricoFirmaDTO;
 import cl.gob.scj.sgdp.dto.KeyParametroPorContextoDTO;
 import cl.gob.scj.sgdp.dto.RespuestaConversionArchivoDTO;
-import cl.gob.scj.sgdp.dto.RespuestaSimpleDTO;
 import cl.gob.scj.sgdp.dto.SubirArhivoDTO;
 import cl.gob.scj.sgdp.exception.SgdpException;
 import cl.gob.scj.sgdp.ws.alfresco.rest.response.FirmaSimpleDocumentoResponse;
@@ -35,13 +33,11 @@ public interface GestorDeDocumentosService {
 	String getJnlp(String iddoc, String ticket, String nameDoc, String idexpediente,long idTipoDeDocumento, Usuario usuario, long idInstanciaDeTarea) throws Exception;
 	
 	void registraFirma(String idUsuario, HistoricoFirmaDTO historicoFirmaDTO);
-		
+	
+	//RespuestaConversionArchivoDTO convertirArchivoAPDFYSubirACMS(Usuario usuario, String idArchivo) throws SgdpException;
+	
 	RespuestaConversionArchivoDTO convertirArchivoAPDF(Usuario usuario, SubirArhivoDTO subirArhivoDTO) throws Exception;
 	
 	byte[] getContenidoArchivoDesdeUrlYVersion(DetalleDeArchivoDTO detalleDeArchivoDTO, String version, Usuario usuario) throws Exception;
-	
-	SubirArhivoDTO subirArchivoDesdeOtroCambiandoNombre(Usuario usuario, String nombreDeArchivo, SubirArhivoDTO sdto) throws SgdpException;
-	
-	ArchivosInstDeTareaDTO getUltimoArchivoInstDeTareaFirmado(long idInstanciaDeTarea, long idTipoDeDocumento, String idUsuario);
 	
 }

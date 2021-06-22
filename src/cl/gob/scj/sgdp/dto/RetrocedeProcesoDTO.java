@@ -14,8 +14,6 @@ public class RetrocedeProcesoDTO implements Serializable {
 	private String cssStatus;
 	private boolean recarga;
 	private String parametrosMapParaGuardarJSON;
-	private short horasOcupadas;
-	private short minutosOcupados;
 	
 	public RetrocedeProcesoDTO() {
 		super();		
@@ -93,22 +91,6 @@ public class RetrocedeProcesoDTO implements Serializable {
 	public void setParametrosMapParaGuardarJSON(String parametrosMapParaGuardarJSON) {
 		this.parametrosMapParaGuardarJSON = parametrosMapParaGuardarJSON;
 	}
-	
-	public short getHorasOcupadas() {
-		return horasOcupadas;
-	}
-
-	public void setHorasOcupadas(short horasOcupadas) {
-		this.horasOcupadas = horasOcupadas;
-	}
-
-	public short getMinutosOcupados() {
-		return minutosOcupados;
-	}
-
-	public void setMinutosOcupados(short minutosOcupados) {
-		this.minutosOcupados = minutosOcupados;
-	}
 
 	@Override
 	public String toString() {
@@ -121,8 +103,6 @@ public class RetrocedeProcesoDTO implements Serializable {
 				+ ", nombreDeTarea=" + nombreDeTarea
 				+ ", recarga=" + recarga
 				+ ", parametrosMapParaGuardarJSON=" + parametrosMapParaGuardarJSON
-				+ ", horasOcupadas=" + horasOcupadas
-				+ ", minutosOcupados=" + minutosOcupados
 				+ "]";
 	}	
 	

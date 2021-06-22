@@ -1,13 +1,12 @@
-
-
 package cl.gob.scj.sgdp.service.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -19,13 +18,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 import cl.gob.scj.sgdp.auth.user.Usuario;
 import cl.gob.scj.sgdp.config.Constantes;
+import cl.gob.scj.sgdp.dao.AccesoDao;
 import cl.gob.scj.sgdp.dao.AutorDao;
 import cl.gob.scj.sgdp.dao.EstadoDeProcesoDao;
 import cl.gob.scj.sgdp.dao.InstanciaDeProcesoDao;
 import cl.gob.scj.sgdp.dao.InstanciaDeTareaDao;
 import cl.gob.scj.sgdp.dao.MacroProcesoDao;
+import cl.gob.scj.sgdp.dao.ParametroDeTareaDao;
 import cl.gob.scj.sgdp.dao.TareaDao;
+import cl.gob.scj.sgdp.dao.TextoParametroDeTareaDao;
+import cl.gob.scj.sgdp.dao.TipoParametroDeTareaDao;
 import cl.gob.scj.sgdp.dao.UsuarioRolDao;
+import cl.gob.scj.sgdp.dto.AccesoDTO;
 import cl.gob.scj.sgdp.dto.AnadirAntecedenteDTO;
 import cl.gob.scj.sgdp.dto.AutorDTO;
 import cl.gob.scj.sgdp.dto.EstadoDeProcesoDTO;
@@ -33,19 +37,25 @@ import cl.gob.scj.sgdp.dto.FiltroExpedienteDTO;
 import cl.gob.scj.sgdp.dto.InstanciaDeTareaDTO;
 import cl.gob.scj.sgdp.dto.MacroProcesoDTO;
 import cl.gob.scj.sgdp.dto.ParametroDTO;
+import cl.gob.scj.sgdp.dto.ParametroDeTareaDTO;
 import cl.gob.scj.sgdp.dto.RespuestaMailDTO;
 import cl.gob.scj.sgdp.dto.SuggestionsDTO;
 import cl.gob.scj.sgdp.dto.TareaDTO;
 import cl.gob.scj.sgdp.dto.TipoDeDocumentoDTO;
+import cl.gob.scj.sgdp.dto.TipoParametroDeTareaDTO;
 import cl.gob.scj.sgdp.exception.SgdpException;
+import cl.gob.scj.sgdp.model.Acceso;
 import cl.gob.scj.sgdp.model.Autor;
 import cl.gob.scj.sgdp.model.DocumentoDeSalidaDeTarea;
 import cl.gob.scj.sgdp.model.EstadoDeProceso;
 import cl.gob.scj.sgdp.model.InstanciaDeProceso;
 import cl.gob.scj.sgdp.model.InstanciaDeTarea;
 import cl.gob.scj.sgdp.model.MacroProceso;
+import cl.gob.scj.sgdp.model.ParametroDeTarea;
 import cl.gob.scj.sgdp.model.Tarea;
+import cl.gob.scj.sgdp.model.TextoParametroDeTarea;
 import cl.gob.scj.sgdp.model.TipoDeDocumento;
+import cl.gob.scj.sgdp.model.TipoParametroDeTarea;
 import cl.gob.scj.sgdp.model.UsuarioAsignado;
 import cl.gob.scj.sgdp.model.UsuarioRol;
 import cl.gob.scj.sgdp.service.BandejaDeEntradaService;
@@ -80,10 +90,22 @@ public class BandejaDeEntradaServiceImpl implements BandejaDeEntradaService {
 	private AutorDao autorDao;	
 	
 	@Autowired
+	private AccesoDao accesoDao;	
+	
+	@Autowired
 	private ParametroService parametroService;
 	
 	@Autowired
 	private EmailService emailService;
+	
+	@Autowired
+	private ParametroDeTareaDao parametroDeTareaDao;
+	
+	@Autowired
+	private TextoParametroDeTareaDao textoParametroDeTareaDao;
+	
+	@Autowired
+	private TipoParametroDeTareaDao tipoParametroDeTareaDao;
 	
 	@Resource(name = "configProps")
 	private Properties configProps;
@@ -178,6 +200,17 @@ public class BandejaDeEntradaServiceImpl implements BandejaDeEntradaService {
 		return autoresDTO;
 	}
 
+	@Override
+	public List<AccesoDTO> getTodosLosAccesos() {
+		List<AccesoDTO> accesosDTO = new ArrayList<AccesoDTO>();
+		List<Acceso> accesos = accesoDao.getTodosLosAccesos();
+		for (Acceso acceso : accesos) {
+			AccesoDTO accesoDTO = new AccesoDTO(acceso.getIdAcceso(), acceso.getNombreAcceso(), acceso.getValorAccesoChar());
+			accesosDTO.add(accesoDTO);
+		}
+		return accesosDTO;
+	}
+	
 	/*@Override
 	public List<TipoDeDocumentoDTO> getTodosLosTiposDeDocumentos(List<TipoDeDocumentoDTO> tiposDeDocumentosDTO) {
 		List<TipoDeDocumento> tiposDeDocumentos = tipoDeDocumentoDao.getTodosLosTiposDeDocumentos();
@@ -248,7 +281,8 @@ public class BandejaDeEntradaServiceImpl implements BandejaDeEntradaService {
 		
 		return instanciasDeTareasDTOEnEjecucion;
 		
-	}	
+	}
+	
 	
 	@Override
 	public List<InstanciaDeTareaDTO> getTodasInstanciasDeTareasEnEjecucionPorIdUnidad(long idUnidad, List<InstanciaDeTareaDTO> instanciasDeTareasDTOEnEjecucion) throws IOException {
@@ -268,32 +302,13 @@ public class BandejaDeEntradaServiceImpl implements BandejaDeEntradaService {
 		}		
 		return instanciasDeTareasDTOEnEjecucion;		
 	}
-	
-	@Override
-	public List<InstanciaDeTareaDTO> getTodasInstanciasDeTareasEnEjecucionPorIdUnidades(Usuario usuario, List<InstanciaDeTareaDTO> instanciasDeTareasDTOEnEjecucion) throws IOException {
-		Set<Long> idUnidades = usuario.getIdUnidades();
-		for (Long idUnidad : idUnidades) {
-			List<InstanciaDeTarea> instanciasDeTareas = instanciaDeTareaDao.getTodasInstanciasDeTareasEnEjecucionPorIdUnidad(idUnidad);
-			for (InstanciaDeTarea instanciaDeTarea: instanciasDeTareas) { 			
-				log.debug(instanciaDeTarea.toString());
-				InstanciaDeTareaDTO instanciaDeTareaDTO = new InstanciaDeTareaDTO();
-				instanciaDeTareaDTO.cargaInstanciaDeTareaDTO(instanciaDeTarea);
-				instanciaDeTareaDTO.cargaUsuariosAsignadosString(configProps.getProperty("caracterSeparadorDeUsuarios"));
-				instanciaDeTareaDTO.cargaAdvertenciaDePlazo(
-						parametroService.getParametroPorID(Constantes.ID_PARAM_PORCENTAJE_ADVERTENCIA_TAREA).getValorParametroNumerico(),
-						instanciaDeTarea.getTarea().getDiasHabilesMaxDuracion());		
-				instanciasDeTareasDTOEnEjecucion.add(instanciaDeTareaDTO);			
-			}	
-		}
-		return instanciasDeTareasDTOEnEjecucion;
-	}
 
 	@Override
 	public List<InstanciaDeTareaDTO> getInstanciasDeTareaPorIdUsrNombreEstadoTareaFiltro(Usuario usuario,
 			String nombreEstadoDeTarea, List<InstanciaDeTareaDTO> instanciasDeTareasDTO,
 			FiltroExpedienteDTO filtroExpedienteDTO) throws IOException {
 
-		log.debug("Inicio getInstanciasDeTareaPorIdUsrNombreEstadoTareaFiltro");
+		log.debug("Inicio instanciaDeTareaDao.getInstanciasDeTareaPorIdUsrNombreEstadoTareaFiltro");
 
 		List<InstanciaDeTarea> instanciasDeTareas = new ArrayList<InstanciaDeTarea>();
 
@@ -329,6 +344,7 @@ public class BandejaDeEntradaServiceImpl implements BandejaDeEntradaService {
 
 		}
 
+		log.debug("Fin instanciaDeTareaDao.getInstanciasDeTareaPorIdUsrNombreEstadoTarea");
 		log.debug("instanciasDeTareas.size(): " + instanciasDeTareas.size());
 		log.debug("instanciasDeTareas.isEmpty(): " + instanciasDeTareas.isEmpty());
 		
@@ -342,11 +358,7 @@ public class BandejaDeEntradaServiceImpl implements BandejaDeEntradaService {
 			instanciaDeTareaDTO.setNombreEstadoHomologadoDeInstProceso(estadoInstaProcMap.get(instanciaDeTarea.getIdInstanciaDeTarea()));
 			instanciaDeTareaDTO.cargaUsuariosAsignadosString(configProps.getProperty("caracterSeparadorDeUsuarios"));
 			instanciaDeTareaDTO.cargaAdvertenciaDePlazo(parametroService.getParametroPorID(Constantes.ID_PARAM_PORCENTAJE_ADVERTENCIA_TAREA).getValorParametroNumerico(),
-							instanciaDeTarea.getTarea().getDiasHabilesMaxDuracion());		
-			/*List<ParametroRelacionTarea> parametrosRelacionTarea = parametroRelacionTareaDao.getParamTareaPorIdProc(instanciaDeTareaDTO.getIdProceso());
-			if (parametrosRelacionTarea!=null && parametrosRelacionTarea.size()>0) {
-				instanciaDeTareaDTO.setProcesoTieneRdsSnc(true);
-			}*/
+							instanciaDeTarea.getTarea().getDiasHabilesMaxDuracion());			
 			instanciasDeTareasDTO.add(instanciaDeTareaDTO);
 		}
 
@@ -433,7 +445,217 @@ public class BandejaDeEntradaServiceImpl implements BandejaDeEntradaService {
 		}
 		return tareasDTO;
 	}
+	
+	@Override
+	public List<ParametroDeTareaDTO> getParametrosDeTareaDTOPorIdTarea(long idTarea) {
+		List<ParametroDeTareaDTO> parametrosDeTareaDTOPorIdTarea = new ArrayList<ParametroDeTareaDTO>();
+		List<ParametroDeTarea> parametrosDeTareaPorIdTarea = parametroDeTareaDao.getParametrosDeTareaPorIdTarea(idTarea);
+		for (ParametroDeTarea parametroDeTarea : parametrosDeTareaPorIdTarea) {
+			ParametroDeTareaDTO parametroDeTareaDTO = new ParametroDeTareaDTO();
+			parametroDeTareaDTO.setIdParamTarea(parametroDeTarea.getIdParamTarea());
+			parametroDeTareaDTO.setNombreParamTarea(parametroDeTarea.getNombreParamTarea());			
+			TipoParametroDeTarea tipoParametroDeTarea = parametroDeTarea.getTipoParametroDeTarea();
+			TipoParametroDeTareaDTO tipoParametroDeTareaDTO = new TipoParametroDeTareaDTO();
+			tipoParametroDeTareaDTO.setIdTipoParametroDeTarea(tipoParametroDeTarea.getIdTipoParametroDeTarea());
+			tipoParametroDeTareaDTO.setNombreTipoParametroDeTarea(tipoParametroDeTarea.getNombreTipoParametroDeTarea());
+			tipoParametroDeTareaDTO.setTextoHtml(tipoParametroDeTarea.getTextoHtml());
+			parametroDeTareaDTO.setTipoParametroDeTareaDTO(tipoParametroDeTareaDTO);
+			parametrosDeTareaDTOPorIdTarea.add(parametroDeTareaDTO);
+		}		
+		return parametrosDeTareaDTOPorIdTarea;
+	}
+	
+	@Override
+	public List<ParametroDeTareaDTO> getParametrosDeTareaPorIdInstanciaDeTarea(long idInstanciaDeTarea) {
+		List<ParametroDeTareaDTO> parametrosDeTareaDTOPorIdTarea = new ArrayList<ParametroDeTareaDTO>();
+		List<ParametroDeTarea> parametrosDeTareaPorIdTarea = parametroDeTareaDao.getParametrosDeTareaPorIdInstanciaDeTarea(idInstanciaDeTarea);
+		for (ParametroDeTarea parametroDeTarea : parametrosDeTareaPorIdTarea) {
+			ParametroDeTareaDTO parametroDeTareaDTO = new ParametroDeTareaDTO();
+			parametroDeTareaDTO.setIdParamTarea(parametroDeTarea.getIdParamTarea());
+			parametroDeTareaDTO.setNombreParamTarea(parametroDeTarea.getNombreParamTarea());
+			parametroDeTareaDTO.setTitulo(parametroDeTarea.getTitulo());
+			TipoParametroDeTarea tipoParametroDeTarea = parametroDeTarea.getTipoParametroDeTarea();
+			TipoParametroDeTareaDTO tipoParametroDeTareaDTO = new TipoParametroDeTareaDTO();
+			tipoParametroDeTareaDTO.setIdTipoParametroDeTarea(tipoParametroDeTarea.getIdTipoParametroDeTarea());
+			tipoParametroDeTareaDTO.setNombreTipoParametroDeTarea(tipoParametroDeTarea.getNombreTipoParametroDeTarea());
+			tipoParametroDeTareaDTO.setTextoHtml(tipoParametroDeTarea.getTextoHtml());
+			parametroDeTareaDTO.setTipoParametroDeTareaDTO(tipoParametroDeTareaDTO);
+			tipoParametroDeTareaDTO.setComenta(tipoParametroDeTarea.getComenta());
+			parametrosDeTareaDTOPorIdTarea.add(parametroDeTareaDTO);
+		}		
+		return parametrosDeTareaDTOPorIdTarea;
+	}
+	
+	@Override
+	public Map<String, List<ParametroDeTareaDTO>> getMapParametrosDeTareaDTOTituloPorIdInstanciaDeTarea(long idInstanciaDeTarea) {	
 		
+		Map<String, List<ParametroDeTareaDTO>> mapParametrosDeTareaDTOTitulo = new HashMap<String, List<ParametroDeTareaDTO>>();
+		
+		List<ParametroDeTareaDTO> parametrosDeTareaDTOTitulo = getParametrosDeTareaDTOTituloPorIdInstanciaDeTarea(idInstanciaDeTarea);
+		
+		Iterator<ParametroDeTareaDTO> it = parametrosDeTareaDTOTitulo.iterator();
+		
+		while (it.hasNext()) {
+			ParametroDeTareaDTO parametroDeTareaDTO = it.next();
+			if (mapParametrosDeTareaDTOTitulo.containsKey(parametroDeTareaDTO.getTitulo())) {
+				List<ParametroDeTareaDTO> parametrosDeTareaDTO = mapParametrosDeTareaDTOTitulo.get(parametroDeTareaDTO.getTitulo());
+				parametrosDeTareaDTO.add(parametroDeTareaDTO);
+				it.remove();
+				mapParametrosDeTareaDTOTitulo.put(parametroDeTareaDTO.getTitulo(), parametrosDeTareaDTO);
+			} else {
+				List<ParametroDeTareaDTO> parametrosDeTareaDTO = new ArrayList<ParametroDeTareaDTO>();
+				parametrosDeTareaDTO.add(parametroDeTareaDTO);
+				it.remove();
+				mapParametrosDeTareaDTOTitulo.put(parametroDeTareaDTO.getTitulo(), parametrosDeTareaDTO);
+			}
+		}
+		
+		return mapParametrosDeTareaDTOTitulo;
+	
+	}
+	
+	private List<ParametroDeTareaDTO> getParametrosDeTareaDTOTituloPorIdInstanciaDeTarea(long idInstanciaDeTarea) {		
+		List<ParametroDeTareaDTO> parametrosDeTareaDTOPorIdTarea = getParametrosDeTareaPorIdInstanciaDeTarea(idInstanciaDeTarea);
+		String inputComentario = null;
+		String abreSelect = null;
+		String cierraSelect = null;
+		TipoParametroDeTarea inputComentarioParam = tipoParametroDeTareaDao.getTipoParametroDeTareaPorNombreTipoParametroDeTarea("comentario");
+		TipoParametroDeTarea abreSelectParam =  tipoParametroDeTareaDao.getTipoParametroDeTareaPorNombreTipoParametroDeTarea("abre_select");
+		TipoParametroDeTarea cierraSelectParam =  tipoParametroDeTareaDao.getTipoParametroDeTareaPorNombreTipoParametroDeTarea("cierra_select");
+		if (inputComentarioParam!=null ) {
+			inputComentario = inputComentarioParam.getTextoHtml();
+			log.debug("inputComentario: " + inputComentario);
+		}
+		if (abreSelectParam!=null ) {
+			abreSelect = abreSelectParam.getTextoHtml();
+			log.debug("abreSelect: " + abreSelect);
+		}
+		if (cierraSelectParam!=null ) {
+			cierraSelect = cierraSelectParam.getTextoHtml();
+			log.debug("cierraSelect: " + cierraSelect);
+		}
+		for (ParametroDeTareaDTO parametroDeTareaDTO : parametrosDeTareaDTOPorIdTarea) {
+			List<TextoParametroDeTarea> textosParametroDeTarea = textoParametroDeTareaDao.getTextosParametroDeTareaPorIdParamTarea(parametroDeTareaDTO.getIdParamTarea());
+			for (TextoParametroDeTarea textoParametroDeTarea : textosParametroDeTarea) {
+				log.debug(textoParametroDeTarea.toString());
+				String textoHtml = parametroDeTareaDTO.getTipoParametroDeTareaDTO().getTextoHtml().replace("${textoParametro}", textoParametroDeTarea.getTexto());				
+				textoHtml = textoHtml.replace("${idParamTarea}", Long.toString(parametroDeTareaDTO.getIdParamTarea()));
+				if (parametroDeTareaDTO.getTextoHtml()!=null && !parametroDeTareaDTO.getTextoHtml().isEmpty()) {
+					StringBuilder textoHtmlTipoParam = new StringBuilder(parametroDeTareaDTO.getTextoHtml()); 
+					textoHtmlTipoParam.append(" ");	
+					textoHtmlTipoParam.append(textoHtml);					
+					parametroDeTareaDTO.setTextoHtml(textoHtmlTipoParam.toString());
+				} else {
+					parametroDeTareaDTO.setTextoHtml(textoHtml);
+				}	
+			}
+			if (parametroDeTareaDTO.getTipoParametroDeTareaDTO().getComenta()!=null && parametroDeTareaDTO.getTipoParametroDeTareaDTO().getComenta().booleanValue() == true) {
+				if (parametroDeTareaDTO.getTextoHtml()!=null && !parametroDeTareaDTO.getTextoHtml().isEmpty()) {					
+					StringBuilder textoHtmlTipoParamComentario = new StringBuilder(parametroDeTareaDTO.getTextoHtml()); 
+					textoHtmlTipoParamComentario.append(" ");	
+					if (inputComentario!=null) {
+						textoHtmlTipoParamComentario.append(inputComentario.replace("${idParamTarea}", Long.toString(parametroDeTareaDTO.getIdParamTarea())));
+					}		
+					parametroDeTareaDTO.setTextoHtml(textoHtmlTipoParamComentario.toString());
+				}
+			}
+			if (parametroDeTareaDTO.getTextoHtml()!=null && !parametroDeTareaDTO.getTextoHtml().isEmpty()
+					&& parametroDeTareaDTO.getTextoHtml().contains("<option") && parametroDeTareaDTO.getTextoHtml().contains("<select")) {
+				StringBuilder select = new StringBuilder(parametroDeTareaDTO.getTextoHtml());
+				select.insert(0, abreSelect);
+		    	select.insert(select.length(), cierraSelect);
+		    	String selectTextoHtml = select.toString().replace("${idParamTarea}", Long.toString(parametroDeTareaDTO.getIdParamTarea()));
+		    	parametroDeTareaDTO.setTextoHtml(selectTextoHtml);
+			}			
+			log.debug(parametroDeTareaDTO.toString());
+		}
+		return parametrosDeTareaDTOPorIdTarea;		
+	}
+	
+		
+	/*public Map<String, List<Map<String, String>>> getParametrosDeTareaMapTituloPorIdInstanciaDeTarea(long idInstanciaDeTarea) {
+		Map<String, String> mapParametrosDeTarea = new HashMap<String, String>();
+		Map<String, List<Map<String, String>>> mapParametrosDeTareaTitulo = new HashMap<String, List<Map<String, String>>>();
+		List<ParametroDeTareaDTO> parametrosDeTareaDTOPorIdTarea = getParametrosDeTareaPorIdInstanciaDeTarea(idInstanciaDeTarea);		
+		String inputComentario = null;
+		String abreSelect = null;
+		String cierraSelect = null;
+		TipoParametroDeTarea inputComentarioParam = tipoParametroDeTareaDao.getTipoParametroDeTareaPorNombreTipoParametroDeTarea("comentario");
+		TipoParametroDeTarea abreSelectParam =  tipoParametroDeTareaDao.getTipoParametroDeTareaPorNombreTipoParametroDeTarea("abre_select");
+		TipoParametroDeTarea cierraSelectParam =  tipoParametroDeTareaDao.getTipoParametroDeTareaPorNombreTipoParametroDeTarea("cierra_select");
+		if (inputComentarioParam!=null ) {
+			inputComentario = inputComentarioParam.getTextoHtml();
+			log.debug("inputComentario: " + inputComentario);
+		}
+		if (abreSelectParam!=null ) {
+			abreSelect = abreSelectParam.getTextoHtml();
+			log.debug("abreSelect: " + abreSelect);
+		}
+		if (cierraSelectParam!=null ) {
+			cierraSelect = cierraSelectParam.getTextoHtml();
+			log.debug("cierraSelect: " + cierraSelect);
+		}
+		for (ParametroDeTareaDTO parametroDeTareaDTO : parametrosDeTareaDTOPorIdTarea) {
+			List<TextoParametroDeTarea> textosParametroDeTarea = textoParametroDeTareaDao.getTextosParametroDeTareaPorIdParamTarea(parametroDeTareaDTO.getIdParamTarea());
+			for (TextoParametroDeTarea textoParametroDeTarea : textosParametroDeTarea) {
+				log.debug(textoParametroDeTarea.toString());
+				String textoHtml = parametroDeTareaDTO.getTipoParametroDeTareaDTO().getTextoHtml().replace("${textoParametro}", textoParametroDeTarea.getTexto());				
+				textoHtml = textoHtml.replace("${idParamTarea}", Long.toString(parametroDeTareaDTO.getIdParamTarea()));
+				if (mapParametrosDeTarea.containsKey(parametroDeTareaDTO.getNombreParamTarea())) {
+					StringBuilder textoHtmlTipoParam = new StringBuilder(mapParametrosDeTarea.get(parametroDeTareaDTO.getNombreParamTarea())); 
+					textoHtmlTipoParam.append(" ");	
+					textoHtmlTipoParam.append(textoHtml);
+					mapParametrosDeTarea.put(parametroDeTareaDTO.getNombreParamTarea(), textoHtmlTipoParam.toString());
+				} else {
+					mapParametrosDeTarea.put(parametroDeTareaDTO.getNombreParamTarea(), textoHtml);
+				}	
+			}
+			if (parametroDeTareaDTO.getTipoParametroDeTareaDTO().getComenta()!=null && parametroDeTareaDTO.getTipoParametroDeTareaDTO().getComenta().booleanValue() == true) {
+				if (mapParametrosDeTarea.containsKey(parametroDeTareaDTO.getNombreParamTarea())) {
+					StringBuilder textoHtmlTipoParamComentario = new StringBuilder(mapParametrosDeTarea.get(parametroDeTareaDTO.getNombreParamTarea())); 
+					textoHtmlTipoParamComentario.append(" ");	
+					if (inputComentario!=null) {
+						textoHtmlTipoParamComentario.append(inputComentario.replace("${idParamTarea}", Long.toString(parametroDeTareaDTO.getIdParamTarea())));
+					}					
+					mapParametrosDeTarea.put(parametroDeTareaDTO.getNombreParamTarea(), textoHtmlTipoParamComentario.toString());
+				}
+			}
+			for (Map.Entry<String, String> entry : mapParametrosDeTarea.entrySet()) {			   
+			    if (entry.getValue().contains("<option") && !entry.getValue().contains("<select")) {
+			    	log.debug("ACA entry.getValue(): " + entry.getValue());
+			    	StringBuilder select = new StringBuilder(entry.getValue());
+			    	select.insert(0, abreSelect);
+			    	select.insert(select.length(), cierraSelect);
+			    	String selectTextoHtml = select.toString().replace("${idParamTarea}", Long.toString(parametroDeTareaDTO.getIdParamTarea()));
+			    	mapParametrosDeTarea.put(entry.getKey(), selectTextoHtml);
+			    }
+			}
+			log.debug(parametroDeTareaDTO.toString());
+			if (mapParametrosDeTareaTitulo.containsKey(parametroDeTareaDTO.getTitulo())) {
+				log.debug("Adjuntando en lista de: " + parametroDeTareaDTO.getTitulo());
+				log.debug(mapParametrosDeTarea.toString());
+				List<Map<String, String>> listaParametroPorTitulo = mapParametrosDeTareaTitulo.get(parametroDeTareaDTO.getTitulo());
+				listaParametroPorTitulo.add(mapParametrosDeTarea);				
+			} else {
+				log.debug("Creando la lista de: " + parametroDeTareaDTO.getTitulo());
+				log.debug(mapParametrosDeTarea.toString());
+				List<Map<String, String>> listaParametroPorTitulo = new ArrayList<Map<String, String>>();
+				listaParametroPorTitulo.add(mapParametrosDeTarea);
+				mapParametrosDeTareaTitulo.put(parametroDeTareaDTO.getTitulo(), listaParametroPorTitulo);
+			}			
+		}		
+		return mapParametrosDeTareaTitulo;
+	}*/
+	
+	/*@Override
+	public Map<String, Map<String, String>> getParametrosDeTareaMapTituloPorIdInstanciaDeTarea(long idInstanciaDeTarea) {
+		Map<String, Map<String, String>> mapParametrosDeTareaTitulo = new HashMap<String, Map<String, String>>();
+		Map<String, String> mapParametrosDeTarea = this.getParametrosDeTareaMapPorIdInstanciaDeTarea(idInstanciaDeTarea);
+		for () {
+			
+		}
+		return mapParametrosDeTareaTitulo;
+	}*/
 
 	@Override
 	public List<TipoDeDocumentoDTO> getTodosLosTiposDeDocumentosPorIdTarea(long idTarea) {

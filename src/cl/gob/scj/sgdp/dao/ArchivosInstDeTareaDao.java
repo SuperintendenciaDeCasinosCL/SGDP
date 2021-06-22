@@ -1,6 +1,5 @@
 package cl.gob.scj.sgdp.dao;
 
-import java.util.Date;
 import java.util.List;
 
 import cl.gob.scj.sgdp.dto.ArchivosInstDeTareaDTO;
@@ -64,12 +63,12 @@ public interface ArchivosInstDeTareaDao {
 	
 	List<ArchivosInstDeTareaDTO> getTodosLosDocSubidosPorIdExpediente(String idExpediente);
 	
-	List<ArchivosInstDeTarea> getArchivosPorIdArchivoEnTareaConNumero(String idArchivoCms);	
+	List<ArchivosInstDeTarea> getArchivosPorIdArchivoEnTareaConNumero(String idArchivoCms);
 
-	ArchivosInstDeTarea getArchivoPorIdInstanciaDeTareaIdTipoDeDocumento(long idInstanciaDeTarea, long idTipoDeDocumento);
+	List<ArchivosInstDeTarea> getArchivosInstDeTareaPorIdSerie(long idSerie, Long idEstadoProceso, Long estadoDocumento, String fechaTransferirInicio, String fechaTransferirTermino);
+
+	List<ArchivosInstDeTarea> getArchivosInstDeTareaPorNombreSerie(String nombreSerie, String fechaTransferirInicio, String fechaTransferirTermino);
+
 	
-	ArchivosInstDeTarea getUltimoArchivoInstDeTareaFirmado(long idInstanciaDeTarea, long idTipoDeDocumento, String idUsuario);
-	
-	List<ArchivosInstDeTarea> getArchivosInstDeTareaPorIdInstTareaIdUsuarioNombreTipoDocFechaSubidoMayorA(Long idInstanciaDeTarea, String idUsuario, String nombreDeTipoDeDocumento, Date fechaSubido);
 	
 }

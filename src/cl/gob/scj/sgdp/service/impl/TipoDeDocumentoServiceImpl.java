@@ -1,16 +1,13 @@
 package cl.gob.scj.sgdp.service.impl;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import cl.gob.scj.sgdp.control.DetalleDeTareaControl;
 import cl.gob.scj.sgdp.dao.TipoDeDocumentoDao;
 import cl.gob.scj.sgdp.dto.TipoDeDocumentoDTO;
 import cl.gob.scj.sgdp.model.TipoDeDocumento;
@@ -19,7 +16,6 @@ import cl.gob.scj.sgdp.service.TipoDeDocumentoService;
 @Service
 @Transactional(rollbackFor = Throwable.class)
 public class TipoDeDocumentoServiceImpl implements TipoDeDocumentoService {
-	private static final Logger log = Logger.getLogger(DetalleDeTareaControl.class);
 	
 	@Autowired
 	private TipoDeDocumentoDao tipoDeDocumentoDao;
@@ -41,13 +37,8 @@ public class TipoDeDocumentoServiceImpl implements TipoDeDocumentoService {
 
 	@Override
 	public TipoDeDocumentoDTO getTipoDeDocumentoDTOPorIdTipoDeDocumento(long idTipoDeDocumento) {
-		log.error("idTipoDeDocumento");
-		log.error(idTipoDeDocumento);
-		
 		TipoDeDocumento tipoDeDocumento = tipoDeDocumentoDao.getTipoDeDocumentoPorIdTipoDeDocumento(idTipoDeDocumento);
 		TipoDeDocumentoDTO tipoDeDocumentoDTO = new TipoDeDocumentoDTO();
-		log.error("hola");
-		log.error(tipoDeDocumento);
 		BeanUtils.copyProperties(tipoDeDocumento, tipoDeDocumentoDTO);
 		return tipoDeDocumentoDTO;
 	}

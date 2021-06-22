@@ -37,7 +37,5 @@ public interface InstanciaDeTareaService {
 	List<InstanciaDeTareaDTO> getInstanciaDeTareaDTOAnteriores(InstanciaDeTareaDTO instanciaDeTareaDTO);
 	
 	InstanciaDeTareaDTO getInstanciaDeTareaPorIdDiagramaTareaNombreExpediente(String idDiagramaTarea, String nombreExpediente);
-	
-	//void cargaInstanciaDeTareaDTO(InstanciaDeTarea instanciaDeTarea, InstanciaDeTareaDTO instanciaDeTareaDTO);
 
 }

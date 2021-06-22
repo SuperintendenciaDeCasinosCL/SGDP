@@ -54,12 +54,11 @@ public class VinculacionExpRestServiceImpl implements VinculacionExpRestService 
 		
 		Usuario usuario = new Usuario();
 		usuario.setIdUsuario(vinculacionExpedienteRestDTO.getIdUsuario());
-	    //usuario.setIdRolUsuarioSeleccionado(vinculacionExpedienteRestDTO.getIdRol());        
+	    usuario.setIdRolUsuarioSeleccionado(vinculacionExpedienteRestDTO.getIdRol());        
 	    usuario.setAlfTicket(autenticacionService.login(vinculacionExpedienteRestDTO.getIdUsuario()));
 	    
 	    List<UsuarioRol> usuarioRoles = usuarioRolService.getUsuarioRolesPorIdUsuario(usuario.getIdUsuario());
-        //usuario.setRolUnidadPermisosPorIdRolUsuarioSeleccionado(usuarioRoles);
-        usuario.setPermisosRolesYUnidades(usuarioRoles);
+        usuario.setRolUnidadPermisosPorIdRolUsuarioSeleccionado(usuarioRoles);
         
         String permisoPuedeVincularExp = PermisoType.PUEDE_VINCULAR_EXPEDIENTES.getNombrePermiso();
 		String permisoUsrPuedeVincularExp = usuario.getPermisos().get(permisoPuedeVincularExp);

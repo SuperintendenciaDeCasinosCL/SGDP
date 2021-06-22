@@ -42,7 +42,7 @@ public class DetalleDeArchivoDTO implements Serializable {
 	private String documentoNombreExpediente;
 	private long idCategoriaDocumento;
 	private String categoriaDocumento;
-
+	
 	public String getNombre() {
 		return nombre;
 	}
@@ -242,13 +242,7 @@ public class DetalleDeArchivoDTO implements Serializable {
 	}
 	public void setCategoriaDocumento(String categoriaDocumento) {
 		this.categoriaDocumento = categoriaDocumento;
-	}	
-	/*public String getActualizaNombre() {
-		return actualizaNombre;
 	}
-	public void setActualizaNombre(String actualizaNombre) {
-		this.actualizaNombre = actualizaNombre;
-	}*/
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -317,7 +311,6 @@ public class DetalleDeArchivoDTO implements Serializable {
 				+ ", documentoNombreExpediente=" + documentoNombreExpediente
 				+ ", idCategoriaDocumento=" + idCategoriaDocumento
 				+ ", categoriaDocumento=" + categoriaDocumento
-				//+ ", actualizaNombre=" + actualizaNombre
 				+ "]";
 	}
 	

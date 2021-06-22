@@ -13,13 +13,5 @@ public interface HistoricoFirmaDao {
 	List<HistoricoFirma> getHistoricoFirmaDocumentoFEAPorIdInstanciaDeTareaIdUsuario(long idInstanciaDeTarea, String idUsuario);
 	
 	List<HistoricoFirma> getHistoricoFirmaDocumentoFEAPorIdArchivo(String idArchivoCMS);
-	
-	HistoricoFirma getUltimoHistoricoFirmaDocumentoFEAPorIdArchivo(String idArchivoCMS);
-	
-	long getIdDocumentoFirmado();
-	
-	HistoricoFirma getHistoricoFirmaPorIdDocumentoFirmado(Long idDocumentoFirmado);
-	
-	List<HistoricoFirma> getHistoricoFirmaPorIdTipoDocumentoIdInstanciaDeTareaIdUsuario(Long idTipoDeDocumento, Long idInstanciaDeTarea, String idUsuario);
-	
+
 }

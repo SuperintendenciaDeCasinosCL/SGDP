@@ -66,23 +66,11 @@ public class CrearExpedienteCMSServiceImpl implements CrearExpedienteCMSService 
 		
 		try {
 			autenticacionService.validaSesion(usuario);
-			log.info("usuario.getAlfTicket(): " + usuario.getAlfTicket());
-			log.info(serviceRestURLCrearExpediente);
-			
-			log.info("aaaaaaaaaaa");
-			log.error(parametrosURL);
-			log.error(serviceRestURLCrearExpediente);
-			log.error(entity);
-			
-			
+			log.debug("usuario.getAlfTicket(): " + usuario.getAlfTicket());
 			parametrosURL.put("alf_ticket", usuario.getAlfTicket());
-			log.error("a");
 			CrearExpedienteResponse crearExpedienteResponse = restTemplate.postForObject(serviceRestURLCrearExpediente, entity, CrearExpedienteResponse.class, parametrosURL);
-			log.error("b");
-			log.error(crearExpedienteResponse );
-			log.error("crearExpediente");
-			log.error("crearExpedienteResponse.getIdExpediente(): " + crearExpedienteResponse.getIdExpediente());  
-			log.error("crearExpediente... fin");	
+			log.debug("crearExpedienteResponse.getIdExpediente(): " + crearExpedienteResponse.getIdExpediente());  
+			log.debug("crearExpediente... fin");	
 			return crearExpedienteResponse.getIdExpediente();
 		} catch (HttpClientErrorException e) {
 			HttpStatus status = e.getStatusCode();

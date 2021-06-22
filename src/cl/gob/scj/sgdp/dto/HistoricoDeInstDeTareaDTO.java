@@ -23,8 +23,6 @@ public class HistoricoDeInstDeTareaDTO implements Serializable {
 	private String nombreExpediente;
 	private String nombreResponsabilidadOrigen;
 	private String nombreResponsabilidadDestino;
-	private Short horasOcupadas;
-	private Short minutosOcupados;
 	
 	public HistoricoDeInstDeTareaDTO() {
 		super();
@@ -125,18 +123,6 @@ public class HistoricoDeInstDeTareaDTO implements Serializable {
 	}
 	public void setNombreResponsabilidadDestino(String nombreResponsabilidadDestino) {
 		this.nombreResponsabilidadDestino = nombreResponsabilidadDestino;
-	}	
-	public Short getHorasOcupadas() {
-		return horasOcupadas;
-	}
-	public void setHorasOcupadas(Short horasOcupadas) {
-		this.horasOcupadas = horasOcupadas;
-	}
-	public Short getMinutosOcupados() {
-		return minutosOcupados;
-	}
-	public void setMinutosOcupados(Short minutosOcupados) {
-		this.minutosOcupados = minutosOcupados;
 	}
 	public void cargaUsuariosDestinoString(String caracterSeparadorDeUsuarios) {	
 		
@@ -171,8 +157,6 @@ public class HistoricoDeInstDeTareaDTO implements Serializable {
 				+ ", nombreExpediente=" + nombreExpediente
 				+ ", nombreResponsabilidadOrigen=" + nombreResponsabilidadOrigen
 				+ ", nombreResponsabilidadDestino=" + nombreResponsabilidadDestino
-				+ ", horasOcupadas=" + horasOcupadas
-				+ ", minutosOcupados=" + minutosOcupados
 				+ "]";
 	}	
 	

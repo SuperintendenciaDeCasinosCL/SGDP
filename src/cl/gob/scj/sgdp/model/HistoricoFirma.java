@@ -59,29 +59,7 @@ import cl.gob.scj.sgdp.config.Constantes;
 			+ "( SELECT count(*) FROM DocumentoDeSalidaDeTarea ds WHERE ds.id.tarea.idTarea = ai.instanciaDeTarea.tarea.idTarea "
 			//+ "  AND ds.id.tipoDeDocumento.idTipoDeDocumento = hf.tipoDeDocumento.idTipoDeDocumento "
 			+ " AND ds.id.tipoDeDocumento.aplicaFEA = true "			
-			+ ") "),
-	
-	@NamedQuery(name="HistoricoFirma.getUltimoHistoricoFirmaDocumentoFEAPorIdArchivo", 
-	query=" SELECT hf from HistoricoFirma hf "
-			+ "	WHERE hf.tipoFirma IN ('WEB_START', 'CENTRALIZADO') "
-			+ "	AND hf.idArchivoCMS = :idArchivoCMS "
-			+ " AND hf.fechaFirma = ( "
-			+ " SELECT max(hf.fechaFirma) from HistoricoFirma hf "
-			+ "	WHERE hf.tipoFirma IN ('WEB_START', 'CENTRALIZADO') "
-			+ "	AND hf.idArchivoCMS = :idArchivoCMS )"),
-	
-	@NamedQuery(name="HistoricoFirma.getHistoricoFirmaPorIdDocumentoFirmado", 
-	query=" SELECT hf from HistoricoFirma hf "
-			+ "	where hf.tipoFirma IN ('WEB_START', 'CENTRALIZADO') "
-			+ "	and hf.idDocumentoFirmado = :idDocumentoFirmado "),
-	
-	@NamedQuery(name="HistoricoFirma.getHistoricoFirmaPorIdTipoDocumentoIdInstanciaDeTareaIdUsuario", 
-	query="SELECT hf from HistoricoFirma hf "
-			+ "WHERE hf.tipoFirma IN ('WEB_START', 'CENTRALIZADO') "
-			+ "AND hf.tipoDeDocumento.idTipoDeDocumento = :idTipoDeDocumento "
-			+ "AND hf.instanciaDeTarea.idInstanciaDeTarea = :idInstanciaDeTarea "
-			+ "AND hf.idUsuario = :idUsuario")
-	
+			+ ") ")	
 	})
 
 public class HistoricoFirma {
@@ -112,9 +90,6 @@ public class HistoricoFirma {
 	@ManyToOne
 	@JoinColumn(name="\"ID_TIPO_DE_DOCUMENTO\"")
 	private TipoDeDocumento tipoDeDocumento;
-	
-	@Column(name="\"ID_DOCUMENTO_FIRMADO\"")
-	private Long idDocumentoFirmado;
 	
 	public long getIdHistoricoFirma() {
 		return idHistoricoFirma;
@@ -170,24 +145,13 @@ public class HistoricoFirma {
 
 	public void setTipoDeDocumento(TipoDeDocumento tipoDeDocumento) {
 		this.tipoDeDocumento = tipoDeDocumento;
-	}	
-	
-	public Long getIdDocumentoFirmado() {
-		return idDocumentoFirmado;
-	}
-
-	public void setIdDocumentoFirmado(Long idDocumentoFirmado) {
-		this.idDocumentoFirmado = idDocumentoFirmado;
 	}
 
 	@Override
 	public String toString() {
 		return "HistoricoFirma [idHistoricoFirma=" + idHistoricoFirma + ", instanciaDeTarea=" + instanciaDeTarea
 				+ ", idArchivoCMS=" + idArchivoCMS + ", idUsuario=" + idUsuario + ", fechaFirma=" + fechaFirma
-				+ ", tipoFirma=" + tipoFirma 
-				+ ", tipoDeDocumento=" + tipoDeDocumento
-				+ ", idDocumentoFirmado=" + idDocumentoFirmado 
-				+ "]";
+				+ ", tipoFirma=" + tipoFirma + ", tipoDeDocumento=" + tipoDeDocumento + "]";
 	}	
 		
 }

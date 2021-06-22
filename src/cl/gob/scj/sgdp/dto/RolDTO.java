@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 public class RolDTO implements Serializable {
 
+
 	private Long idRol;
 	private String nombreRol;
 		
@@ -25,5 +26,8 @@ public class RolDTO implements Serializable {
 		this.nombreRol = nombreRol;
 	}
 	
-	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2923719707263843402L;
 }

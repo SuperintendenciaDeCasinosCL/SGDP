@@ -318,7 +318,8 @@ public class ObtenerArchivosExpedienteServiceImpl implements
 	
 	@Override
 	public boolean archivoEsEditable(String MimeType) {
-		ParametroDTO parametroDTOEsEditable = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_EDITABLES, MimeType);		
+		ParametroDTO parametroDTOEsEditable = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_EDITABLES, MimeType);
+		
 		if (parametroDTOEsEditable!=null) {
 			return true;
 		}else{
@@ -394,13 +395,10 @@ public class ObtenerArchivosExpedienteServiceImpl implements
 			) throws Exception {
 		log.debug("Inicio cargaDocBuscandoHaciaAtrasEnHistoricoInsTarea");
 		log.debug(historicoDeInstDeTarea.toString());						
-		for (int i = 0; i < cantidadArchivos; i++) {
+		for (int i = 0; i < cantidadArchivos; i++) {				
 			List<ArchivosInstDeTarea> archivosInstDeTareaPorIDInstTareaIdUsuarioNombreTipoDoc = 
-					/*archivosInstDeTareaDao.getArchivosInstDeTareaPorIdInstTareaIdUsuarioNombreTipoDoc(historicoDeInstDeTarea.getInstanciaDeTareaDeOrigen().getIdInstanciaDeTarea(),
-							historicoDeInstDeTarea.getIdUsuarioOrigen(), tipoDeDocumentoDTODInstanciaDeTarea.getNombreDeTipoDeDocumento());*/
-					archivosInstDeTareaDao.getArchivosInstDeTareaPorIdInstTareaIdUsuarioNombreTipoDocFechaSubidoMayorA(historicoDeInstDeTarea.getInstanciaDeTareaDeOrigen().getIdInstanciaDeTarea(),
-							historicoDeInstDeTarea.getIdUsuarioOrigen(), tipoDeDocumentoDTODInstanciaDeTarea.getNombreDeTipoDeDocumento(),
-							historicoDeInstDeTarea.getInstanciaDeTareaDeOrigen().getFechaAsignacion());
+					archivosInstDeTareaDao.getArchivosInstDeTareaPorIdInstTareaIdUsuarioNombreTipoDoc(historicoDeInstDeTarea.getInstanciaDeTareaDeOrigen().getIdInstanciaDeTarea(),
+							historicoDeInstDeTarea.getIdUsuarioOrigen(), tipoDeDocumentoDTODInstanciaDeTarea.getNombreDeTipoDeDocumento());
 			if (archivosInstDeTareaPorIDInstTareaIdUsuarioNombreTipoDoc!=null && !archivosInstDeTareaPorIDInstTareaIdUsuarioNombreTipoDoc.isEmpty()) {
 				log.debug("archivosInstDeTareaPorIDInstTareaIdUsuarioNombreTipoDoc!=null && !archivosInstDeTareaPorIDInstTareaIdUsuarioNombreTipoDoc.isEmpty()");
 				for (ArchivosInstDeTarea archivosInstDeTarea : archivosInstDeTareaPorIDInstTareaIdUsuarioNombreTipoDoc) {
@@ -408,7 +406,7 @@ public class ObtenerArchivosExpedienteServiceImpl implements
 					DetalleDeArchivoDTO detalleDeArchivoDTO = obtenerDetalleDeArchivoCMSService.obtenerDetalleDeArchivo(usuario, archivosInstDeTarea.getIdArchivoCms()).getDetalleDeArchivoDTO();
 					detalleDeArchivoDTO.setIdArchivo(archivosInstDeTarea.getIdArchivoCms());
 					log.debug(detalleDeArchivoDTO.toString());
-					//ParametroDTO parametroDTOEsMimeTypeConvertibleAPDF = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_CONVERTIBLES_A_PDF, detalleDeArchivoDTO.getMimeType());
+					ParametroDTO parametroDTOEsMimeTypeConvertibleAPDF = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_CONVERTIBLES_A_PDF, detalleDeArchivoDTO.getMimeType());
 					ParametroDTO parametroDTOEsMimeTypeAplicaVisacion = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_VISABLES, detalleDeArchivoDTO.getMimeType());
 					ParametroDTO parametroDTOEsMimeTypeAplicaFEA = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_APLICA_FEA, detalleDeArchivoDTO.getMimeType());
 					ParametroDTO parametroDTOEsEditable = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_EDITABLES, detalleDeArchivoDTO.getMimeType());
@@ -419,19 +417,19 @@ public class ObtenerArchivosExpedienteServiceImpl implements
 					log.debug(tipoDeDocumentoDTODInstanciaDeTarea.toString());
 					log.debug("puedeVisarDocumentos: " + puedeVisarDocumentos);
 					log.debug("puedeAplicarFEA: " + puedeAplicarFEA);
-					/*if (parametroDTOEsMimeTypeConvertibleAPDF!=null) {
+					if (parametroDTOEsMimeTypeConvertibleAPDF!=null) {
 						log.debug("parametroDTOEsMimeTypeConvertibleAPDF: " + parametroDTOEsMimeTypeConvertibleAPDF.toString());
-					}*/
+					}
 					if (parametroDTOEsMimeTypeAplicaVisacion!=null) {
 						log.debug("parametroDTOEsMimeTypeAplicaVisacion: " + parametroDTOEsMimeTypeAplicaVisacion.toString());
 					}
 					if (parametroDTOEsMimeTypeAplicaFEA!=null) {
 						log.debug("parametroDTOEsMimeTypeAplicaFEA: " + parametroDTOEsMimeTypeAplicaFEA.toString());
 					}
-					if (/*parametroDTOEsMimeTypeConvertibleAPDF!=null &&*/ parametroDTOEsMimeTypeAplicaVisacion==null && tipoDeDocumentoDTODInstanciaDeTarea.getAplicaVisacion()==true && puedeVisarDocumentos) {
+					if (parametroDTOEsMimeTypeConvertibleAPDF!=null && parametroDTOEsMimeTypeAplicaVisacion==null && tipoDeDocumentoDTODInstanciaDeTarea.getAplicaVisacion()==true && puedeVisarDocumentos) {
 						detalleDeArchivoDTO.setConvertirAPDF(true);
 					}
-					if (/*parametroDTOEsMimeTypeConvertibleAPDF!=null &&*/ parametroDTOEsMimeTypeAplicaFEA==null && tipoDeDocumentoDTODInstanciaDeTarea.getAplicaFEA()==true && puedeAplicarFEA) {
+					if (parametroDTOEsMimeTypeConvertibleAPDF!=null && parametroDTOEsMimeTypeAplicaFEA==null && tipoDeDocumentoDTODInstanciaDeTarea.getAplicaFEA()==true && puedeAplicarFEA) {
 						 detalleDeArchivoDTO.setConvertirAPDF(true);
 					}
 					if (estaArchivoEnListaTodosLosArchivosSubidosRequeridos(detalleDeArchivoDTO.getIdArchivo(), todosLosArchivosSubidosRequeridos)) {
@@ -492,14 +490,14 @@ public class ObtenerArchivosExpedienteServiceImpl implements
 			log.debug(archivosInstDeTarea.toString());
 			DetalleDeArchivoDTO detalleDeArchivoDTO = obtenerDetalleDeArchivoCMSService.obtenerDetalleDeArchivo(usuario, archivosInstDeTarea.getIdArchivoCms()).getDetalleDeArchivoDTO();
 			detalleDeArchivoDTO.setIdArchivo(archivosInstDeTarea.getIdArchivoCms());
-			//ParametroDTO parametroDTOEsMimeTypeConvertibleAPDF = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_CONVERTIBLES_A_PDF, detalleDeArchivoDTO.getMimeType());
+			ParametroDTO parametroDTOEsMimeTypeConvertibleAPDF = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_CONVERTIBLES_A_PDF, detalleDeArchivoDTO.getMimeType());
 			ParametroDTO parametroDTOEsMimeTypeAplicaVisacion = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_VISABLES, detalleDeArchivoDTO.getMimeType());
 			ParametroDTO parametroDTOEsMimeTypeAplicaFEA = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_APLICA_FEA, detalleDeArchivoDTO.getMimeType());
 			TipoDeDocumentoDTO tipoDeDocumentoDTO = tipoDeDocumentoService.getTipoDeDocumentoDTOPorNombreDeTipoDeDocumentoIdInstanciaDeTarea(archivosInstDeTarea.getTipoDeDocumento().getNombreDeTipoDeDocumento(), idInstanciaDeTarea);	
-			if (/*parametroDTOEsMimeTypeConvertibleAPDF!=null &&*/ parametroDTOEsMimeTypeAplicaVisacion==null && tipoDeDocumentoDTO.getAplicaVisacion()==true && puedeVisarDocumentos) {
+			if (parametroDTOEsMimeTypeConvertibleAPDF!=null && parametroDTOEsMimeTypeAplicaVisacion==null && tipoDeDocumentoDTO.getAplicaVisacion()==true && puedeVisarDocumentos) {
 				detalleDeArchivoDTO.setConvertirAPDF(true);
 			}
-			if (/*parametroDTOEsMimeTypeConvertibleAPDF!=null &&*/ parametroDTOEsMimeTypeAplicaFEA==null && tipoDeDocumentoDTO.getAplicaFEA()==true && puedeAplicarFEA) {
+			if (parametroDTOEsMimeTypeConvertibleAPDF!=null && parametroDTOEsMimeTypeAplicaFEA==null && tipoDeDocumentoDTO.getAplicaFEA()==true && puedeAplicarFEA) {
 				 detalleDeArchivoDTO.setConvertirAPDF(true);
 			}
 			if (estaArchivoEnListaTodosLosArchivosSubidosRequeridos(detalleDeArchivoDTO.getIdArchivo(), todosLosArchivosSubidosRequeridos)) {
@@ -514,14 +512,14 @@ public class ObtenerArchivosExpedienteServiceImpl implements
 				log.debug(archivoInfoDTO.toString());
 				DetalleDeArchivoDTO detalleDeArchivoDTO = obtenerDetalleDeArchivoCMSService.obtenerDetalleDeArchivo(usuario, archivoInfoDTO.getIdArchivo()).getDetalleDeArchivoDTO();
 				detalleDeArchivoDTO.setIdArchivo(archivoInfoDTO.getIdArchivo());
-				//ParametroDTO parametroDTOEsMimeTypeConvertibleAPDF = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_CONVERTIBLES_A_PDF, archivoInfoDTO.getMimeType());
+				ParametroDTO parametroDTOEsMimeTypeConvertibleAPDF = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_CONVERTIBLES_A_PDF, archivoInfoDTO.getMimeType());
 				ParametroDTO parametroDTOEsMimeTypeAplicaVisacion = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_VISABLES, archivoInfoDTO.getMimeType());
 				ParametroDTO parametroDTOEsMimeTypeAplicaFEA = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_APLICA_FEA, archivoInfoDTO.getMimeType());
 				TipoDeDocumentoDTO tipoDeDocumentoDTO = tipoDeDocumentoService.getTipoDeDocumentoDTOPorNombreDeTipoDeDocumentoIdInstanciaDeTarea(archivoInfoDTO.getTipoDeDocumento(), idInstanciaDeTarea);	
-				if (/*parametroDTOEsMimeTypeConvertibleAPDF!=null &&*/ parametroDTOEsMimeTypeAplicaVisacion==null && tipoDeDocumentoDTO.getAplicaVisacion()==true && puedeVisarDocumentos) {
+				if (parametroDTOEsMimeTypeConvertibleAPDF!=null && parametroDTOEsMimeTypeAplicaVisacion==null && tipoDeDocumentoDTO.getAplicaVisacion()==true && puedeVisarDocumentos) {
 					detalleDeArchivoDTO.setConvertirAPDF(true);
 				}
-				if (/*parametroDTOEsMimeTypeConvertibleAPDF!=null &&*/ parametroDTOEsMimeTypeAplicaFEA==null && tipoDeDocumentoDTO.getAplicaFEA()==true && puedeAplicarFEA) {
+				if (parametroDTOEsMimeTypeConvertibleAPDF!=null && parametroDTOEsMimeTypeAplicaFEA==null && tipoDeDocumentoDTO.getAplicaFEA()==true && puedeAplicarFEA) {
 					 detalleDeArchivoDTO.setConvertirAPDF(true);
 				}
 				if (estaArchivoEnListaTodosLosArchivosSubidosRequeridos(detalleDeArchivoDTO.getIdArchivo(), todosLosArchivosSubidosRequeridos)) {
@@ -547,14 +545,14 @@ public class ObtenerArchivosExpedienteServiceImpl implements
 				log.debug(archivoInfoDTO.toString());
 				DetalleDeArchivoDTO detalleDeArchivoDTO = obtenerDetalleDeArchivoCMSService.obtenerDetalleDeArchivo(usuario, archivoInfoDTO.getIdArchivo()).getDetalleDeArchivoDTO();
 				detalleDeArchivoDTO.setIdArchivo(archivoInfoDTO.getIdArchivo());
-				//ParametroDTO parametroDTOEsMimeTypeConvertibleAPDF = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_CONVERTIBLES_A_PDF, archivoInfoDTO.getMimeType());
+				ParametroDTO parametroDTOEsMimeTypeConvertibleAPDF = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_CONVERTIBLES_A_PDF, archivoInfoDTO.getMimeType());
 				ParametroDTO parametroDTOEsMimeTypeAplicaVisacion = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_VISABLES, archivoInfoDTO.getMimeType());
 				ParametroDTO parametroDTOEsMimeTypeAplicaFEA = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_APLICA_FEA, archivoInfoDTO.getMimeType());
 				TipoDeDocumentoDTO tipoDeDocumentoDTO = tipoDeDocumentoService.getTipoDeDocumentoDTOPorNombreDeTipoDeDocumentoIdInstanciaDeTarea(archivoInfoDTO.getTipoDeDocumento(), idInstanciaDeTarea);	
-				if (/*parametroDTOEsMimeTypeConvertibleAPDF!=null &&*/ parametroDTOEsMimeTypeAplicaVisacion==null && tipoDeDocumentoDTO.getAplicaVisacion()==true && puedeVisarDocumentos) {
+				if (parametroDTOEsMimeTypeConvertibleAPDF!=null && parametroDTOEsMimeTypeAplicaVisacion==null && tipoDeDocumentoDTO.getAplicaVisacion()==true && puedeVisarDocumentos) {
 					detalleDeArchivoDTO.setConvertirAPDF(true);
 				}
-				if (/*parametroDTOEsMimeTypeConvertibleAPDF!=null &&*/ parametroDTOEsMimeTypeAplicaFEA==null && tipoDeDocumentoDTO.getAplicaFEA()==true && puedeAplicarFEA) {
+				if (parametroDTOEsMimeTypeConvertibleAPDF!=null && parametroDTOEsMimeTypeAplicaFEA==null && tipoDeDocumentoDTO.getAplicaFEA()==true && puedeAplicarFEA) {
 					 detalleDeArchivoDTO.setConvertirAPDF(true);
 				}
 				if (estaArchivoEnListaTodosLosArchivosSubidosRequeridos(detalleDeArchivoDTO.getIdArchivo(), todosLosArchivosSubidosRequeridos)) {
@@ -573,14 +571,14 @@ public class ObtenerArchivosExpedienteServiceImpl implements
 						) {
 					DetalleDeArchivoDTO detalleDeArchivoDTO = obtenerDetalleDeArchivoCMSService.obtenerDetalleDeArchivo(usuario, archivosInstDeTareaDTO.getIdArchivoCms()).getDetalleDeArchivoDTO();
 					detalleDeArchivoDTO.setIdArchivo(archivosInstDeTareaDTO.getIdArchivoCms());
-					//ParametroDTO parametroDTOEsMimeTypeConvertibleAPDF = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_CONVERTIBLES_A_PDF, archivosInstDeTareaDTO.getMimeType());
+					ParametroDTO parametroDTOEsMimeTypeConvertibleAPDF = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_CONVERTIBLES_A_PDF, archivosInstDeTareaDTO.getMimeType());
 					ParametroDTO parametroDTOEsMimeTypeAplicaVisacion = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_VISABLES, detalleDeArchivoDTO.getMimeType());
 					ParametroDTO parametroDTOEsMimeTypeAplicaFEA = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_APLICA_FEA, detalleDeArchivoDTO.getMimeType());
 					TipoDeDocumentoDTO tipoDeDocumentoDTO = tipoDeDocumentoService.getTipoDeDocumentoDTOPorNombreDeTipoDeDocumentoIdInstanciaDeTarea(detalleDeArchivoDTO.getTipoDeDocumento(), idInstanciaDeTarea);	
-					if (/*parametroDTOEsMimeTypeConvertibleAPDF!=null &&*/ parametroDTOEsMimeTypeAplicaVisacion==null && tipoDeDocumentoDTO.getAplicaVisacion()==true && puedeVisarDocumentos) {
+					if (parametroDTOEsMimeTypeConvertibleAPDF!=null && parametroDTOEsMimeTypeAplicaVisacion==null && tipoDeDocumentoDTO.getAplicaVisacion()==true && puedeVisarDocumentos) {
 						detalleDeArchivoDTO.setConvertirAPDF(true);
 					}
-					if (/*parametroDTOEsMimeTypeConvertibleAPDF!=null &&*/ parametroDTOEsMimeTypeAplicaFEA==null && tipoDeDocumentoDTO.getAplicaFEA()==true && puedeAplicarFEA) {
+					if (parametroDTOEsMimeTypeConvertibleAPDF!=null && parametroDTOEsMimeTypeAplicaFEA==null && tipoDeDocumentoDTO.getAplicaFEA()==true && puedeAplicarFEA) {
 						 detalleDeArchivoDTO.setConvertirAPDF(true);
 					}
 					if (estaArchivoEnListaTodosLosArchivosSubidosRequeridos(detalleDeArchivoDTO.getIdArchivo(), todosLosArchivosSubidosRequeridos)) {

@@ -4,11 +4,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -117,5 +119,19 @@ public class FileUtil {
 				
 		return bFile;
 	}
-	
+
+	public static String checkSumMD5(byte[] byteArchivo) throws IOException, NoSuchAlgorithmException {
+
+		MessageDigest digest = MessageDigest.getInstance("MD5");
+
+		byte[] bytes = digest.digest(byteArchivo);
+
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < bytes.length; i++) {
+			sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+		}
+
+		return sb.toString();
+	}
+
 }

@@ -21,6 +21,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -140,7 +141,24 @@ import cl.gob.scj.sgdp.config.Constantes;
 	
 	@NamedQuery(name="InstanciaDeProceso.getInstanciaDeProcesoPorNombreExpediente", 
 	query="SELECT i FROM InstanciaDeProceso i "
-			+ "WHERE i.nombreExpediente =:nombreExpediente")	 
+			+ "WHERE i.nombreExpediente =:nombreExpediente"),
+	
+	@NamedQuery(name="InstanciaDeProceso.getMetadataListaExpediente", 
+	query="SELECT DISTINCT i FROM InstanciaDeProceso i "
+			+ " INNER JOIN i.instanciaProcesoMetadata im "
+			+ " INNER JOIN i.instanciasDeTareas it "
+			+ " INNER JOIN it.archivosInstDeTarea ait "
+			+ " INNER JOIN ait.archivosInstDeTareaMetadata aitm "
+			+ " INNER JOIN ait.tipoDeDocumento TD " // fix cduran
+			+ " INNER JOIN i.proceso p "
+			+ " INNER JOIN i.estadoDeProceso ep "
+			+ " WHERE p.nombreProceso = :nombreProceso "
+			+ " AND ait.fechaDocumento BETWEEN TO_DATE(:fechaTransferirInicio, 'DD-MM-YYYY') AND TO_DATE(:fechaTransferirTermino, 'DD-MM-YYYY') "
+			+ " AND ep.idEstadoDeProceso = 3 " //FINALIZADO
+			+ " AND aitm.flagEnvio = 0 "// NO ENVIADO
+			+ " AND aitm.tipo is not null " // fix cduran
+			+ " AND aitm.tipo.idTipo = 1 "// EXPEDIENTE
+			+ " AND ait.tipoDeDocumento.idTipoDeDocumento <> 46 ") // Tipo documento Antecedente
 })
 
 public class InstanciaDeProceso implements Serializable {
@@ -252,6 +270,29 @@ public class InstanciaDeProceso implements Serializable {
 	@ManyToOne
 	@JoinColumn(name="\"ID_UNIDAD\"")
 	private Unidad unidad;
+	
+	//bi-directional many-to-one association to Unidad
+	@ManyToOne
+	@JoinColumn(name="\"ID_ACCESO\"")
+	private Acceso acceso;
+	
+	
+	//bi-directional many-to-one association to Unidad
+	@ManyToOne
+	@JoinColumn(name="\"ID_TIPO\"")
+	private Tipo tipo;
+
+	//bi-directional many-to-one association to Unidad
+	@ManyToOne
+	@JoinColumn(name="\"ID_INSTANCIA_PROCESO_METADATA\"")
+	private InstanciaProcesoMetadata instanciaProcesoMetadata;
+	
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name="\"D_FECHA_EXPIRACION\"")
+	private Date fechaExpiracion;
+	
+	@Transient
+	private List<ArchivosInstDeTarea> archivosInstancia;
 	
 	public InstanciaDeProceso() {
 	}
@@ -535,6 +576,38 @@ public class InstanciaDeProceso implements Serializable {
 		this.unidad = unidad;
 	}
 
+	public Acceso getAcceso() {
+		return acceso;
+	}
+
+	public void setAcceso(Acceso acceso) {
+		this.acceso = acceso;
+	}
+
+	public Tipo getTipo() {
+		return tipo;
+	}
+
+	public void setTipo(Tipo tipo) {
+		this.tipo = tipo;
+	}
+	
+	public InstanciaProcesoMetadata getInstanciaProcesoMetadata() {
+		return instanciaProcesoMetadata;
+	}
+
+	public void setInstanciaProcesoMetadata(InstanciaProcesoMetadata instanciaProcesoMetadata) {
+		this.instanciaProcesoMetadata = instanciaProcesoMetadata;
+	}
+	
+	public Date getFechaExpiracion() {
+		return fechaExpiracion;
+	}
+
+	public void setFechaExpiracion(Date fechaExpiracion) {
+		this.fechaExpiracion = fechaExpiracion;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -560,19 +633,29 @@ public class InstanciaDeProceso implements Serializable {
 
 	@Override
 	public String toString() {
-		return "InstanciaDeProceso [idInstanciaDeProceso="
-				+ idInstanciaDeProceso + ", nombreExpediente="
-				+ nombreExpediente + ", fechaFin=" + fechaFin
-				+ ", fechaInicio=" + fechaInicio + ", fechaVencimientoUsuario="
-				+ fechaVencimientoUsuario + ", fechaVencimiento="
-				+ fechaVencimiento + ", idExpediente=" + idExpediente
-				+ ", idUsuarioInicia=" + idUsuarioInicia
-				+ ", idUsuarioTermina=" + idUsuarioTermina
-				+ ", tieneDocumentosEnCMS=" + tieneDocumentosEnCMS
-				+ ", estadoDeProceso=" + estadoDeProceso
-				+ ", emisor=" + emisor 
-				+ ", asunto=" + asunto 
-				+"]";
+		return "InstanciaDeProceso [idInstanciaDeProceso=" + idInstanciaDeProceso + ", nombreExpediente="
+				+ nombreExpediente + ", fechaFin=" + fechaFin + ", fechaInicio=" + fechaInicio
+				+ ", fechaVencimientoUsuario=" + fechaVencimientoUsuario + ", fechaVencimiento=" + fechaVencimiento
+				+ ", idExpediente=" + idExpediente + ", idUsuarioInicia=" + idUsuarioInicia + ", idUsuarioTermina="
+				+ idUsuarioTermina + ", tieneDocumentosEnCMS=" + tieneDocumentosEnCMS + ", emisor=" + emisor
+				+ ", proceso=" + proceso + ", estadoDeProceso=" + estadoDeProceso + ", instanciaDeProcesoPadre="
+				+ instanciaDeProcesoPadre + ", instanciasDeTareas=" + instanciasDeTareas + ", asunto=" + asunto
+				+ ", seguimientoIntanciaProceso=" + seguimientoIntanciaProceso + ", vinculacionesDeExp="
+				+ vinculacionesDeExp + ", vinculacionesDeExpAntecesores=" + vinculacionesDeExpAntecesores
+				+ ", historicoVinculacionesExp=" + historicoVinculacionesExp + ", historicoVinculacionesExpAntecesores="
+				+ historicoVinculacionesExpAntecesores + ", solicitudCreacionExp=" + solicitudCreacionExp
+				+ ", historicoSolicitudesCreacionExps=" + historicoSolicitudesCreacionExps + ", unidad=" + unidad
+				+ ", acceso=" + acceso + ", tipo=" + tipo + ", instanciaProcesoMetadata=" + instanciaProcesoMetadata
+				+ ", fechaExpiracion=" + fechaExpiracion + "]";
 	}
-	
+
+	public List<ArchivosInstDeTarea> getArchivosInstancia() {
+		return archivosInstancia;
+	}
+
+	public void setArchivosInstancia(List<ArchivosInstDeTarea> archivosInstancia) {
+		this.archivosInstancia = archivosInstancia;
+	}
+
+
 }

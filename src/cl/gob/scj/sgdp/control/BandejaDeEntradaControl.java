@@ -34,6 +34,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cl.gob.scj.sgdp.auth.user.Usuario;
 import cl.gob.scj.sgdp.config.Constantes;
+import cl.gob.scj.sgdp.dto.AccesoDTO;
 import cl.gob.scj.sgdp.dto.AnadirAntecedenteDTO;
 import cl.gob.scj.sgdp.dto.AutorDTO;
 import cl.gob.scj.sgdp.dto.ExpedienteDTO;
@@ -44,6 +45,7 @@ import cl.gob.scj.sgdp.dto.RespuestaMailDTO;
 import cl.gob.scj.sgdp.dto.SubirArhivoDTO;
 import cl.gob.scj.sgdp.dto.SuggestionsDTO;
 import cl.gob.scj.sgdp.dto.TipoDeDocumentoDTO;
+import cl.gob.scj.sgdp.dto.TipoGestionDTO;
 import cl.gob.scj.sgdp.dto.UsuarioRolDTO;
 import cl.gob.scj.sgdp.exception.SgdpException;
 import cl.gob.scj.sgdp.exception.SgdpExceptionValidaTareaEnBE;
@@ -53,6 +55,7 @@ import cl.gob.scj.sgdp.service.ParametroService;
 import cl.gob.scj.sgdp.service.ProcesoService;
 import cl.gob.scj.sgdp.service.SubirArchivoService;
 import cl.gob.scj.sgdp.service.TipoDeDocumentoService;
+import cl.gob.scj.sgdp.service.TipoGestionService;
 import cl.gob.scj.sgdp.service.UsuarioRolService;
 import cl.gob.scj.sgdp.tipos.EstadoDeTareaType;
 import cl.gob.scj.sgdp.tipos.PermisoType;
@@ -91,16 +94,19 @@ public class BandejaDeEntradaControl {
 	private UsuarioRolService usuarioRolService;
 	
 	@Autowired
+	private TipoGestionService tipoGestionService;
+	
+	@Autowired
 	private ProcesoService procesoService;
 	
 	@RequestMapping("/bandejaDeEntrada")	
 	public String cargaBandejaDeEntrada(Model model, HttpServletRequest request) {
 					
 		try { 
-
-			//KeyParametroPorContextoDTO keyParametroPorContextoDTOMuestraTareasEnEjecucion = new KeyParametroPorContextoDTO();
-			//keyParametroPorContextoDTOMuestraTareasEnEjecucion.setNombreParametro(Constantes.NOMBRE_PARAMETRO_POR_CONTEXTO_MUESTRA_TAREAS_EN_EJECUCION_POR_ID_ROL);				
-
+			
+			KeyParametroPorContextoDTO keyParametroPorContextoDTOMuestraTareasEnEjecucion = new KeyParametroPorContextoDTO();
+			keyParametroPorContextoDTOMuestraTareasEnEjecucion.setNombreParametro(Constantes.NOMBRE_PARAMETRO_POR_CONTEXTO_MUESTRA_TAREAS_EN_EJECUCION_POR_ID_ROL);				
+		
 			boolean tareaEnEspera = false;
 			boolean trabajoInterno = false;
 			
@@ -133,9 +139,9 @@ public class BandejaDeEntradaControl {
 						
 			log.debug("estadoDeTareaType.getCodigoEstadoDeTarea(): " + estadoDeTareaAsignadaType.getCodigoEstadoDeTarea());
 			
-			//keyParametroPorContextoDTOMuestraTareasEnEjecucion.setValorContexto(Long.toString(usuario.getRolDTO().getIdRol()));
+			keyParametroPorContextoDTOMuestraTareasEnEjecucion.setValorContexto(Long.toString(usuario.getRolDTO().getIdRol()));
 			
-			//log.debug(keyParametroPorContextoDTOMuestraTareasEnEjecucion);
+			log.debug(keyParametroPorContextoDTOMuestraTareasEnEjecucion);
 			
 			List<InstanciaDeTareaDTO> instanciasDeTareasDTO = new ArrayList<InstanciaDeTareaDTO>();
 			//List<InstanciaDeTareaDTO> instanciasDeTareasDTOEnEjecucion = new ArrayList<InstanciaDeTareaDTO>();
@@ -155,7 +161,12 @@ public class BandejaDeEntradaControl {
 			for (AutorDTO autorDTO: autoresDTO) {
 				log.debug("autor cargaBandejaDeEntrada: " + autorDTO.toString());
 			}
-				
+			
+			List<AccesoDTO> accesosDTO = bandejaDeEntradaService.getTodosLosAccesos();
+			for (AccesoDTO accesoDTO: accesosDTO) {
+				log.info("acceso cargaBandejaDeEntrada: " + accesoDTO.toString());
+			}
+			
 			String permisoTareasEnEjecucion = usuario.getPermisos().get(permisoMuestraTareasEnEjecucionType.getNombrePermiso());
 			log.debug("permisoTareasEnEjecucion: " + permisoTareasEnEjecucion);
 			log.debug("permisoMuestraTareasEnEjecucionType.getNombrePermiso(): " + permisoMuestraTareasEnEjecucionType.getNombrePermiso());
@@ -177,9 +188,12 @@ public class BandejaDeEntradaControl {
 			
 			model.addAttribute("instanciasDeTareasDTO", instanciasDeTareasDTO);
 			model.addAttribute("autoresDTO", autoresDTO);
+			model.addAttribute("accesosDTO", accesosDTO);
 			model.addAttribute("permisos", usuario.getPermisos());	
 			model.addAttribute("expedienteDTO", expedienteDTO);
-			model.addAttribute("tiposDeDocumentosDTO", tiposDeDocumentosDTO);		
+			model.addAttribute("tiposDeDocumentosDTO", tiposDeDocumentosDTO);
+			List<TipoGestionDTO> tiposGestionDTO = this.tipoGestionService.getAll();
+			model.addAttribute("tiposGestionDTO", tiposGestionDTO);
 			//model.addAttribute("instanciasDeTareasDTOEnEjecucion", instanciasDeTareasDTOEnEjecucion);
 			model.addAttribute("urlFuncPhp", parametroService.getParametroPorID(Constantes.ID_PARAM_URL_FUNC_PHP).getValorParametroChar());
 			
@@ -397,7 +411,7 @@ public class BandejaDeEntradaControl {
 			UsuarioRolDTO usuarioRolDTO = new UsuarioRolDTO();
 			
 			usuarioRolDTO.setIdUsuario(usuario.getIdUsuario());
-			//usuarioRolDTO.setIdRol(usuario.getIdRolUsuarioSeleccionado());
+			usuarioRolDTO.setIdRol(usuario.getIdRolUsuarioSeleccionado());
 			usuarioRolDTO.setFueraDeOficina(checkBoxFueraDeOficina);
 			
 			usuarioRolService.actualizaFueraDeOficina(usuarioRolDTO);

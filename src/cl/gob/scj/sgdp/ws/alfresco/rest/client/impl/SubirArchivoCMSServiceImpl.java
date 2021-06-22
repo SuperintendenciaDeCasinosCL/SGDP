@@ -1,6 +1,7 @@
 package cl.gob.scj.sgdp.ws.alfresco.rest.client.impl;
 
 import java.net.URLEncoder;
+import java.text.Normalizer;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
@@ -64,7 +65,13 @@ public class SubirArchivoCMSServiceImpl implements SubirArchivoCMSService {
 		
 		LinkedMultiValueMap<String, Object> mvm = new LinkedMultiValueMap<String, Object>();
 		mvm.add("idExpediente", idExpediente.toString());
-		mvm.add("nombreDeArchivo", subirArhivoDTO.getArchivo().getOriginalFilename());
+		String sNombreArchivo = subirArhivoDTO.getArchivo().getOriginalFilename();
+		sNombreArchivo = Normalizer.normalize(sNombreArchivo, Normalizer.Form.NFD);
+		sNombreArchivo = sNombreArchivo.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
+		
+		//mvm.add("nombreDeArchivo", subirArhivoDTO.getArchivo().getOriginalFilename());
+	    mvm.add("nombreDeArchivo", sNombreArchivo);
+	    
 		mvm.add("cdr", subirArhivoDTO.getCdr());
 		mvm.add("numeroDeDocumento", subirArhivoDTO.getNumeroDocumento());
 		
@@ -74,13 +81,22 @@ public class SubirArchivoCMSServiceImpl implements SubirArchivoCMSService {
 		
 		if (subirArhivoDTO.getTipoDeDocumento()!=null && !subirArhivoDTO.getTipoDeDocumento().isEmpty()
 				&& !subirArhivoDTO.getTipoDeDocumento().equals("null")) {
-			mvm.add("tipoDeDocumento", subirArhivoDTO.getTipoDeDocumento());
+			String nombreDeTipoDeDocumento = subirArhivoDTO.getTipoDeDocumento();
+			//nombreDeTipoDeDocumento = URLEncoder.encode(nombreDeTipoDeDocumento, "UTF-8");
+			//mvm.add("tipoDeDocumento", subirArhivoDTO.getTipoDeDocumento());
+			mvm.add("tipoDeDocumento", nombreDeTipoDeDocumento);
+			log.info("TIPODOCUMENTO!!!!!:"+nombreDeTipoDeDocumento);
 		} else if (subirArhivoDTO.getIdTipoDeDocumentoSubir() == 0L) {
 			mvm.add("tipoDeDocumento", "");
 		} else {
-			mvm.add("tipoDeDocumento", tipoDeDocumentoDao.getTipoDeDocumentoPorIdTipoDeDocumento(subirArhivoDTO.getIdTipoDeDocumentoSubir()).getNombreDeTipoDeDocumento());			
+			String nombreDeTipoDeDocumento = tipoDeDocumentoDao.getTipoDeDocumentoPorIdTipoDeDocumento(subirArhivoDTO.getIdTipoDeDocumentoSubir()).getNombreDeTipoDeDocumento();
+			//nombreDeTipoDeDocumento = URLEncoder.encode(nombreDeTipoDeDocumento, "UTF-8");
+			mvm.add("tipoDeDocumento", nombreDeTipoDeDocumento);
+			
+			log.info("TIPODOCUMENTO!!!!!:"+nombreDeTipoDeDocumento);
 		}
 		
+		log.info("PASO POR ACA!!!!!!!!!!!!!!!!!!!!!!");
 		if (subirArhivoDTO.getFechaCreacionArchivo() == null || subirArhivoDTO.getFechaCreacionArchivo().isEmpty()) {
 			log.debug("FechaUtil.simpleDateFormatForm.format(new Date()): " + FechaUtil.simpleDateFormatForm.format(new Date()));
 			mvm.add("fechaDeCreacion", FechaUtil.toFormatCMS(FechaUtil.simpleDateFormatForm.format(new Date())));
@@ -117,8 +133,12 @@ public class SubirArchivoCMSServiceImpl implements SubirArchivoCMSService {
 		
 		if (subirArhivoDTO.getCategoriaDocumento()!=null && !subirArhivoDTO.getCategoriaDocumento().isEmpty()
 				&& !subirArhivoDTO.getCategoriaDocumento().equals("null")) {
-			mvm.add("categoriaDocumento", URLEncoder.encode(subirArhivoDTO.getCategoriaDocumento(), "UTF-8"));
+			String encode = URLEncoder.encode(subirArhivoDTO.getCategoriaDocumento(), "UTF-8");
+			mvm.add("categoriaDocumento", encode);
+			log.info("CATEGORIA DOCUMENTO:"+encode);
 		}		
+		
+		
 		
 		// Separar el String por comas 
         //  String listaTag = String.join(",", subirArhivoDTO.getIdTags());
@@ -178,6 +198,10 @@ public class SubirArchivoCMSServiceImpl implements SubirArchivoCMSService {
 			HttpStatus status = e.getStatusCode();
 			log.error(status.getReasonPhrase() + "/" + status.value());
 			log.error(e);
+			log.error("Subir archivo... fin");	
+			throw e;
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
 			log.error("Subir archivo... fin");	
 			throw e;
 		}		

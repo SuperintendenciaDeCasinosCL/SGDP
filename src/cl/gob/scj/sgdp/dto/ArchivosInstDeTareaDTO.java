@@ -3,12 +3,9 @@ package cl.gob.scj.sgdp.dto;
 import java.io.Serializable;
 import java.util.Date;
 
-public class ArchivosInstDeTareaDTO extends RespuestaDTO implements Serializable  {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -6812730917092358190L;
+import cl.gob.scj.sgdp.model.ArchivosInstDeTareaMetadata;
+
+public class ArchivosInstDeTareaDTO implements Serializable  {
 	
 	private long idInstanciaDeTarea;
 	private String nombreTarea;
@@ -32,7 +29,17 @@ public class ArchivosInstDeTareaDTO extends RespuestaDTO implements Serializable
 	private Boolean estaFirmadoConFEAWebStart;
 	private Boolean estaFirmadoConFEACentralizada;
 	private Boolean conformaExpediente;
+	private long flagEnvio;
+	private long idArchivoInstanciaTarea;
+	private long idArchivoMetadataTarea;
+	private ArchivosInstDeTareaMetadata archivoMetadata;
 	
+	public long getIdArchivoInstanciaTarea() {
+		return idArchivoInstanciaTarea;
+	}
+	public void setIdArchivoInstanciaTarea(long idArchivoInstanciaTarea) {
+		this.idArchivoInstanciaTarea = idArchivoInstanciaTarea;
+	}
 	public long getIdInstanciaDeTarea() {
 		return idInstanciaDeTarea;
 	}
@@ -165,6 +172,12 @@ public class ArchivosInstDeTareaDTO extends RespuestaDTO implements Serializable
 	public void setConformaExpediente(Boolean conformaExpediente) {
 		this.conformaExpediente = conformaExpediente;
 	}
+	public long getFlagEnvio() {
+		return flagEnvio;
+	}
+	public void setFlagEnvio(long flagEnvioArchivoNacional) {
+		this.flagEnvio = flagEnvioArchivoNacional;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -208,5 +221,17 @@ public class ArchivosInstDeTareaDTO extends RespuestaDTO implements Serializable
 				+ ", estaFirmadoConFEACentralizada=" + estaFirmadoConFEACentralizada
 				+ ", conformaExpediente=" + conformaExpediente
 				+ "]";
+	}
+	public long getIdArchivoMetadataTarea() {
+		return idArchivoMetadataTarea;
+	}
+	public void setIdArchivoMetadataTarea(long idArchivoMetadataTarea) {
+		this.idArchivoMetadataTarea = idArchivoMetadataTarea;
+	}
+	public ArchivosInstDeTareaMetadata getArchivoMetadata() {
+		return archivoMetadata;
+	}
+	public void setArchivoMetadata(ArchivosInstDeTareaMetadata archivoMetadata) {
+		this.archivoMetadata = archivoMetadata;
 	}	
 }

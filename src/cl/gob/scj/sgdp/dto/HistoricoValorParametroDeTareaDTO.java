@@ -1,7 +1,6 @@
 package cl.gob.scj.sgdp.dto;
 
 import java.io.Serializable;
-import java.util.Date;
 
 public class HistoricoValorParametroDeTareaDTO implements Serializable {
 	
@@ -12,13 +11,9 @@ public class HistoricoValorParametroDeTareaDTO implements Serializable {
 	
 	private Long idHistoricoValorParametroDeTarea;
 	private String valor;
-	//private HistoricoDeInstDeTareaDTO historicoDeInstDeTareaDTO;
+	private HistoricoDeInstDeTareaDTO historicoDeInstDeTareaDTO;
 	private ParametroDeTareaDTO parametroDeTareaDTO;
 	private String comentario;
-	private InstanciaDeTareaDTO instanciaDeTareaDTO;
-	private Date fecha;
-	private String idUsuario;
-	private String nombreResponsabilidad;
 	
 	public Long getIdHistoricoValorParametroDeTarea() {
 		return idHistoricoValorParametroDeTarea;
@@ -31,7 +26,13 @@ public class HistoricoValorParametroDeTareaDTO implements Serializable {
 	}
 	public void setValor(String valor) {
 		this.valor = valor;
-	}	
+	}
+	public HistoricoDeInstDeTareaDTO getHistoricoDeInstDeTareaDTO() {
+		return historicoDeInstDeTareaDTO;
+	}
+	public void setHistoricoDeInstDeTareaDTO(HistoricoDeInstDeTareaDTO historicoDeInstDeTareaDTO) {
+		this.historicoDeInstDeTareaDTO = historicoDeInstDeTareaDTO;
+	}
 	public ParametroDeTareaDTO getParametroDeTareaDTO() {
 		return parametroDeTareaDTO;
 	}
@@ -43,39 +44,11 @@ public class HistoricoValorParametroDeTareaDTO implements Serializable {
 	}
 	public void setComentario(String comentario) {
 		this.comentario = comentario;
-	}	
-	public InstanciaDeTareaDTO getInstanciaDeTareaDTO() {
-		return instanciaDeTareaDTO;
-	}
-	public void setInstanciaDeTareaDTO(InstanciaDeTareaDTO instanciaDeTareaDTO) {
-		this.instanciaDeTareaDTO = instanciaDeTareaDTO;
-	}
-	public Date getFecha() {
-		return fecha;
-	}
-	public void setFecha(Date fecha) {
-		this.fecha = fecha;
-	}
-	public String getIdUsuario() {
-		return idUsuario;
-	}
-	public void setIdUsuario(String idUsuario) {
-		this.idUsuario = idUsuario;
-	}	
-	public String getNombreResponsabilidad() {
-		return nombreResponsabilidad;
-	}
-	public void setNombreResponsabilidad(String nombreResponsabilidad) {
-		this.nombreResponsabilidad = nombreResponsabilidad;
 	}
 	@Override
 	public String toString() {
 		return "HistoricoValorParametroDeTareaDTO [idHistoricoValorParametroDeTarea=" + idHistoricoValorParametroDeTarea
-				+ ", valor=" + valor + ", instanciaDeTareaDTO=" + instanciaDeTareaDTO
-				+ ", parametroDeTareaDTO=" + parametroDeTareaDTO 
-				+ ", comentario=" + comentario
-				+ ", idUsuario=" + idUsuario
-				+ ", nombreResponsabilidad=" + nombreResponsabilidad			
-				+ "]";
+				+ ", valor=" + valor + ", historicoDeInstDeTareaDTO=" + historicoDeInstDeTareaDTO
+				+ ", parametroDeTareaDTO=" + parametroDeTareaDTO + ", comentario=" + comentario + "]";
 	}
 }

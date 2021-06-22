@@ -9,52 +9,53 @@
 
 
 
-	
+	<!-- esto nos dice que nuestra BD sera accesada por jndi -->
 	<jee:jndi-lookup jndi-name="java:jboss/datasources/SgdpDS"
 		id="sgdpDS" expected-type="javax.sql.DataSource">
 	</jee:jndi-lookup>
 
-	
+	<!-- habilitar las anotaciones de inyeccion de depenecias de spring -->
 	<context:annotation-config></context:annotation-config>
 
-	
+	<!-- las clases que tiene autowere estan en dao -->
 	<context:component-scan base-package="cl.gob.scj.sgdp.dao"></context:component-scan>
 
-	
+	<!-- generamos un a fabrica de sessiones -->
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
-		
+		<!-- hace referencia al datasource jndi -->
 		<property name="dataSource" ref="sgdpDS"></property>
 
-			
+		<!-- hace referencia a las clases que van a tener el mapping relacional 
+			de objetos -->
 
 		<property name="packagesToScan" value="cl.gob.scj.sgdp.model"></property>
 		<property name="hibernateProperties">
 			<props>
-				
+				<!-- el dialecto que trabaja con BD postgres -->
 
 				<prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</prop>
-				
+				<!-- muestra por consola las sentecia que hibernate genera-->
 				<prop key="hibernate.show_sql">true</prop>
-				
+				<!--<prop key="hibernate.current_session_context_class">thread</prop>-->
 				<prop key="hibernate.jdbc.use_streams_for_binary">true</prop>
 			</props>
 		</property>
 		
 	</bean>
 
-	
+	<!-- traducir expeciones hibernate en spring -->
 	<bean id="exceptionTraslator"
 		class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor">
 	</bean>
 
-	
+	<!-- habilitar trasaccionalidad en hibernate -->
 	<bean id="transactionManager"
 		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
 		<property name="sessionFactory" ref="sessionFactory"></property>
 	</bean>
 
-	
+	<!-- anotaciones de transacionalidad , haciendo referencia al transactionManager -->
 	<tx:annotation-driven transaction-manager="transactionManager" />
 
 </beans>

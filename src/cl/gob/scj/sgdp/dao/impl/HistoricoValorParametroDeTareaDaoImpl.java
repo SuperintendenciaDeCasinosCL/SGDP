@@ -13,24 +13,10 @@ public class HistoricoValorParametroDeTareaDaoImpl extends GenericDaoImpl<Histor
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<HistoricoValorParametroDeTarea> getHistoricoValorParametroDeTareaPorIdInstanciaDeTarea(
-			long idInstanciaDeTarea) {
-		Query query = getSession().getNamedQuery("HistoricoValorParametroDeTarea.getHistoricoValorParametroDeTareaPorIdInstanciaDeTarea");	
-		query.setLong("idInstanciaDeTarea", idInstanciaDeTarea);
-		return query.list();
-	}
-
-	@Override
-	public List<HistoricoValorParametroDeTarea> getHistoricoValorParametroDeTareaPorIdExpediente(String idExpediente) {
-		Query query = getSession().getNamedQuery("HistoricoValorParametroDeTarea.getHistoricoValorParametroDeTareaPorIdExpediente");	
-		query.setString("idExpediente", idExpediente);
-		return query.list();
-	}
-	
-	@Override
-	public List<HistoricoValorParametroDeTarea> getHistoricoValorParametroDeTareaPorIdHistoricoInstanciaDeTarea(long idHistoricoDeInstDeTarea) {
-		Query query = getSession().getNamedQuery("HistoricoValorParametroDeTarea.getHistoricoValorParametroDeTareaPorIdHistoricoInstanciaDeTarea");	
-		query.setLong("idHistoricoDeInstDeTarea", idHistoricoDeInstDeTarea);
+	public List<HistoricoValorParametroDeTarea> getHistoricoValorParametroDeTareaPorIdInstanciaDeTareaOrigen(
+			long idInstanciaDeTareaOrigen) {
+		Query query = getSession().getNamedQuery("HistoricoValorParametroDeTarea.getHistoricoValorParametroDeTareaPorIdInstanciaDeTareaOrigen");	
+		query.setLong("idInstanciaDeTareaOrigen", idInstanciaDeTareaOrigen);
 		return query.list();
 	}
 

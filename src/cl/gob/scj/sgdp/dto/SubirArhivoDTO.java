@@ -50,7 +50,20 @@ public class SubirArhivoDTO implements Serializable {
 	protected boolean recarga;
 	private long idCategoriaDocumento;
 	private String categoriaDocumento;
-	//private boolean cambiaNombreArchivo;
+	private String titulo;
+	private String autor;
+	private String destinatarios;
+	private boolean digitalizado;
+	private String tipoGestion;
+	private String nombreInteresado;
+	private String apellidoPaterno;
+	private String apellidoMaterno;
+	private String rut;
+	//private String fechaCapturaDocumento;
+	private String etiquetasDocumento;
+	private String region;
+	private String comuna;
+	private String listaMetadata;
 	
 	public SubirArhivoDTO() {	
 	}
@@ -239,6 +252,102 @@ public class SubirArhivoDTO implements Serializable {
 		this.idUsuarioSube = idUsuarioSube;
 	}
 
+	public String getTitulo() {
+		return titulo;
+	}
+
+	public void setTitulo(String titulo) {
+		this.titulo = titulo;
+	}
+
+	public String getAutor() {
+		return autor;
+	}
+
+	public void setAutor(String autor) {
+		this.autor = autor;
+	}
+
+	public String getDestinatarios() {
+		return destinatarios;
+	}
+
+	public void setDestinatarios(String destinatarios) {
+		this.destinatarios = destinatarios;
+	}
+
+	public boolean isDigitalizado() {
+		return digitalizado;
+	}
+
+	public void setDigitalizado(boolean digitalizado) {
+		this.digitalizado = digitalizado;
+	}
+
+	public String getTipoGestion() {
+		return tipoGestion;
+	}
+
+	public void setTipoGestion(String tipoGestion) {
+		this.tipoGestion = tipoGestion;
+	}
+
+	public String getNombreInteresado() {
+		return nombreInteresado;
+	}
+
+	public void setNombreInteresado(String nombreInteresado) {
+		this.nombreInteresado = nombreInteresado;
+	}
+
+	public String getApellidoPaterno() {
+		return apellidoPaterno;
+	}
+
+	public void setApellidoPaterno(String apellidoPaterno) {
+		this.apellidoPaterno = apellidoPaterno;
+	}
+
+	public String getApellidoMaterno() {
+		return apellidoMaterno;
+	}
+
+	public void setApellidoMaterno(String apellidoMaterno) {
+		this.apellidoMaterno = apellidoMaterno;
+	}
+
+	public String getRut() {
+		return rut;
+	}
+
+	public void setRut(String rut) {
+		this.rut = rut;
+	}
+
+//	public String getFechaCapturaDocumento() {
+//		return fechaCapturaDocumento;
+//	}
+//
+//	public void setFechaCapturaDocumento(String fechaCapturaDocumento) {
+//		this.fechaCapturaDocumento = fechaCapturaDocumento;
+//	}
+
+	public String getRegion() {
+		return region;
+	}
+
+	public void setRegion(String region) {
+		this.region = region;
+	}
+
+	public String getComuna() {
+		return comuna;
+	}
+
+	public void setComuna(String comuna) {
+		this.comuna = comuna;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -325,14 +434,14 @@ public class SubirArhivoDTO implements Serializable {
 	public void setCategoriaDocumento(String categoriaDocumento) {
 		this.categoriaDocumento = categoriaDocumento;
 	}
-	
-	/*public boolean isCambiaNombreArchivo() {
-		return cambiaNombreArchivo;
+
+	public String getListaMetadata() {
+		return listaMetadata;
 	}
 
-	public void setCambiaNombreArchivo(boolean cambiaNombreArchivo) {
-		this.cambiaNombreArchivo = cambiaNombreArchivo;
-	}*/
+	public void setListaMetadata(String listaMetadata) {
+		this.listaMetadata = listaMetadata;
+	}
 
 	public SubirArhivoDTO(MultipartFile archivo, String cdr, String numeroDocumento, String fechaCreacionArchivo,
 			String fechaRecepcionArchivo, long idAutorSubirDocumento, String otro, long idTipoDeDocumentoSubir,
@@ -391,8 +500,15 @@ public class SubirArhivoDTO implements Serializable {
 				+ ", recarga=" + recarga
 				+ ", idCategoriaDocumento=" + idCategoriaDocumento
 				+ ", categoriaDocumento=" + categoriaDocumento
-				//+ ", cambiaNombreArchivo=" + cambiaNombreArchivo				
 				+ "]";
+	}
+
+	public String getEtiquetasDocumento() {
+		return etiquetasDocumento;
+	}
+
+	public void setEtiquetasDocumento(String etiquetasDocumento) {
+		this.etiquetasDocumento = etiquetasDocumento;
 	}
 	
 }

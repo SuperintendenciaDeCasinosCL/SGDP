@@ -1,5 +1,7 @@
 package cl.gob.scj.sgdp.ws.alfresco.rest.client.impl;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,19 +17,24 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import cl.gob.scj.sgdp.auth.user.Usuario;
 import cl.gob.scj.sgdp.config.Constantes;
 import cl.gob.scj.sgdp.dto.BuscarConFiltroDTO;
 import cl.gob.scj.sgdp.dto.BuscarDTO;
 import cl.gob.scj.sgdp.dto.CargaFacetDTO;
 import cl.gob.scj.sgdp.dto.ParametroDTO;
+import cl.gob.scj.sgdp.dto.RespuestaActualizaMetaDataExpedienteDTO;
 import cl.gob.scj.sgdp.dto.RespuestaCargaFacetDTO;
 import cl.gob.scj.sgdp.service.ParametroService;
 import cl.gob.scj.sgdp.util.DataTableRequestDTO;
+import cl.gob.scj.sgdp.util.DatatablesInput_SIMPLE;
 import cl.gob.scj.sgdp.util.SingleObjectFactory;
 import cl.gob.scj.sgdp.ws.alfresco.rest.client.AutenticacionService;
 import cl.gob.scj.sgdp.ws.alfresco.rest.client.BusquedaCMSService;
 import cl.gob.scj.sgdp.ws.alfresco.rest.response.ResultadoBusquedaResponse;
+import cl.gob.scj.sgdp.ws.alfresco.rest.response.SubirArchivoResponse;
 
 @Service
 public class BusquedaCMSServiceImpl implements BusquedaCMSService {

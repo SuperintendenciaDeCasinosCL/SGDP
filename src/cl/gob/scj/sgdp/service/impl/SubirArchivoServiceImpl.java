@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.text.Normalizer;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
@@ -29,8 +30,10 @@ import com.itextpdf.text.pdf.PdfStamper;
 
 import cl.gob.scj.sgdp.auth.user.Usuario;
 import cl.gob.scj.sgdp.config.Constantes;
+import cl.gob.scj.sgdp.converter.SubirArchivoConverter;
 import cl.gob.scj.sgdp.dao.AccionesHistInstDeTareaDao;
 import cl.gob.scj.sgdp.dao.ArchivosInstDeTareaDao;
+import cl.gob.scj.sgdp.dao.ArchivosInstDeTareaMetadataDao;
 import cl.gob.scj.sgdp.dao.HistoricoArchivosInstDeTareaDao;
 import cl.gob.scj.sgdp.dao.HistoricoDeInstDeTareaDao;
 import cl.gob.scj.sgdp.dao.InstanciaDeTareaDao;
@@ -43,19 +46,20 @@ import cl.gob.scj.sgdp.dto.ParametroDTO;
 import cl.gob.scj.sgdp.dto.RespuestaAsignarNumeroDocumento;
 import cl.gob.scj.sgdp.dto.RespuestaConversionArchivoDTO;
 import cl.gob.scj.sgdp.dto.RespuestaMailDTO;
-import cl.gob.scj.sgdp.dto.RespuestaSimpleDTO;
 import cl.gob.scj.sgdp.dto.SubirArhivoDTO;
 import cl.gob.scj.sgdp.dto.TipoDeDocumentoDTO;
 import cl.gob.scj.sgdp.dto.rest.AsignacionesNumerosDocDto;
 import cl.gob.scj.sgdp.dto.rest.RespuestaAsignacionesNumerosDocDto;
-import cl.gob.scj.sgdp.dto.rest.TipoDocumentoDTO;
+import cl.gob.scj.sgdp.enums.TipoEnum;
 import cl.gob.scj.sgdp.exception.SgdpException;
 import cl.gob.scj.sgdp.exception.SgdpExceptionValidaTareaEnBE;
 import cl.gob.scj.sgdp.model.ArchivosInstDeTarea;
+import cl.gob.scj.sgdp.model.ArchivosInstDeTareaMetadata;
 import cl.gob.scj.sgdp.model.HistoricoArchivosInstDeTarea;
 import cl.gob.scj.sgdp.model.HistoricoDeInstDeTarea;
 import cl.gob.scj.sgdp.model.InstanciaDeTarea;
 import cl.gob.scj.sgdp.model.Tarea;
+import cl.gob.scj.sgdp.model.Tipo;
 import cl.gob.scj.sgdp.model.TipoDeDocumento;
 import cl.gob.scj.sgdp.model.UsuarioAsignado;
 import cl.gob.scj.sgdp.service.GestorDeDocumentosService;
@@ -91,6 +95,9 @@ public class SubirArchivoServiceImpl implements SubirArchivoService {
 	
 	@Autowired
 	private ArchivosInstDeTareaDao archivosInstDeTareaDao;
+	
+	@Autowired
+	private ArchivosInstDeTareaMetadataDao archivosInstDeTareaMetadaDao;
 	
 	@Autowired
 	private InstanciaDeTareaDao instanciaDeTareaDao;
@@ -140,11 +147,21 @@ public class SubirArchivoServiceImpl implements SubirArchivoService {
 	@Override
 	public SubirArhivoDTO subirArchivo(Usuario usuario, SubirArhivoDTO subirArhivoDTO) throws SgdpException, SgdpExceptionValidaTareaEnBE {
 		
-		log.debug("Inico... subirArchivo..");
-		log.debug(subirArhivoDTO.toString());
+		log.info("Inicio!!!!... subirArchivo..");
+		log.info(subirArhivoDTO.toString());
+		log.info("NOMBRE_ARCHIVO!!!!!!");
+		//log.info(subirArhivoDTO.getArchivo().getName());
+		//log.info(subirArhivoDTO.getArchivo().getOriginalFilename());
+		//MultipartFile fileTemp = subirArhivoDTO.getArchivo();
+		//String s = fileTemp.getOriginalFilename();
+		//s = Normalizer.normalize(s, Normalizer.Form.NFD);
+	    //s = s.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
+	    //fileTemp.
+	    //subirArhivoDTO
 		
-		RespuestaAsignarNumeroDocumento respuestaAsignarNumeroDocumento = new RespuestaAsignarNumeroDocumento();
-						
+		
+		RespuestaAsignarNumeroDocumento respuestaAsignarNumeroDocumento = new RespuestaAsignarNumeroDocumento();		
+		
 		try {	
 			
 			boolean estaTipoDeDocumentoEnProceso = estaTipoDeDocumentoEnProceso(subirArhivoDTO); 
@@ -221,6 +238,8 @@ public class SubirArchivoServiceImpl implements SubirArchivoService {
 				subirArhivoDTO.setEsDocumentoOficial(true);						
 			}
 			
+			/*
+			 * TECNOVA COMENTO TIPO DE DOCUMENTO SERVICIO DE NUMERACION NO SE UTILIZA
 			log.debug("tipoDeDocumento.getCodTipoDocumento(): " + tipoDeDocumento.getCodTipoDocumento());
 			if (tipoDeDocumento.getCodTipoDocumento()!=null && !tipoDeDocumento.getCodTipoDocumento().isEmpty()) {
 				TipoDocumentoDTO tipoDocumentoDTO = numeracionClientRestService.getTipoDocumentoPorCodTipoDoc(tipoDeDocumento.getCodTipoDocumento());				
@@ -230,7 +249,7 @@ public class SubirArchivoServiceImpl implements SubirArchivoService {
 					throw new SgdpException("ERROR al intentar obtener el tipo de documento del sistema de numeraci\u00F3n", Level.ERROR, true);
 				}				
 			}
-	
+			 */
 			// --------------------------------------------------------------------------------------------------------------
 			
 			SubirArchivoResponse subirArchivoResponse = subirArchivoCMSService.subirArchivo(usuario, subirArhivoDTO);
@@ -239,7 +258,12 @@ public class SubirArchivoServiceImpl implements SubirArchivoService {
 				gestorMetadataCMSService.agregarComentarioANodo(usuario, subirArchivoResponse.getIdArchivo(), subirArhivoDTO.getComentario());
 			}
 			subirArhivoDTO.setIdArchivoEnCMS(subirArchivoResponse.getIdArchivo());	
-			subirArhivoDTO.setNombreDeArchivo(subirArhivoDTO.getArchivo().getOriginalFilename());
+			
+			String s = subirArhivoDTO.getArchivo().getOriginalFilename();
+			s = Normalizer.normalize(s, Normalizer.Form.NFD);
+		    s = s.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
+		    subirArhivoDTO.setNombreDeArchivo(s);
+			//subirArhivoDTO.setNombreDeArchivo(subirArhivoDTO.getArchivo().getOriginalFilename());
 			marcarArchivoComoSubido(usuario, subirArhivoDTO);	
 				
 			// Los documentos que  se suben de manera trasversal entran a este metodo
@@ -335,20 +359,14 @@ public class SubirArchivoServiceImpl implements SubirArchivoService {
 	@Override
 	public void marcarArchivoComoSubido(Usuario usuario, SubirArhivoDTO subirArhivoDTO) throws SgdpException, SgdpExceptionValidaTareaEnBE {
 		ArchivosInstDeTarea archivosInstDeTarea;
+		ArchivosInstDeTareaMetadata archivosInstDeTareaMetadata = null;
 		boolean nuevoRegistroArchivosInstDeTarea = false;
 		boolean dejarContadorDeVisacionEnCero = false;
 		RespuestaConversionArchivoDTO respuestaConversionArchivoDTO;
-		
 		log.info("Inicio marcarArchivoComoSubido");
-		log.info(subirArhivoDTO.toString());
-		
-		InstanciaDeTarea instanciaDeTarea = instanciaDeTareaDao.getInstanciaDeTareaPorIdInstanciaDeTarea(subirArhivoDTO.getIdInstanciaDeTareaSubirArchivo());
-		
-		//boolean puedeAplicarFEA = instanciaDeTarea.getTarea().getPuedeAplicarFEA();
-		//boolean puedeTenerNumAuto = instanciaDeTarea.getTarea().getNumAuto()!=null ? instanciaDeTarea.getTarea().getNumAuto().booleanValue() : false;
-		
+		log.info(subirArhivoDTO.toString());		
 		if (subirArhivoDTO.isValidaInstanciaDeTareaEnBE()==true) {
-			//InstanciaDeTarea instanciaDeTarea = instanciaDeTareaDao.getInstanciaDeTareaPorIdInstanciaDeTarea(subirArhivoDTO.getIdInstanciaDeTareaSubirArchivo());
+			InstanciaDeTarea instanciaDeTarea = instanciaDeTareaDao.getInstanciaDeTareaPorIdInstanciaDeTarea(subirArhivoDTO.getIdInstanciaDeTareaSubirArchivo());
 			//Valida si la tarea la tiene el usuario que esta intentando subir el archivo		
 			log.debug("Valida si la tarea la tiene el usuario que esta intentando subir el archivo");
 			UsuarioAsignado ua = usuarioAsignadoDao.getUsuarioAsignadoPorInstanciaDeTareaIdUsuario(instanciaDeTarea, usuario.getIdUsuario());
@@ -361,33 +379,10 @@ public class SubirArchivoServiceImpl implements SubirArchivoService {
 		String usuarioSGDP = subirArhivoDTO.getIdUsuarioSube()!=null && !subirArhivoDTO.getIdUsuarioSube().isEmpty() ? subirArhivoDTO.getIdUsuarioSube() : usuario.getIdUsuario();
 		log.info("usuarioSGDP: " + usuarioSGDP);		
 		TipoDeDocumento tipoDeDocumentoValidaOficial = tipoDeDocumentoDao.getTipoDeDocumentoPorIdTipoDeDocumento(subirArhivoDTO.getIdTipoDeDocumentoSubir());
-		
-		//boolean aplicaFea = tipoDeDocumentoValidaOficial.getAplicaFEA();
-		//boolean tieneNumAuto = tipoDeDocumentoValidaOficial.getNumAuto()!=null ? tipoDeDocumentoValidaOficial.getNumAuto().booleanValue() : false;
-		
 		Tarea tarea = TareaDao.getBuscaDocumentoOficialEnTarea(subirArhivoDTO.getIdInstanciaDeTareaSubirArchivo());
-		
-		try {		
-			
-			/*if (puedeAplicarFEA == true && aplicaFea == true && puedeTenerNumAuto == true && tieneNumAuto == true && tipoDeDocumentoValidaOficial.getCodTipoDocumento()!=null && !tipoDeDocumentoValidaOficial.getCodTipoDocumento().isEmpty()) {
-				
-				if (subirArhivoDTO.getCategoriaDocumento()== null || subirArhivoDTO.getCategoriaDocumento().isEmpty()) {
-
-					TipoDocumentoDTO tipoDocumentoDTO = numeracionClientRestService.getTipoDocumentoPorCodTipoDoc(tipoDeDocumentoValidaOficial.getCodTipoDocumento());				
-					if (tipoDocumentoDTO.getEstado().equals("0")) {
-						subirArhivoDTO.setCategoriaDocumento(tipoDocumentoDTO.getNombreCompletoTipoDoc());
-					} else {
-						throw new SgdpException("ERROR al intentar obtener el tipo de documento del sistema de numeraci\u00F3n", Level.ERROR, true);
-					}				
-				}
-				
-				String extensionDocumento = subirArhivoDTO.getNombreDeArchivo().substring(subirArhivoDTO.getNombreDeArchivo().lastIndexOf('.'), subirArhivoDTO.getNombreDeArchivo().length());				
-				String nombreArchivo = subirArhivoDTO.getCategoriaDocumento()  + " " + FechaUtil.simpleDateFormat.format(new Date()) + extensionDocumento;
-				subirArhivoDTO.setNombreDeArchivo(nombreArchivo);
-				subirArhivoDTO.setCambiaNombreArchivo(true);
-							
-			}*/
-			
+		try {
+			/**
+			 * TECNOVA SE ELIMINA EL LLAMADO AL SERVICIO DE NUMERACION NO SE UTILIZA
 			if (tipoDeDocumentoValidaOficial.getCodTipoDocumento()!=null && !tipoDeDocumentoValidaOficial.getCodTipoDocumento().isEmpty()
 					&& (subirArhivoDTO.getCategoriaDocumento()==null || subirArhivoDTO.getCategoriaDocumento().isEmpty())) {
 				TipoDocumentoDTO tipoDocumentoDTO = numeracionClientRestService.getTipoDocumentoPorCodTipoDoc(tipoDeDocumentoValidaOficial.getCodTipoDocumento());				
@@ -398,7 +393,7 @@ public class SubirArchivoServiceImpl implements SubirArchivoService {
 					throw new SgdpException("ERROR al intentar obtener el tipo de documento del sistema de numeraci\u00F3n");
 				}
 			}
-			
+			*/			
 			if (subirArhivoDTO.getConvertirAPDF()) {				
 				log.info("Conviertiendo a PDF");
 				if (tipoDeDocumentoValidaOficial.getConformaExpediente() == true && tarea.getConformaExpediente()!=null && tarea.getConformaExpediente() == true ) {
@@ -461,9 +456,6 @@ public class SubirArchivoServiceImpl implements SubirArchivoService {
 					String respuestaActualizaMetaDataDeDocumento = gestorDeDocumentosService.actualizaMetaDataDeDocumento(usuario, detalleDeArchivoDTOActualiza);
 					log.info("respuestaActualizaMetaDataDeDocumento: " + respuestaActualizaMetaDataDeDocumento);	
 				}
-				/*if (subirArhivoDTO.isCambiaNombreArchivo()==true) {
-					subirArhivoDTO = gestorDeDocumentosService.subirArchivoDesdeOtroCambiandoNombre(usuario, subirArhivoDTO.getNombreDeArchivo(), subirArhivoDTO);
-				}*/
 			}
 			if (subirArhivoDTO.getIdInstanciaDeTareaSubirArchivo()>0) {
 				DetalleDeArchivoDTO detalleDeArchivoDTO = obtenerDetalleDeArchivoService.obtenerDetalleDeArchivo(usuario, subirArhivoDTO.getIdArchivoEnCMS());
@@ -471,14 +463,13 @@ public class SubirArchivoServiceImpl implements SubirArchivoService {
 					subirArhivoDTO.setNombreDeArchivo(detalleDeArchivoDTO.getNombre());
 				}
 				TipoDeDocumento tipoDeDocumento = tipoDeDocumentoDao.getTipoDeDocumentoPorIdTipoDeDocumento(subirArhivoDTO.getIdTipoDeDocumentoSubir());				
-				//InstanciaDeTarea instanciaDeTarea = instanciaDeTareaDao.getInstanciaDeTareaPorIdInstanciaDeTarea(subirArhivoDTO.getIdInstanciaDeTareaSubirArchivo());	
+				InstanciaDeTarea instanciaDeTarea = instanciaDeTareaDao.getInstanciaDeTareaPorIdInstanciaDeTarea(subirArhivoDTO.getIdInstanciaDeTareaSubirArchivo());	
 				log.debug("Buscando archivosInstDeTarea");				
 				if (subirArhivoDTO.getEsRequerido()) {
 					log.debug("buscando el archivosInstDeTarea cuando es requerido");
 					log.debug(subirArhivoDTO.toString());
-					//archivosInstDeTarea = archivosInstDeTareaDao.getArchivosPorIdInstanciaDeTareaIdTipoDeDocumentoIdUsuario(
-					//		usuarioSGDP, subirArhivoDTO.getIdInstanciaDeTareaSubirArchivo(), subirArhivoDTO.getIdTipoDeDocumentoSubir());
-					archivosInstDeTarea = archivosInstDeTareaDao.getArchivoPorIdInstanciaDeTareaIdTipoDeDocumento(subirArhivoDTO.getIdInstanciaDeTareaSubirArchivo(), subirArhivoDTO.getIdTipoDeDocumentoSubir());
+					archivosInstDeTarea = archivosInstDeTareaDao.getArchivosPorIdInstanciaDeTareaIdTipoDeDocumentoIdUsuario(
+							usuarioSGDP, subirArhivoDTO.getIdInstanciaDeTareaSubirArchivo(), subirArhivoDTO.getIdTipoDeDocumentoSubir());
 				} else {
 					log.debug("buscando el archivosInstDeTarea cuando no es requerido");
 					log.debug(subirArhivoDTO.toString());
@@ -488,13 +479,57 @@ public class SubirArchivoServiceImpl implements SubirArchivoService {
 				}				
 				log.debug("Busco archivosInstDeTarea");
 				if (archivosInstDeTarea==null) {
-					log.debug("***** archivosInstDeTarea==null ******");
+					log.debug("archivosInstDeTarea==null");
 					archivosInstDeTarea = new ArchivosInstDeTarea();
 					nuevoRegistroArchivosInstDeTarea = true;
-				} else {
-					log.debug("***** archivosInstDeTarea!=null ******");
-					log.debug(archivosInstDeTarea.toString());
+					
+					archivosInstDeTareaMetadata = SubirArchivoConverter.subirDocumentoToArchivoTareaMetadata(subirArhivoDTO);
+					
 				}
+
+				if (archivosInstDeTarea.getArchivosInstDeTareaMetadata() != null && archivosInstDeTarea
+						.getArchivosInstDeTareaMetadata().getIdArchivosInstDeTareaMetadata() > 0) {
+					
+//					long idArchivoMetadata = archivosInstDeTarea.getArchivosInstDeTareaMetadata().getIdArchivosInstDeTareaMetadata();
+//					ArchivosInstDeTareaMetadata archivoAux =  SubirArchivoConverter.subirDocumentoToArchivoTareaMetadata(subirArhivoDTO);
+//					archivoAux.setIdArchivosInstDeTareaMetadata(idArchivoMetadata);
+//					archivosInstDeTarea.setArchivosInstDeTareaMetadata(archivoAux);
+					
+					archivosInstDeTarea.getArchivosInstDeTareaMetadata().setAutor(subirArhivoDTO.getAutor());
+					archivosInstDeTarea.getArchivosInstDeTareaMetadata().setTitulo(subirArhivoDTO.getTitulo());
+					archivosInstDeTarea.getArchivosInstDeTareaMetadata()
+							.setDigitalizado(subirArhivoDTO.isDigitalizado());
+					if (subirArhivoDTO.getDestinatarios() != null && !subirArhivoDTO.getDestinatarios().isEmpty()) {
+						archivosInstDeTarea.getArchivosInstDeTareaMetadata().setDestinatarios(subirArhivoDTO.getDestinatarios());	
+					}
+					if (TipoEnum.DOCUMENTO.getIdString().equals(subirArhivoDTO.getTipoGestion())) {
+						archivosInstDeTarea.getArchivosInstDeTareaMetadata().setNombreInteresado(subirArhivoDTO.getNombreInteresado());
+						archivosInstDeTarea.getArchivosInstDeTareaMetadata().setApellidoPaterno(subirArhivoDTO.getApellidoPaterno());
+						archivosInstDeTarea.getArchivosInstDeTareaMetadata().setApellidoMaterno(subirArhivoDTO.getApellidoMaterno());
+						archivosInstDeTarea.getArchivosInstDeTareaMetadata().setRut(subirArhivoDTO.getRut());
+						archivosInstDeTarea.getArchivosInstDeTareaMetadata().setFechaDocumento(FechaUtil.simpleDateFormatForm.parse(subirArhivoDTO.getFechaCreacionArchivo()));
+						archivosInstDeTarea.getArchivosInstDeTareaMetadata().setDigitalizado(subirArhivoDTO.isDigitalizado());
+						//TECNOVA: SE QUITA FECHA CAPTURA
+//						if (subirArhivoDTO.getFechaCapturaDocumento()!= null && !subirArhivoDTO.getFechaCapturaDocumento().isEmpty()) {
+//							archivosInstDeTarea.getArchivosInstDeTareaMetadata().setFechaCaptura(FechaUtil.simpleDateFormatForm.parse(subirArhivoDTO.getFechaCapturaDocumento()));
+//						}
+						archivosInstDeTarea.getArchivosInstDeTareaMetadata().setRegion(subirArhivoDTO.getRegion());
+						archivosInstDeTarea.getArchivosInstDeTareaMetadata().setComuna(subirArhivoDTO.getComuna());
+						archivosInstDeTarea.getArchivosInstDeTareaMetadata().setMetadataCustom(subirArhivoDTO.getListaMetadata());
+						if (subirArhivoDTO.getEtiquetasDocumento()!= null && !subirArhivoDTO.getEtiquetasDocumento().isEmpty()) {
+							archivosInstDeTarea.getArchivosInstDeTareaMetadata().setEtiquetas(subirArhivoDTO.getEtiquetasDocumento().replace(",", "||%"));
+						}else {
+							archivosInstDeTarea.getArchivosInstDeTareaMetadata().setEtiquetas(null);
+						}
+						if (subirArhivoDTO.getDestinatarios() != null && !subirArhivoDTO.getDestinatarios().isEmpty()) {
+							archivosInstDeTarea.getArchivosInstDeTareaMetadata().setDestinatarios(subirArhivoDTO.getDestinatarios().replace(",", "||%"));
+						}else {
+							archivosInstDeTarea.getArchivosInstDeTareaMetadata().setDestinatarios(null);
+						}
+					}
+
+				}
+				
 				log.debug(archivosInstDeTarea.toString());
 				archivosInstDeTarea.setFechaSubido(new Date());
 				archivosInstDeTarea.setIdArchivoCms(subirArhivoDTO.getIdArchivoEnCMS());
@@ -504,9 +539,6 @@ public class SubirArchivoServiceImpl implements SubirArchivoService {
 				archivosInstDeTarea.setNombreArchivo(detalleDeArchivoDTO.getNombre());
 				archivosInstDeTarea.setTipoDeDocumento(tipoDeDocumento);
 				archivosInstDeTarea.setVersion(detalleDeArchivoDTO.getLabelUltimaVersion());
-				archivosInstDeTarea.setEstaVisado(false);
-				archivosInstDeTarea.setEstaFirmadoConFEACentralizada(false);
-				archivosInstDeTarea.setEstaFirmadoConFEAWebStart(false);
 				if (!detalleDeArchivoDTO.getFechaDeCreacion().isEmpty() && detalleDeArchivoDTO.getFechaDeCreacion()!=null) {
 					try {
 						Date fechaDoc = FechaUtil.simpleDateFormatForm.parse(detalleDeArchivoDTO.getFechaDeCreacion());
@@ -547,6 +579,11 @@ public class SubirArchivoServiceImpl implements SubirArchivoService {
 				if (nuevoRegistroArchivosInstDeTarea==true) {
 					log.debug("nuevoRegistroArchivosInstDeTarea==true");
 					log.debug("insertando nvo registro");
+					//ACA GUARDA ARCHIVO DE TAREA
+					if (archivosInstDeTareaMetadata != null) {
+						archivosInstDeTareaMetadaDao.insertaArchivosInstDeTareaMetada(archivosInstDeTareaMetadata);
+						archivosInstDeTarea.setArchivosInstDeTareaMetadata(archivosInstDeTareaMetadata);
+					}
 					archivosInstDeTareaDao.insertaArchivosInstDeTarea(archivosInstDeTarea);	
 				}									
 			} else {

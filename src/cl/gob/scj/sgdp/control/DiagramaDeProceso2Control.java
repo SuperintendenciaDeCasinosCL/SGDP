@@ -38,12 +38,14 @@ public class DiagramaDeProceso2Control {
 		
 		instanciaDeProcesoService.cargaInstanciaDeProcesoDTOPorIdExpediente(idExpediente, instanciaDeProcesoDTO);				
 		
+		log.info("En DIAGRAMA DE PROCESO 2");
 		
 		model.addAttribute("idDiagrama",idDiagrama);
 		model.addAttribute("idProceso",idProceso);
 		model.addAttribute("idInstanciaDeProceso",idInstanciaDeProceso);
 		model.addAttribute("instanciaDeProcesoDTO",instanciaDeProcesoDTO);
 		model.addAttribute("flagBuscarDiagrama",0); // Flag para diferenciar el metodo que viene con sobrecarga
+		model.addAttribute("urlFuncPhp", parametroService.getParametroPorID(Constantes.ID_PARAM_URL_FUNC_PHP).getValorParametroChar());
 		return "modals/diagramaDeProceso2";
 	}
 	
@@ -57,6 +59,8 @@ public class DiagramaDeProceso2Control {
 		
 		model.addAttribute("instanciaDeProcesoDTO",instanciaDeProcesoDTO);
 		model.addAttribute("flagBuscarDiagrama",1);// Flag para diferenciar el metodo que viene con sobrecarga
+		
+		model.addAttribute("urlFuncPhp", parametroService.getParametroPorID(Constantes.ID_PARAM_URL_FUNC_PHP).getValorParametroChar());
 		return "modals/diagramaDeProceso2";
 	}
 	
@@ -64,7 +68,7 @@ public class DiagramaDeProceso2Control {
 	public String diagramaDeProcesoReaperturaSalto(Model model ,@PathVariable("nombreExpediente") String nombreExpediente) {
 		log.debug("nombreExpediente: " + nombreExpediente);
 		model.addAttribute("urlFuncPhp", parametroService.getParametroPorID(Constantes.ID_PARAM_URL_FUNC_PHP).getValorParametroChar());
-		model.addAttribute("nombreExpediente", nombreExpediente);	
+		model.addAttribute("nombreExpediente", nombreExpediente);
 		return "modals/diagramaDeProcesoReaperturaSalto";
 	}
 	

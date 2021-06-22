@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import cl.gob.scj.sgdp.auth.user.Usuario;
 import cl.gob.scj.sgdp.dto.ProcesoDTO;
+import cl.gob.scj.sgdp.exception.SgdpException;
 
 @Service
 public interface ProcesoService {
@@ -17,4 +18,6 @@ public interface ProcesoService {
 	List<ProcesoDTO> getBuscarTodosProcesosPorVigencia(boolean vigente);
 	
 	List<ProcesoDTO> getProcesosPorVigencia(Usuario usuario, boolean vigente);
+
+	ProcesoDTO getProcesoByNombre(String string) throws SgdpException;
 }

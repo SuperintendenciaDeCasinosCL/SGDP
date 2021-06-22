@@ -40,8 +40,6 @@ public class ContinuarProcesoDTO implements Serializable {
 	private String idArchivosADistribuirJSON;
 	private String asuntoCorreoDistribucion;
 	private boolean reabre;
-	private short horasOcupadas;
-	private short minutosOcupados;
 	
 	public String getComentario() {
 		return comentario;
@@ -176,18 +174,6 @@ public class ContinuarProcesoDTO implements Serializable {
 	}
 	public void setReabre(boolean reabre) {
 		this.reabre = reabre;
-	}	
-	public short getHorasOcupadas() {
-		return horasOcupadas;
-	}
-	public void setHorasOcupadas(short horasOcupadas) {
-		this.horasOcupadas = horasOcupadas;
-	}
-	public short getMinutosOcupados() {
-		return minutosOcupados;
-	}
-	public void setMinutosOcupados(short minutosOcupados) {
-		this.minutosOcupados = minutosOcupados;
 	}
 	@Override
 	public String toString() {
@@ -208,8 +194,6 @@ public class ContinuarProcesoDTO implements Serializable {
 				+ ", idArchivosADistribuirJSON=" + idArchivosADistribuirJSON
 				+ ", asuntoCorreoDistribucion=" + asuntoCorreoDistribucion
 				+ ", reabre=" + reabre
-				+ ", horasOcupadas=" + horasOcupadas
-				+ ", minutosOcupados=" + minutosOcupados
 				+ "]";
-	}	
+	}
 }
