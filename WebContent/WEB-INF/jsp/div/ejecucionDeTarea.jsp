@@ -123,7 +123,7 @@
 			
 			function dejarSeguir(idInstanciaDeProceso){
 					bootbox.confirm({
-				     message: "¿Dejar de seguir el proceso?",
+				     message: "Â¿Dejar de seguir el proceso?",
 				    buttons: {
 				        confirm: {
 				            label: 'Si',
@@ -653,7 +653,9 @@
  			
 	<c:import url="/WEB-INF/jsp/modals/subirDocumentoAdicional.jsp"></c:import>
  
-	
+	<!-- Modal Subir Documento Requerido  -->					
+	<c:import url="/WEB-INF/jsp/modals/subirDocumentoRequerido.jsp"></c:import>	
+
 	<c:url value="/verificarSession" var="sessionURL" />
 	<c:url value="/" var="raizURL" />
 	
@@ -736,9 +738,9 @@ var inicializaBotonDevolverTarea = function(){
 			formData.append("minutosOcupados", minutosOcupados);			
 			var mensajeConfirmacionRetrocederTarea = "";		    
 		    if (tareaTieneParametros == 'true') {
-		    	mensajeConfirmacionRetrocederTarea = "¿Desea retroceder la tarea?<br><br><div style='color:red'> Recuerde que esta tarea tiene requisitos de satisfacci&oacute;n y/o salidas no conformes que deben ser verificados</div>";	
+		    	mensajeConfirmacionRetrocederTarea = "Â¿Desea retroceder la tarea?<br><br><div style='color:red'> Recuerde que esta tarea tiene requisitos de satisfacci&oacute;n y/o salidas no conformes que deben ser verificados</div>";	
 		    } else {
-		    	mensajeConfirmacionRetrocederTarea = "¿Desea retroceder la tarea?";		    	
+		    	mensajeConfirmacionRetrocederTarea = "Â¿Desea retroceder la tarea?";		    	
 		    }			
 			bootbox.confirm({
 		    	title: "Retroceder tarea",
@@ -913,9 +915,9 @@ var inicializaBotonEnviarTarea = function(){
 		    var puedeAvanzarProcesoConAdvertenciaFEA = $(this).attr("data-puedeavanzarprocesoconadvertenciafea");	    
 		    var mensajeConfirmacionEnviaTarea = "";		    
 		    if (tareaTieneParametros == 'true') {
-		    	mensajeConfirmacionEnviaTarea = "¿Desea enviar su tarea?<br><br><div style='color:red'> Recuerde que esta tarea tiene requisitos de satisfacci&oacute;n y/o salidas no conformes que deben ser verificados</div>";	
+		    	mensajeConfirmacionEnviaTarea = "Â¿Desea enviar su tarea?<br><br><div style='color:red'> Recuerde que esta tarea tiene requisitos de satisfacci&oacute;n y/o salidas no conformes que deben ser verificados</div>";	
 		    } else {
-		    	mensajeConfirmacionEnviaTarea = "¿Desea enviar su tarea?";		    	
+		    	mensajeConfirmacionEnviaTarea = "Â¿Desea enviar su tarea?";		    	
 		    }
 		    if (distribuye == "true" && $("#validoFormDistribucion").val()=="true") {			   
 		    	var correosDeDistribucionJSON = JSON.stringify($("#correosDeDistribucion").val());
@@ -930,10 +932,10 @@ var inicializaBotonEnviarTarea = function(){
 		    }	
 		    
 		    if (puedeAvanzarProcesoConAdvertenciaVisacion == "true" && tareaTieneParametros == 'true') {
-		    	mensajeConfirmacionEnviaTarea = "Esta es una tarea de visaci&oacuten, pero no ha visado todos los documentos. <br> ¿Desea enviar la tarea de todos modos?<br><br><div style='color:red'> Recuerde que esta tarea tiene requisitos de satisfacci&oacute;n y/o salidas no conformes que deben ser verificados</div>";
+		    	mensajeConfirmacionEnviaTarea = "Esta es una tarea de visaci&oacuten, pero no ha visado todos los documentos. <br> Â¿Desea enviar la tarea de todos modos?<br><br><div style='color:red'> Recuerde que esta tarea tiene requisitos de satisfacci&oacute;n y/o salidas no conformes que deben ser verificados</div>";
 		    	formData.append("avanzaProcesoConAdvertenciaVisacion", true);
 			} else if (puedeAvanzarProcesoConAdvertenciaVisacion == "true") {
-				mensajeConfirmacionEnviaTarea = "Esta es una tarea de visaci&oacuten, pero no ha visado todos los documentos. <br> ¿Desea enviar la tarea de todos modos?";
+				mensajeConfirmacionEnviaTarea = "Esta es una tarea de visaci&oacuten, pero no ha visado todos los documentos. <br> Â¿Desea enviar la tarea de todos modos?";
 		    	formData.append("avanzaProcesoConAdvertenciaVisacion", true);
 			}
 
@@ -1118,9 +1120,9 @@ var inicializaBotonFinalizaProceso = function(){
             }
 	        var mensajeFinalizaTarea = "";		    
 		    if (tareaTieneParametros == 'true') {
-		    	mensajeFinalizaTarea = "¿Desea finalizar la tarea?<br><br><div style='color:red'> Recuerde que esta tarea tiene requisitos de satisfacci&oacute;n y/o salidas no conformes que deben ser verificados</div>";	
+		    	mensajeFinalizaTarea = "Â¿Desea finalizar la tarea?<br><br><div style='color:red'> Recuerde que esta tarea tiene requisitos de satisfacci&oacute;n y/o salidas no conformes que deben ser verificados</div>";	
 		    } else {
-		    	mensajeFinalizaTarea = "¿Desea finalizar la tarea?";		    	
+		    	mensajeFinalizaTarea = "Â¿Desea finalizar la tarea?";		    	
 		    }
 			bootbox.confirm({
 		    	title: "Finalizar Tarea",
