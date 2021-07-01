@@ -595,13 +595,8 @@
 		<!-- Modal Subir Adjunto  -->
 		
 		<c:import url="/WEB-INF/jsp/modals/subirAdjunto.jsp"></c:import>
-		<!-- Modal Subir Documento Requerido  -->
-					
-		<c:import url="/WEB-INF/jsp/modals/subirDocumentoRequerido.jsp"></c:import>
-		<!-- Modal Subir Documento Adicional  -->
-				
-		<c:import url="/WEB-INF/jsp/modals/subirDocumentoAdicional.jsp"></c:import>
-		
+		<!-- Modal Subir Documento Requerido  -->					
+			
 		<!-- Firma Avanzada-->
 		<c:import url="/WEB-INF/jsp/modals/firmaAvanzada.jsp"></c:import>
 		
