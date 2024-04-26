@@ -9,11 +9,9 @@
 	<context:component-scan base-package="cl.gob.scj.sgdp.util"></context:component-scan>
 
 	<context:annotation-config></context:annotation-config>
-	<!--  <context:component-scan base-package="cl.gob.scj.sgdp.config"></context:component-scan>-->
 	
 	<bean id="messageSource"
 		class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
-		<!--  	<property name="basename" value="cl/gob/scj/sgdp/config/messages" /> -->
 		<property name="basename"> 
       		  <value>classpath:cl/gob/scj/sgdp/config/messages</value> 
         </property> 
@@ -37,40 +35,14 @@
 		</property>
 	</bean>
 	
-	<!--  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-            <property name="location" value="/WEB-INF/classes/config.properties"></property>
-    </bean> -->
-    
-    <!--<bean id="configProps" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
-  		<property name="location" value="classpath:config.properties"/>
-	</bean> -->
-	
-	<!-- Configuring interceptors based on URI -->
-
-	<!--
-	<interceptors>
-		<interceptor>
-			<mapping path="/home" />
-			<beans>			
-				<bean class="cl.gob.scj.sgdp.interceptor.RequestProcessingTimeInterceptor"></bean>			
-			</beans>
-			<exclude-mapping path="/servicios/*"/>
-			<exclude-mapping path="/serviciosDoc/*"/>
-			<exclude-mapping path="/vinculacion/*"/>
-			<exclude-mapping path="/mantenimiento/*"/>
-		</interceptor>
-	</interceptors>	
-	-->	
-
-	
 	<bean id="configProps" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
   		<property name="location" value="classpath:cl/gob/scj/sgdp/config/config.properties"/>
 	</bean>
-	
-	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">  
-       <property name="host" value="172.16.40.11" /> 
-       <property name="port" value="25" />
-       <property name="javaMailProperties">
+
+    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="smtp" />
+		<property name="port" value="25" />
+		<property name="javaMailProperties">
            <props>
                <prop key="mail.transport.protocol">smtp</prop>
                <prop key="mail.smtp.auth">false</prop>

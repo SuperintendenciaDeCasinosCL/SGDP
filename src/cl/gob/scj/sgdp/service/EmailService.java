@@ -1,6 +1,7 @@
 package cl.gob.scj.sgdp.service;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
@@ -10,7 +11,6 @@ import cl.gob.scj.sgdp.dto.RespuestaMailDTO;
 import cl.gob.scj.sgdp.exception.SgdpException;
 import cl.gob.scj.sgdp.model.InstanciaDeProceso;
 import cl.gob.scj.sgdp.model.InstanciaDeTarea;
-import cl.gob.scj.sgdp.ws.soap.client.GeneraRegistroDocumentoResponse;
 
 @Service
 public interface EmailService {
@@ -23,12 +23,13 @@ public interface EmailService {
 	void enviarMailNotificacionPorTarea(InstanciaDeTareaDTO instanciaDeTareaDTO, String to, Usuario usuario) throws SgdpException;
 	
 	void enviarCorreosConAdjuntosAListaDeDistribucion (List<String> correosDeDistribucion,
-			List<String> idArchivosADistribuir,
+			Set<String> idArchivosADistribuir,
 			String idExpediente,
 			String nombreExpediente,
 			long idInstanciaDeTarea,
 			Usuario usuario,
-			String asunto) throws Exception;
+			String asunto,
+			List<String> nombreArchivosADistribuir) throws Exception;
 	
 	void enviarCorreoeX (String from, String to, String mailSmtpHost, String asunto, String mensaje, String tipoDeContenido) throws Exception;
 	

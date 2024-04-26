@@ -33,6 +33,9 @@ import cl.gob.scj.sgdp.config.Constantes;
 	@NamedQuery(name="Proceso.findAll", 
 		query="SELECT p FROM Proceso p"),
 	
+	@NamedQuery(name="Proceso.findAllBiSuperProceso", 
+	query="SELECT p FROM Proceso p where superProceso.idSuperProceso = :idSuperProceso and vigente = true"),
+	
 	@NamedQuery(name="Proceso.getProcesosPorIdMacroProceso", 
 		query="SELECT p FROM Proceso p where p.macroProceso.idMacroProceso =:idMacroProceso and p.vigente =:vigente "
 				+ "and 0 < (SELECT count(t.idTarea) FROM Tarea t where t.proceso.idProceso = p.idProceso)"),
@@ -69,7 +72,19 @@ import cl.gob.scj.sgdp.config.Constantes;
 	@NamedQuery(name="Proceso.buscarTodosProcesoVigenteOrderPorCod", 
 	query=" SELECT p FROM Proceso p where p.vigente =:vigente "
 			+ " and 0 < (SELECT count(t.idTarea) FROM Tarea t where t.proceso.idProceso = p.idProceso) "
-			+ "	order by p.codigoProceso asc ")
+			+ "	order by p.codigoProceso asc "),
+	
+	@NamedQuery(name="Proceso.buscarTodosProcesoPorVigencia", 
+	query=" SELECT p FROM Proceso p where p.vigente =:vigente order by p.nombreProceso"),
+			
+	
+	@NamedQuery(name="Proceso.deshabilitaProceso", 
+	query=" UPDATE Proceso SET "
+			+ "	vigente = FALSE "
+			+ "	WHERE "
+			+ " 	idProceso != :idProceso "
+			+ " 	AND codigoProceso = :codigoProceso"),
+	
 	
 })
 public class Proceso implements Serializable {
@@ -111,6 +126,11 @@ public class Proceso implements Serializable {
 	@ManyToOne
 	@JoinColumn(name="\"ID_MACRO_PROCESO\"")
 	private MacroProceso macroProceso;
+	
+	//bi-directional many-to-one association to MacroProceso
+	@ManyToOne
+	@JoinColumn(name="\"ID_SUPER_PROCESO\"")
+	private SuperProceso superProceso;
 
 	//bi-directional many-to-one association to Unidad
 	@ManyToOne
@@ -135,6 +155,15 @@ public class Proceso implements Serializable {
 	
 	@Column(name="\"B_TIENE_PARAM_POR_TAREA\"")
 	private Boolean tieneRdsSnc;
+	
+	@Column(name="\"X_BPMN\"")
+	private String xml;
+
+	@Column(name="\"A_ARCHIVO_IMAGEN\"")
+	private String archivoImagen;
+	
+//	@Column(name="\"D_FECHA_CREACION\"")
+//	private String fechaCreacion;
 
 	public Proceso() {
 	}
@@ -305,6 +334,42 @@ public class Proceso implements Serializable {
 
 	public void setTieneRdsSnc(Boolean tieneRdsSnc) {
 		this.tieneRdsSnc = tieneRdsSnc;
-	}		
+	}
+
+	public String getXml() {
+		return xml;
+	}
+
+	public void setXml(String xml) {
+		this.xml = xml;
+	}
+
+	public SuperProceso getSuperProceso() {
+		return superProceso;
+	}
+
+	public void setSuperProceso(SuperProceso superProceso) {
+		this.superProceso = superProceso;
+	}
+
+	public String getArchivoImagen() {
+		return archivoImagen;
+	}
+
+	public void setArchivoImagen(String archivoImagen) {
+		this.archivoImagen = archivoImagen;
+	}
+	
+	
+
+//	public String getFechaCreacion() {
+//		return fechaCreacion;
+//	}
+//
+//	public void setFechaCreacion(String fechaCreacion) {
+//		this.fechaCreacion = fechaCreacion;
+//	}		
+	
+	
 	
 }

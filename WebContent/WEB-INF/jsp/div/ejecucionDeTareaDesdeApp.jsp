@@ -148,7 +148,8 @@
 									,"${instanciaDeTareaDTO.idInstanciaDeTarea}"
 									,"true"
 									,"${instanciaDeTareaDTO.idExpediente}"
-									,"${instanciaDeTareaDTO.urlControl}");
+									,"${instanciaDeTareaDTO.urlControl}"
+									,"${instanciaDeTareaDTO.idEstadoTarea}");
 							// notificacionSeguimiento();
 							
 						},
@@ -205,7 +206,8 @@
 													,"${instanciaDeTareaDTO.idInstanciaDeTarea}"
 													,"true"
 													,"${instanciaDeTareaDTO.idExpediente}"
-													,"${instanciaDeTareaDTO.urlControl}");
+													,"${instanciaDeTareaDTO.urlControl}"
+													,"${instanciaDeTareaDTO.idEstadoTarea}");
 										
 										// $("#divTabsDetalleDeTarea").addClass('hide');			
 										//	notificacionSeguimiento();
@@ -462,7 +464,7 @@
 		
 						$("#iframeDivDetalleDeTareaDentro").removeClass("hide");
 						
-		               var urlControl = '<c:out value="${urlControl}"/>'+'/${idArchivosInstTareasAnteriores}'; 
+		                var urlControl = '<c:out value="${urlControl}"/>'+'/${idArchivosInstTareasAnteriores}'+'?nombreExpediente=${instanciaDeProcesoDTO.nombreExpediente}'; 
 					  
 						$("<iframe id='myId'></iframe>").appendTo("#iframeDivDetalleDeTareaDentro")
 					    .attr('src', urlControl)
@@ -505,11 +507,11 @@
 
 			</div>
 
-			<div class="col-sm-12">
+			<div class="col-sm-12" id="tiempoDedicadoDivDesdeAPP">
 
-				<label class="control-label" for="idTipoDeDocumentoRequeridoModal">Tiempo
-					dedicado:</label> <input type="text" id="tiempoDedicado"
-					name="tiempoDedicado"> <br>
+				<label class="control-label" for="tiempoDedicadoDesdeAPP">Tiempo
+					dedicado:</label> <input type="text" id="tiempoDedicadoDesdeAPP"
+					name="tiempoDedicadoDesdeAPP"> <br>
 
 			</div>
 
@@ -774,8 +776,21 @@
 							var formData = new FormData();
 							var comentario = $("#commentarioEjecucionTareaDesdeApp").val();
 							var idInstanciaDeTareaSeleccionada = $(this).attr("data-idinstanciadetarea");
-							var horasOcupadas = $("#duration-hours").val();
-							var minutosOcupados = $("#duration-minutes").val();														
+							//var horasOcupadas = $("#duration-hours").val();
+							//var minutosOcupados = $("#duration-minutes").val();														
+							var tiempoDeDicadoDivContainerDesdeAPP = $("#tiempoDedicadoDivDesdeAPP");
+							var durationArray = tiempoDeDicadoDivContainerDesdeAPP.find(".durationpicker-duration");
+							var horasOcupadas;
+							var minutosOcupados;
+							$(durationArray).each(function() {
+								if ($(this).attr('id') == "duration-hours") {
+									horasOcupadas = $(this).val();
+									
+								}
+								if ($(this).attr('id') == "duration-minutes") {
+									minutosOcupados = $(this).val();
+								}
+							});	
 							formData.append("comentario", comentario);
 							formData.append("idInstanciaDeTareaSeleccionada", idInstanciaDeTareaSeleccionada);
 							formData.append("horasOcupadas", horasOcupadas);
@@ -787,8 +802,11 @@
 								minutosOcupados = 0;
 							}
 							if (horasOcupadas <= 0 && minutosOcupados <= 0) {
-								$("#duration-hours").validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');	
-								$("#duration-minutes").validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');
+								//$("#duration-hours").validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');	
+								//$("#duration-minutes").validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');
+								$(durationArray).each(function() {
+									$(this).validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');	
+								});	
 								return;
 							}
 							bootbox.confirm({
@@ -912,8 +930,19 @@
 							var avanzaRetrocede= "avanzarProceso";
 							var idExpedienteContinuarProceso = $(this).attr("data-idexpediente");
 							var reasigna = false;
-							var horasOcupadas = $("#duration-hours").val();
-							var minutosOcupados = $("#duration-minutes").val();
+							var tiempoDeDicadoDivContainerDesdeAPP = $("#tiempoDedicadoDivDesdeAPP");
+							var durationArray = tiempoDeDicadoDivContainerDesdeAPP.find(".durationpicker-duration");
+							var horasOcupadas;
+							var minutosOcupados;
+							$(durationArray).each(function() {
+								if ($(this).attr('id') == "duration-hours") {
+									horasOcupadas = $(this).val();
+									
+								}
+								if ($(this).attr('id') == "duration-minutes") {
+									minutosOcupados = $(this).val();
+								}
+							});	
 							if (horasOcupadas == "") {
 								horasOcupadas = 0;
 							}
@@ -921,8 +950,11 @@
 								minutosOcupados = 0;
 							}
 							if (horasOcupadas <= 0 && minutosOcupados <= 0) {
-								$("#duration-hours").validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');	
-								$("#duration-minutes").validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');
+								//$("#duration-hours").validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');	
+								//$("#duration-minutes").validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');
+								$(durationArray).each(function() {
+									$(this).validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');	
+								});
 								return;
 							}	
 						    $(".asignaciones-tareas-desde-app").each(function (colIndex, c) {						    	
@@ -1039,7 +1071,7 @@
 				            	haySessionB = false;
 				                bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu última acción y hemos caducado tu sesión por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
 				                    , function(){
-				                            window.open('${raizURL}', '_blank');                            
+				                            window.open('${raizURL}', '_self');                            
 				                    }
 				                );                
 				            } 
@@ -1052,8 +1084,21 @@
 						} else {
 							var idInstanciaDeTarea = $(this).attr("data-idinstanciadetarea");
 							var comentario = $("#commentarioEjecucionTareaDesdeApp").val();
-							var horasOcupadas = $("#duration-hours").val();
-							var minutosOcupados = $("#duration-minutes").val();
+							//var horasOcupadas = $("#duration-hours").val();
+							//var minutosOcupados = $("#duration-minutes").val();
+							var tiempoDeDicadoDivContainerDesdeAPP = $("#tiempoDedicadoDivDesdeAPP");
+							var durationArray = tiempoDeDicadoDivContainerDesdeAPP.find(".durationpicker-duration");
+							var horasOcupadas;
+							var minutosOcupados;
+							$(durationArray).each(function() {
+								if ($(this).attr('id') == "duration-hours") {
+									horasOcupadas = $(this).val();
+									
+								}
+								if ($(this).attr('id') == "duration-minutes") {
+									minutosOcupados = $(this).val();
+								}
+							});	
 							if (horasOcupadas == "") {
 								horasOcupadas = 0;
 							}
@@ -1061,8 +1106,11 @@
 								minutosOcupados = 0;
 							}
 							if (horasOcupadas <= 0 && minutosOcupados <= 0) {
-								$("#duration-hours").validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');	
-								$("#duration-minutes").validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');
+								//$("#duration-hours").validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');	
+								//$("#duration-minutes").validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');
+								$(durationArray).each(function() {
+									$(this).validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');	
+								});
 								return;
 							}	
 					        var formData = new FormData();
@@ -1160,8 +1208,8 @@
 						});
 				};
 				
-				function inicializaTiempoDedicado() {
-					$("#tiempoDedicado").durationPicker({
+				function inicializaTiempoDedicadoDesdeAPP() {
+					$("#tiempoDedicadoDesdeAPP").durationPicker({
 						  hours: {
 						    label: "h",
 						    min: 0
@@ -1176,7 +1224,7 @@
 						});
 				}
 				
-				function agregaValidityTiempoDedicado() {
+				function agregaValidityTiempoDedicadoDesdeAPP() {
 					$("#duration-hours").attr("oninput", "validity.valid||(value='');");
 					$("#duration-minutes").attr("oninput", "validity.valid||(value='');");
 				}
@@ -1187,8 +1235,8 @@
 					$(inicializaBotonDevolverTareaDesdeApp);	
 					$(inicializaBotonFinalizaProcesoDesdeApp);
 					$(inicializaBotonVerDiagramaEnNuevaVentanaApp);
-					$(inicializaTiempoDedicado);
-					$(agregaValidityTiempoDedicado);
+					$(inicializaTiempoDedicadoDesdeAPP);
+					$(agregaValidityTiempoDedicadoDesdeAPP);
 				});
 				
 				

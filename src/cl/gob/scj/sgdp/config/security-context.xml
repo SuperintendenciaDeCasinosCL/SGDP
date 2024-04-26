@@ -3,42 +3,48 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xmlns:security="http://www.springframework.org/schema/security"
 	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-	
+
 	<security:http use-expressions="true">
 	
-		<security:intercept-url pattern="/" access="permitAll" />
+		<security:intercept-url pattern="/autenticar" access="permitAll" />
+		<security:intercept-url pattern="/login" access="permitAll" />
 		<security:intercept-url pattern="/verificarSession" access="permitAll" /> 
 		<security:intercept-url pattern="/sessionTimeout" access="permitAll"  />
 		<security:intercept-url pattern="/login/getRolesUsuario" access="permitAll" />		
-		<security:intercept-url pattern="/*" access="isAuthenticated()" /> 
+		<security:intercept-url pattern="/servicios/*" access="permitAll" />
+		<security:intercept-url pattern="/archivo/*" access="permitAll" />
+		<security:intercept-url pattern="/serviciosDoc/*" access="permitAll" />
+		<security:intercept-url pattern="/mantenimiento/*" access="permitAll" />
+		<security:intercept-url pattern="/vinculacion/*" access="permitAll" />
+		<security:intercept-url pattern="/" access="isAuthenticated()" />
+		<security:intercept-url pattern="/*" access="isAuthenticated()" />
 		
-		<security:form-login login-page="/"
+		<security:form-login login-page="/autenticar"
 			password-parameter="clave" username-parameter="idUsuario"		
-			authentication-failure-url="/?error=errorCredenciales"
+			authentication-failure-url="/autenticar?error=errorCredenciales"
 			authentication-success-handler-ref="authenticationSuccessHandlerImpl"
 			 />	
 		
         <security:logout logout-url="/logout" invalidate-session="true" />	
 		
-		<security:access-denied-handler error-page="/?error=accesoDenegado" />	
+		<security:access-denied-handler error-page="/autenticar?error=accesoDenegado" />	
 		
 	</security:http>
 
 	<bean id="authenticationSuccessHandlerImpl" class="cl.gob.scj.sgdp.config.AuthenticationSuccessHandlerImpl" >
 	</bean>
-	
+
 	<bean id="contextSource"
-		class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
-		<constructor-arg value="ldap://supercasino.cl:389/dc=supercasino,dc=cl">
+		  class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
+		<constructor-arg value="#{systemEnvironment['SGDP_LDAP_SPRING_CONTEXT_SOURCE'] ?: systemProperties['sgdp.ldap.spring.context.source'] ?: 'ldap://supercasino.cl:389/dc=supercasino,dc=cl'}">
 		</constructor-arg>
-		<property name="userDn" value="ldap@supercasino.cl"></property>
-		<property name="password" value="P@ssw0rd"></property>
-		<!-- <property name="anonymousReadOnly" value="true"/> -->		
+		<property name="userDn" value="#{systemEnvironment['SGDP_LDAP_USERDN'] ?: systemProperties['sgdp.ldap.userdn'] ?: 'ldap@supercasino.cl'}"></property>
+		<property name="password" value="#{systemEnvironment['SGDP_LDAP_PASSWORD'] ?: systemProperties['sgdp.ldap.password'] ?: 'P@ssw0rd'}"></property>
 	</bean>
 
 	<bean id="userSearch" class="org.springframework.security.ldap.search.FilterBasedLdapUserSearch">
 		<constructor-arg index="0" value=""></constructor-arg>
-		<constructor-arg index="1" value="(sAMAccountName={0})"></constructor-arg>
+		<constructor-arg index="1" value="#{systemEnvironment['SGDP_SAM_ACCOUNT_NAME'] ?: systemProperties['sgdp.ldap.sAMAccountName'] ?: '(sAMAccountName={0})'}"></constructor-arg>
 		<constructor-arg index="2" ref="contextSource"></constructor-arg>
 	</bean>
 

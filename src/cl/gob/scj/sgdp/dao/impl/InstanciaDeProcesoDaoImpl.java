@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import cl.gob.scj.sgdp.auth.user.Usuario;
 import cl.gob.scj.sgdp.dao.InstanciaDeProcesoDao;
 import cl.gob.scj.sgdp.dto.FechaEstadoInstanciaProcesoDTO;
+import cl.gob.scj.sgdp.dto.InfoProcesoExternoDTO;
 import cl.gob.scj.sgdp.dto.rest.ConsultaEstadoProceso;
 import cl.gob.scj.sgdp.dto.rest.MensajeJson;
 import cl.gob.scj.sgdp.dto.rest.RespuestaConsultaAvanzadaEstadoProceso;
@@ -148,6 +149,14 @@ public class InstanciaDeProcesoDaoImpl implements InstanciaDeProcesoDao {
 		Query query = getSession().getNamedQuery("InstanciaDeProceso.getInstanciaDeProcesoPorNombreExpediente");	
 		query.setString("nombreExpediente", nombreExpediente);			
 		return (InstanciaDeProceso) query.uniqueResult();
+	}
+	
+	@Override
+	public Object getInstanciaDeProcesoPorNombreExpedienteAPI(String nombreExpediente) {
+		Query query = getSession().getNamedQuery("InstanciaDeProceso.getInstanciaDeProcesoPorNombreExpedienteAPI");	
+		query.setString("nombreExpediente", nombreExpediente);	
+		query.setMaxResults(1);
+		return  query.uniqueResult();
 	}
 	
 }

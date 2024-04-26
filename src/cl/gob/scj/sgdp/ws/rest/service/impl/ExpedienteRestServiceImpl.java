@@ -41,6 +41,7 @@ import cl.gob.scj.sgdp.dto.ProcesoDTO;
 import cl.gob.scj.sgdp.dto.RetrocedeProcesoDTO;
 import cl.gob.scj.sgdp.dto.SubirArhivoDTO;
 import cl.gob.scj.sgdp.dto.TareaDTO;
+import cl.gob.scj.sgdp.dto.UsuarioResponsabilidadDTO;
 import cl.gob.scj.sgdp.dto.rest.AgregaORemueveTagDeObjetoRequest;
 import cl.gob.scj.sgdp.dto.rest.AgregaORemueveTagDeObjetoResponse;
 import cl.gob.scj.sgdp.dto.rest.AnulacionProcesoRequest;
@@ -75,8 +76,10 @@ import cl.gob.scj.sgdp.dto.rest.TareaRestDTO;
 import cl.gob.scj.sgdp.dto.rest.TipoDeDocumentoDTO;
 import cl.gob.scj.sgdp.exception.SgdpException;
 import cl.gob.scj.sgdp.model.InstanciaDeTarea;
+import cl.gob.scj.sgdp.model.LogError;
 import cl.gob.scj.sgdp.model.TipoDeDocumento;
 import cl.gob.scj.sgdp.model.UsuarioAsignado;
+import cl.gob.scj.sgdp.model.UsuarioResponsabilidad;
 import cl.gob.scj.sgdp.model.UsuarioRol;
 import cl.gob.scj.sgdp.service.BandejaDeEntradaService;
 import cl.gob.scj.sgdp.service.CrearExpedienteService;
@@ -97,6 +100,7 @@ import cl.gob.scj.sgdp.tipos.BifurcacionType;
 import cl.gob.scj.sgdp.tipos.SubeArchivoTareaType;
 import cl.gob.scj.sgdp.util.FechaUtil;
 import cl.gob.scj.sgdp.util.FileUtil;
+import cl.gob.scj.sgdp.util.SGDPUtil;
 import cl.gob.scj.sgdp.util.SgdpMultipartFile;
 import cl.gob.scj.sgdp.util.SingleObjectFactory;
 import cl.gob.scj.sgdp.util.StringUtilSGDP;
@@ -374,7 +378,7 @@ public class ExpedienteRestServiceImpl implements ExpedienteRestService {
 				for (InstanciaDeTarea instanciaDeTarea : respuestaInstanciasDeTareasPorIdExpediente) {
 					logger.debug(instanciaDeTarea.toString());
 					subirArhivoDTO.setIdInstanciaDeTareaSubirArchivo(instanciaDeTarea.getIdInstanciaDeTarea());
-					subirArhivoDTO.setIdUsuarioSube(instanciaDeTarea.getUsuariosAsignados().get(0).getId().getIdUsuario());
+					subirArhivoDTO.setIdUsuarioSube(instanciaDeTarea.getUsuariosAsignados().get(0).getId().getIdUsuario());					
 					logger.debug(subirArhivoDTO.toString());					
 					subirArchivoService.subirArchivo(usuario, subirArhivoDTO);
 				}
@@ -486,8 +490,18 @@ public class ExpedienteRestServiceImpl implements ExpedienteRestService {
 						logger.debug("cambioEstadoRestDTO.getReceptor(): " + avanzaEstadoRestDTO.getReceptor());
 						asignacionTareaDTO.setUsuariosAsignados(avanzaEstadoRestDTO.getReceptor());
 					} else {		
-						logger.debug("getPrimerUsuarioResponsabilidadDTOPorIdInstanciaDeTarea");
-						asignacionTareaDTO.setUsuariosAsignados(usuarioResponsabilidadService.getPrimerUsuarioResponsabilidadDTOPorIdInstanciaDeTarea(instanciaDeTareaDTO.getIdInstanciaDeTarea()).getIdUsuario());
+						//logger.debug("getPrimerUsuarioResponsabilidadDTOPorIdInstanciaDeTarea");
+						//asignacionTareaDTO.setUsuariosAsignados(usuarioResponsabilidadService.getPrimerUsuarioResponsabilidadDTOPorIdInstanciaDeTarea(instanciaDeTareaDTO.getIdInstanciaDeTarea()).getIdUsuario());
+						//List<UsuarioResponsabilidadDTO> usuariosResponsabilidadDTO = usuarioResponsabilidadService.getUsuariosResponsabilidadDTODeSegundasTareaPorIdProceso(instanciaDeTarea.getInstanciaDeProceso().getProceso().getIdProceso());
+						List<UsuarioResponsabilidadDTO> usuariosResponsabilidadDTO = usuarioResponsabilidadService.getUsuariosRolesPosiblesPorIdInstanciaDeTarea(instanciaDeTareaDTO.getIdInstanciaDeTarea());
+						logger.info("Buscando usuario de manera aleatoria para avanzar expediente: " + avanzaEstadoRestDTO.getIdExpediente());
+						logger.info("Avanzando hacia la tarea: " + instanciaDeTareaDTO.getNombreDeTarea());
+						logger.info("Eligiendo de manera aleatoria de la siguiente lista: ");
+						for (UsuarioResponsabilidadDTO usuarioResponsabilidadDTO : usuariosResponsabilidadDTO) {
+							logger.info(usuarioResponsabilidadDTO.toString());
+						}
+						UsuarioResponsabilidadDTO usuarioResponsabilidadDTO = SGDPUtil.getUsuarioAletarorio(usuariosResponsabilidadDTO);
+						asignacionTareaDTO.setUsuariosAsignados(usuarioResponsabilidadDTO.getIdUsuario());
 					}					
 					asignacionesTareasDTO.add(asignacionTareaDTO);
 				}

@@ -19,8 +19,8 @@
 	            <th>Usuario Destino</th>
 	            <th>Tarea Destino</th>
 	            <th>Comentario</th>
-	            <th>Tiempo Dedicado</th>
-	            <th>Acciones</th>		       
+	            <th>Tiempo Dedicado</th>	
+	            <th></th>       
 	        </tr>
 	    </thead>
 	    <tbody>	    
@@ -55,6 +55,13 @@
 							</button>
 		    			
 		    			</c:if>
+		    			<c:if test="${historicoDeInstDeTareaDTO.cantAccionesEnBitacora > 0}">
+							<button type="button" title="Bit&aacute;cora de Subtareas"
+											class="btn btn-primary btn-xs"
+											onclick="cargaBitacora(${historicoDeInstDeTareaDTO.idInstanciaDeTareaDeOrigen})">
+											<span class="fa fa-compass font-icon-2 "></span>
+							</button>
+						</c:if>	
 		    		</td>		    		
 	    		</tr>
 	    	</c:forEach> 

@@ -15,6 +15,7 @@ import cl.gob.scj.sgdp.dao.HistoricoDeInstDeTareaDao;
 import cl.gob.scj.sgdp.dto.HistoricoDeInstDeTareaDTO;
 import cl.gob.scj.sgdp.model.HistoricoDeInstDeTarea;
 import cl.gob.scj.sgdp.model.HistoricoUsuariosAsignadosATarea;
+import cl.gob.scj.sgdp.service.BitacoraSubTareaService;
 import cl.gob.scj.sgdp.service.HistoricoDeInstDeTareaService;
 
 @Service
@@ -23,6 +24,9 @@ public class HistoricoDeInstDeTareaServiceImpl implements HistoricoDeInstDeTarea
 	
 	@Autowired
 	private HistoricoDeInstDeTareaDao historicoDeInstDeTareaDao;
+	
+	@Autowired
+	private BitacoraSubTareaService bitacoraSubTareaService;
 	
 	@Resource(name = "configProps")
 	private Properties configProps;
@@ -54,7 +58,15 @@ public class HistoricoDeInstDeTareaServiceImpl implements HistoricoDeInstDeTarea
 	
 	@Override
 	public List<HistoricoDeInstDeTareaDTO> getHistoricoDeInstDeTareaPorIdExpedienteBusqueda(String idExpediente) {
-		return historicoDeInstDeTareaDao.getHistoricoDeInstDeTareaPorIdExpedienteBusqueda(idExpediente);
+		List<HistoricoDeInstDeTareaDTO> list = historicoDeInstDeTareaDao.getHistoricoDeInstDeTareaPorIdExpedienteBusqueda(idExpediente);
+		
+		for(int i = 0; i < list.size() ; i++) {
+			HistoricoDeInstDeTareaDTO h = list.get(i);
+			Integer cant = bitacoraSubTareaService.getAllByIdInstTarea(h.getIdInstanciaDeTareaDeOrigen()).size();
+			list.get(i).setCantAccionesEnBitacora(cant);
+		}
+		
+		return list;
 	}
 	
 	@Override

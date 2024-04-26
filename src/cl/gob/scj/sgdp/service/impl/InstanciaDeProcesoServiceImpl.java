@@ -1,5 +1,6 @@
 package cl.gob.scj.sgdp.service.impl;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -15,16 +16,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import cl.gob.scj.sgdp.auth.user.Usuario;
+import cl.gob.scj.sgdp.dao.ComplejidadExpedienteDao;
 import cl.gob.scj.sgdp.dao.HistoricoDeInstDeTareaDao;
 import cl.gob.scj.sgdp.dao.InstanciaDeProcesoDao;
 import cl.gob.scj.sgdp.dao.ParametroRelacionTareaDao;
 import cl.gob.scj.sgdp.dao.SeguimientoIntanciaProcesoDao;
+import cl.gob.scj.sgdp.dto.ComplejidadExpedienteDTO;
 import cl.gob.scj.sgdp.dto.ElementoResultadoBusquedaDTO;
 import cl.gob.scj.sgdp.dto.EtapaDeInstanciaDeProcesoDTO;
 import cl.gob.scj.sgdp.dto.FechaEstadoInstanciaProcesoDTO;
 import cl.gob.scj.sgdp.dto.HistorialProcesoDTO;
+import cl.gob.scj.sgdp.dto.InfoProcesoExternoDTO;
 import cl.gob.scj.sgdp.dto.InstanciaDeProcesoDTO;
+import cl.gob.scj.sgdp.dto.RespuestaActualizaMetaDataExpedienteDTO;
 import cl.gob.scj.sgdp.dto.ResultadoBusquedaDTO;
+import cl.gob.scj.sgdp.dto.rest.ExpedienteRestActMetaDTO;
 import cl.gob.scj.sgdp.dto.rest.MensajeJson;
 import cl.gob.scj.sgdp.model.EtapaDeInstanciaDeProceso;
 import cl.gob.scj.sgdp.model.HistorialProceso;
@@ -37,6 +43,9 @@ import cl.gob.scj.sgdp.model.SeguimientoIntanciaProcesoPK;
 import cl.gob.scj.sgdp.model.SolicitudCreacionExp;
 import cl.gob.scj.sgdp.service.InstanciaDeProcesoService;
 import cl.gob.scj.sgdp.tipos.AccionType;
+import cl.gob.scj.sgdp.util.FechaUtil;
+import cl.gob.scj.sgdp.util.SGDPUtil;
+import cl.gob.scj.sgdp.ws.alfresco.rest.client.GestorMetadataCMSService;
 
 @Service
 @Transactional(rollbackFor = Throwable.class)
@@ -55,6 +64,12 @@ public class InstanciaDeProcesoServiceImpl implements InstanciaDeProcesoService 
 	
 	@Autowired
 	private ParametroRelacionTareaDao parametroRelacionTareaDao;
+	
+	@Autowired
+	private ComplejidadExpedienteDao complejidadExpedienteDao;
+	
+	@Autowired
+	private GestorMetadataCMSService gestorMetadataCMSService;
 	
 	@Override
 	public List<HistorialProcesoDTO> getHistorialDelProceso(String idExpediente) {
@@ -249,7 +264,16 @@ public class InstanciaDeProcesoServiceImpl implements InstanciaDeProcesoService 
 	List<ElementoResultadoBusquedaDTO> listaElementoResultadoBusquedaDTO = new ArrayList<ElementoResultadoBusquedaDTO>();		
 		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");		  
 		for (ElementoResultadoBusquedaDTO elementoResultadoBusquedaDTO : resultadoBusquedaDTO.getElementosResultadoBusquedaDTO()) {	
-			FechaEstadoInstanciaProcesoDTO fechaEstadoInstanciaProcesoDTO = new FechaEstadoInstanciaProcesoDTO();	
+			FechaEstadoInstanciaProcesoDTO fechaEstadoInstanciaProcesoDTO = new FechaEstadoInstanciaProcesoDTO();
+		
+			// Complejidad de expediente o instancia de proceso
+			if (elementoResultadoBusquedaDTO.getComplejidad() == null || elementoResultadoBusquedaDTO.getComplejidad().isEmpty()) {
+				ComplejidadExpedienteDTO complejidad = complejidadExpedienteDao.getLastByNombreExpediente(elementoResultadoBusquedaDTO.getNombreDeObjeto(), new ComplejidadExpedienteDTO());	
+				elementoResultadoBusquedaDTO.setComplejidad(complejidad.getComplejidad());
+				elementoResultadoBusquedaDTO.setJustificacionComplejidad(complejidad.getMotivoComplejidad());
+			}// fin complejidad
+
+			
 			if (elementoResultadoBusquedaDTO.getTipoObjeto().equals("Documento")) {				
 				fechaEstadoInstanciaProcesoDTO = instanciaDeProcesoDao.getFechaEstadoInstanciaDeProcesoPorIdExpediente(elementoResultadoBusquedaDTO.getIdExpedienteQueLoContiene());			
 			} else {
@@ -276,6 +300,89 @@ public class InstanciaDeProcesoServiceImpl implements InstanciaDeProcesoService 
 		}			
 		resultadoBusquedaDTO.getElementosResultadoBusquedaDTO().clear();
 		resultadoBusquedaDTO.getElementosResultadoBusquedaDTO().addAll(listaElementoResultadoBusquedaDTO);		
+	}
+	
+	@Override
+	public InstanciaDeProceso getInstanciaDeProcesoPorNombre(String expediente) {
+		return instanciaDeProcesoDao.getInstanciaDeProcesoPorNombreExpediente(expediente);
+	}
+	
+	@Override
+	public InfoProcesoExternoDTO getInstanciaDeProcesoPorNombreAPI(String expediente) {
+		InfoProcesoExternoDTO ipe = new InfoProcesoExternoDTO();
+		Object obj = instanciaDeProcesoDao.getInstanciaDeProcesoPorNombreExpedienteAPI(expediente);
+		if (obj != null ) {
+			Object[] arr = (Object[]) obj;
+			Date fechaInicio = (Date) arr[1];
+			Date fechaPlazo = (Date) arr[2];
+			ipe.setExpediente((String) arr[0]);
+			ipe.setEstadoActual((String) arr[3]); 
+			ipe.setEtapaActual((String) arr[4]);
+			ipe.setNombreProceso((String) arr[5]);
+			Long diasDesdeInicio = 0l;
+			Long diasHastaFin = 0l;
+			try {
+				diasDesdeInicio = FechaUtil.diasEntreFechas(new Date(), fechaInicio);
+				diasHastaFin = FechaUtil.diasEntreFechas(fechaPlazo, new Date());
+				ipe.setDiasDesdeInicio(diasDesdeInicio);
+				ipe.setDiasRestantesDePlazo(diasHastaFin);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		} else {
+			return null;
+		}
+		
+		return ipe;
+	}
+	
+	@Override
+	public InstanciaDeProcesoDTO getInstanciaDeProcesoPorNombreExpediente(String nombreExpediente) {
+		InstanciaDeProceso instanciaDeProceso = instanciaDeProcesoDao.getInstanciaDeProcesoPorNombreExpediente(nombreExpediente);	
+		InstanciaDeProcesoDTO ipDTO = new InstanciaDeProcesoDTO();
+		if (instanciaDeProceso == null ) {
+			return null;
+		}
+		ipDTO.setNombreExpediente(instanciaDeProceso.getNombreExpediente());
+		ipDTO.setIdExpediente(instanciaDeProceso.getIdExpediente());
+		ipDTO.setNombreDeProceso(instanciaDeProceso.getProceso().getNombreProceso());
+		ipDTO.setNombreUnidad(instanciaDeProceso.getUnidad().getNombreCompletoUnidad());
+		ipDTO.setAsunto(instanciaDeProceso.getAsunto());
+		ipDTO.setFechaInicio(instanciaDeProceso.getFechaInicio());
+		ipDTO.setFechaFin(instanciaDeProceso.getFechaFin());
+		return ipDTO;
+	}
+	
+	@Override
+	public boolean actualizaAsunto(InstanciaDeProcesoDTO instanciaDeProcesoDTO, Usuario usuario) {
+		RespuestaActualizaMetaDataExpedienteDTO respuestaActualizaMetaDataExpedienteDTO;
+		InstanciaDeProceso instanciaDeProceso = instanciaDeProcesoDao.getInstanciaDeProcesoPorIdExpediente(instanciaDeProcesoDTO.getIdExpediente());
+		ExpedienteRestActMetaDTO expedienteRestActMetaDTO = new ExpedienteRestActMetaDTO();
+		expedienteRestActMetaDTO.setIdExpediente(instanciaDeProceso.getIdExpediente());
+		expedienteRestActMetaDTO.setMateria(instanciaDeProcesoDTO.getAsunto());
+		try {
+			respuestaActualizaMetaDataExpedienteDTO = gestorMetadataCMSService.actualizaMetaDataExpediente(usuario, expedienteRestActMetaDTO);
+			if (respuestaActualizaMetaDataExpedienteDTO.getRespuesta().equalsIgnoreCase("OK")) {
+				instanciaDeProceso.setAsunto(instanciaDeProcesoDTO.getAsunto());
+				return true;
+			} else {
+				log.info("No se pudo actualizar el asunto del expediente: " + instanciaDeProceso.getNombreExpediente() 
+				+ ". Motivo: " + respuestaActualizaMetaDataExpedienteDTO!=null ? respuestaActualizaMetaDataExpedienteDTO.getRespuesta() : "respuestaActualizaMetaDataExpedienteDTO==null");
+				return false;
+			}
+		} catch (Exception e) {
+			log.error(SGDPUtil.getStackTrace(e));
+			return false;
+		}
+	}
+	
+	@Override
+	public InstanciaDeProcesoDTO getInstanciaDeProcesoDTOPorIdExpediente(String idExpediente) {
+		InstanciaDeProcesoDTO instanciaDeProcesoDTO = new InstanciaDeProcesoDTO();
+		cargaInstanciaDeProcesoDTOPorIdExpediente(idExpediente, instanciaDeProcesoDTO);
+		return instanciaDeProcesoDTO;
 	}
 
 }

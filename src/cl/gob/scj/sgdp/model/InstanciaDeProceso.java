@@ -140,7 +140,16 @@ import cl.gob.scj.sgdp.config.Constantes;
 	
 	@NamedQuery(name="InstanciaDeProceso.getInstanciaDeProcesoPorNombreExpediente", 
 	query="SELECT i FROM InstanciaDeProceso i "
-			+ "WHERE i.nombreExpediente =:nombreExpediente")	 
+			+ "WHERE i.nombreExpediente =:nombreExpediente"),
+	
+	@NamedQuery(name="InstanciaDeProceso.getInstanciaDeProcesoPorNombreExpedienteAPI", 
+	query="SELECT i.nombreExpediente, i.fechaInicio, i.fechaVencimiento, i.estadoDeProceso.nombreEstadoDeProceso, "
+			+ " it.tarea.etapa.nombreEtapa, i.proceso.nombreProceso "
+			+ " FROM InstanciaDeProceso i, InstanciaDeTarea it, HistoricoDeInstDeTarea hit "
+			+ " WHERE i.nombreExpediente =:nombreExpediente"
+			+ " and it.instanciaDeProceso.idInstanciaDeProceso = i.idInstanciaDeProceso "
+			+ " and hit.instanciaDeTareaDeDestino.idInstanciaDeTarea = it.idInstanciaDeTarea"
+			+ " order by hit.fechaMovimiento desc")
 })
 
 public class InstanciaDeProceso implements Serializable {

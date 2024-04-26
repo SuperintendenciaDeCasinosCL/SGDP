@@ -2,6 +2,7 @@ package cl.gob.scj.sgdp.control;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URLDecoder;
 import java.util.Properties;
 
@@ -25,12 +26,16 @@ import cl.gob.scj.sgdp.config.Constantes;
 import cl.gob.scj.sgdp.dto.DetalleDeArchivoDTO;
 import cl.gob.scj.sgdp.dto.FirmaAvanzadaDTO;
 import cl.gob.scj.sgdp.dto.KeyParametroPorContextoDTO;
+import cl.gob.scj.sgdp.dto.LogDocumentoDTO;
 import cl.gob.scj.sgdp.dto.SubirArhivoDTO;
 import cl.gob.scj.sgdp.exception.SgdpException;
+import cl.gob.scj.sgdp.service.ConfidencialidadDocumentoService;
 import cl.gob.scj.sgdp.service.GestorDeDocumentosService;
+import cl.gob.scj.sgdp.service.LogDocumentoService;
 import cl.gob.scj.sgdp.service.ObtenerDetalleDeArchivoService;
 import cl.gob.scj.sgdp.service.SubirArchivoService;
 import cl.gob.scj.sgdp.tipos.PermisoType;
+import cl.gob.scj.sgdp.util.SGDPUtil;
 import cl.gob.scj.sgdp.ws.alfresco.rest.response.FirmaSimpleDocumentoResponse;
 import cl.gob.scj.sgdp.ws.firmaElectronica.rest.request.FirmaAvanzadaArchivoRequest;
 import cl.gob.scj.sgdp.ws.firmaElectronica.rest.request.FirmaAvanzadaRequest;
@@ -51,6 +56,12 @@ public class GestionDocumentosControl {
 	
 	@Autowired
 	private ObtenerDetalleDeArchivoService obtenerDetalleDeArchivoService;
+
+	@Autowired
+	private ConfidencialidadDocumentoService confidencialidadDocumentoService;
+	
+	@Autowired
+	private LogDocumentoService logDocumentoService;
 	
 	@RequestMapping(value="/visarDocumento/{idDocumento}/{idInstanciaDeTarea}/{idTipoDeDocumento}", method=RequestMethod.POST)
 	public @ResponseBody String visarDocumento(@PathVariable("idDocumento") String idDocumento,
@@ -147,7 +158,10 @@ public class GestionDocumentosControl {
 		log.debug("inicio getArchivoPorId");
 		log.debug("idArchivo: " + idArchivo);
 		Usuario usuario = (Usuario)request.getSession().getAttribute("usuario");
-		try {			
+		try {		
+			if (!confidencialidadDocumentoService.puedeVerPorUsuario(idArchivo, usuario) || !confidencialidadDocumentoService.puedeVerPorRol(idArchivo, usuario) ) {
+				throw new SgdpException("No tiene acceso al archivo. idArchivo: " + idArchivo);
+			}	
 			byte[] byteArchivo = gestorDeDocumentosService.getContenidoArchivo(idArchivo, usuario);			
 			DetalleDeArchivoDTO detalleDeArchivoDTO = obtenerDetalleDeArchivoService.obtenerDetalleDeArchivo(usuario, idArchivo);
 			detalleDeArchivoDTO.setIdArchivo(idArchivo);
@@ -158,16 +172,19 @@ public class GestionDocumentosControl {
 		    OutputStream out = response.getOutputStream();
 		    out.write(byteArchivo);		  
 		    out.flush();
-		} catch (Exception e) {
-			log.error("ERROR al obtener archivo por id: ", e);			
+		} catch (SgdpException e) {
+			log.warn(e.getMessage());	
+		} catch (Exception e) {			
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			String exceptionAsString = sw.toString();
+			log.error(exceptionAsString);	
+			log.error("ERROR al obtener archivo por idArchivo: " + idArchivo);			
 		}
 	}
 	
 	@RequestMapping(value = "/getContenidoArchivoPorIdYVersion", method = RequestMethod.GET)
-	public @ResponseBody void getContenidoArchivoPorIdYVersion(/*@PathVariable("idArchivo") String idArchivo, 
-			@PathVariable("versionLabel") String versionLabel,
-			@PathVariable("versionMimeType") String versionMimeType,*/
-			HttpServletRequest request, HttpServletResponse response) {
+	public @ResponseBody void getContenidoArchivoPorIdYVersion(HttpServletRequest request, HttpServletResponse response) {
 		
 		log.debug("inicio getContenidoArchivoPorIdYVersion");
 		
@@ -177,22 +194,121 @@ public class GestionDocumentosControl {
 			String idArchivo = request.getParameter("idArchivo");
 			String versionLabel = request.getParameter("versionLabel");
 			String versionMimeType = request.getParameter("versionMimeType");
+			String tipoOperacion = request.getParameter("tipoOperacion");
+			String modulo = request.getParameter("modulo");
 			versionMimeType = URLDecoder.decode(versionMimeType, "UTF-8");
 			log.debug("idArchivo: " + idArchivo);
 			log.debug("versionLabel: " + versionLabel);
 			log.debug("versionMimeType: " + versionMimeType);
+			if (!confidencialidadDocumentoService.puedeVerPorUsuario(idArchivo, usuario) || !confidencialidadDocumentoService.puedeVerPorRol(idArchivo, usuario) ) {
+				throw new SgdpException("No tiene acceso al archivo. idArchivo: " + idArchivo);
+			}
 			DetalleDeArchivoDTO detalleDeArchivoDTO = obtenerDetalleDeArchivoService.obtenerDetalleDeArchivo(usuario, idArchivo);
 			detalleDeArchivoDTO.setIdArchivo(idArchivo);
 			log.debug(detalleDeArchivoDTO.toString());
-			byte[] byteArchivo = gestorDeDocumentosService.getContenidoArchivoDesdeUrlYVersion(detalleDeArchivoDTO, versionLabel, usuario)	;
+			byte[] byteArchivo = gestorDeDocumentosService.getContenidoArchivoDesdeUrlYVersion(detalleDeArchivoDTO, versionLabel, usuario);
+			LogDocumentoDTO logDocumentoDTO = new LogDocumentoDTO();
+			logDocumentoDTO.setIpLogDocumento(SGDPUtil.getClientIpAddress(request));
+			logDocumentoDTO.setIdDocumentoLogDocumento(idArchivo);
+			logDocumentoDTO.setTipoOperacionLogDocumento(tipoOperacion);
+			logDocumentoDTO.setModuloLogDocumento(modulo);
+			logDocumentoService.insertLogDocumento(usuario, logDocumentoDTO);
 			response.setContentType(versionMimeType);
 		    response.setHeader("Content-Disposition", "attachment; filename=\"" + detalleDeArchivoDTO.getNombre() + "\"");
 		    response.setHeader("Content-Length", String.valueOf(byteArchivo.length));
 		    OutputStream out = response.getOutputStream();
 		    out.write(byteArchivo);		  
 		    out.flush();
+		} catch (SgdpException e) {
+			log.warn(e.getMessage());	
 		} catch (Exception e) {
-			log.error("ERROR al obtener archivo por id y version: ", e);			
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			String exceptionAsString = sw.toString();
+			log.error(exceptionAsString);	
+			log.error("ERROR al obtener archivo");			
+		}
+	}
+	
+	@RequestMapping(value = "/getArchivoPorId/{idArchivo}/{tipoOperacion}/{modulo}", method = RequestMethod.GET)
+	public @ResponseBody void getArchivoPorIdRegistraLog(
+			@PathVariable("idArchivo") String idArchivo,
+			@PathVariable("tipoOperacion") String tipoOperacion, 
+			@PathVariable("modulo") String modulo, 
+			HttpServletRequest request, HttpServletResponse response) {
+		log.debug("inicio getArchivoPorId");
+		log.debug("idArchivo: " + idArchivo);
+		Usuario usuario = (Usuario)request.getSession().getAttribute("usuario");
+		try {			
+			if (!confidencialidadDocumentoService.puedeVerPorUsuario(idArchivo, usuario) || !confidencialidadDocumentoService.puedeVerPorRol(idArchivo, usuario) ) {
+				throw new SgdpException("No tiene acceso al archivo. idArchivo: " + idArchivo);
+			}
+			byte[] byteArchivo = gestorDeDocumentosService.getContenidoArchivo(idArchivo, usuario);			
+			DetalleDeArchivoDTO detalleDeArchivoDTO = obtenerDetalleDeArchivoService.obtenerDetalleDeArchivo(usuario, idArchivo);
+			detalleDeArchivoDTO.setIdArchivo(idArchivo);
+			log.debug(detalleDeArchivoDTO.toString());
+			LogDocumentoDTO logDocumentoDTO = new LogDocumentoDTO();
+			logDocumentoDTO.setIpLogDocumento(SGDPUtil.getClientIpAddress(request));
+			logDocumentoDTO.setIdDocumentoLogDocumento(idArchivo);
+			logDocumentoDTO.setTipoOperacionLogDocumento(tipoOperacion);
+			logDocumentoDTO.setModuloLogDocumento(modulo);
+			logDocumentoService.insertLogDocumento(usuario, logDocumentoDTO);
+			response.setContentType(detalleDeArchivoDTO.getMimeType());
+			response.setHeader("Content-Disposition", "attachment; filename=\"" + detalleDeArchivoDTO.getNombre() + "\"");
+		    response.setHeader("Content-Length", String.valueOf(byteArchivo.length));
+		    OutputStream out = response.getOutputStream();
+		    out.write(byteArchivo);		  
+		    out.flush();
+		} catch (SgdpException e) {
+			log.warn(e.getMessage());	
+		} catch (Exception e) {
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			String exceptionAsString = sw.toString();
+			log.error(exceptionAsString);	
+			log.error("ERROR al obtener archivo por idArchivo: " + idArchivo);			
+		}
+	}
+	
+	@RequestMapping(value = "/getArchivoPorId/{idArchivo}/{tipoOperacion}/{modulo}/{idSolicitudCreacionExp}", method = RequestMethod.GET)
+	public @ResponseBody void getArchivoPorIdRegistraLogSolicitudExp(
+			@PathVariable("idArchivo") String idArchivo,
+			@PathVariable("tipoOperacion") String tipoOperacion, 
+			@PathVariable("modulo") String modulo, 
+			@PathVariable("idSolicitudCreacionExp") long idSolicitudCreacionExp,
+			HttpServletRequest request, HttpServletResponse response) {
+		log.debug("inicio getArchivoPorId");
+		log.debug("idArchivo: " + idArchivo);
+		Usuario usuario = (Usuario)request.getSession().getAttribute("usuario");
+		try {			
+			if (!confidencialidadDocumentoService.puedeVerPorUsuario(idArchivo, usuario) || !confidencialidadDocumentoService.puedeVerPorRol(idArchivo, usuario) ) {
+				throw new SgdpException("No tiene acceso al archivo. idArchivo: " + idArchivo);
+			}
+			byte[] byteArchivo = gestorDeDocumentosService.getContenidoArchivo(idArchivo, usuario);			
+			DetalleDeArchivoDTO detalleDeArchivoDTO = obtenerDetalleDeArchivoService.obtenerDetalleDeArchivo(usuario, idArchivo);
+			detalleDeArchivoDTO.setIdArchivo(idArchivo);
+			log.debug(detalleDeArchivoDTO.toString());
+			LogDocumentoDTO logDocumentoDTO = new LogDocumentoDTO();
+			logDocumentoDTO.setIpLogDocumento(SGDPUtil.getClientIpAddress(request));
+			logDocumentoDTO.setIdDocumentoLogDocumento(idArchivo);
+			logDocumentoDTO.setTipoOperacionLogDocumento(tipoOperacion);
+			logDocumentoDTO.setModuloLogDocumento(modulo);
+			logDocumentoDTO.setIdSolicitudCreacionExp(idSolicitudCreacionExp);
+			logDocumentoService.insertLogDocumentoSolicitudCreacionExpediente(usuario, logDocumentoDTO);
+			response.setContentType(detalleDeArchivoDTO.getMimeType());
+			response.setHeader("Content-Disposition", "attachment; filename=\"" + detalleDeArchivoDTO.getNombre() + "\"");
+		    response.setHeader("Content-Length", String.valueOf(byteArchivo.length));
+		    OutputStream out = response.getOutputStream();
+		    out.write(byteArchivo);		  
+		    out.flush();
+		} catch (SgdpException e) {
+			log.warn(e.getMessage());	
+		} catch (Exception e) {
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			String exceptionAsString = sw.toString();
+			log.error(exceptionAsString);	
+			log.error("ERROR al obtener archivo por idArchivo: " + idArchivo);			
 		}
 	}
 	

@@ -12,8 +12,12 @@ import javax.persistence.Table;
 @Table(name="\"SGDP_RESPONSABILIDAD_TAREA\"")
 @NamedQueries({
 	@NamedQuery(name="ResponsabilidadTarea.findAll", query="SELECT t FROM ResponsabilidadTarea t"),
+	
 	@NamedQuery(name="ResponsabilidadTarea.getResponsabilidadesTareasPorIdTarea", 
-	query="SELECT t FROM ResponsabilidadTarea t where t.id.tarea.idTarea = :idTarea")
+	query="SELECT t FROM ResponsabilidadTarea t where t.id.tarea.idTarea = :idTarea"),
+	
+	@NamedQuery(name="ResponsabilidadTarea.findAllByProcessID", 
+	query="SELECT distinct r FROM ResponsabilidadTarea r where r.id.tarea.proceso.idProceso = :processid")
 })
 public class ResponsabilidadTarea implements Serializable  {
 

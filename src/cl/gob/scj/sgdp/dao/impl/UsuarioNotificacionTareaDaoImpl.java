@@ -23,7 +23,7 @@ public class UsuarioNotificacionTareaDaoImpl implements UsuarioNotificacionTarea
 	
 	@Override
 	public void insertUsuarioNotificacionTarea(UsuarioNotificacionTarea usuarioNotificacionTarea) {
-		getSession().save(usuarioNotificacionTarea);	
+		getSession().save(usuarioNotificacionTarea);
 	}
 	
 	
@@ -48,19 +48,4 @@ public class UsuarioNotificacionTareaDaoImpl implements UsuarioNotificacionTarea
 		return (UsuarioNotificacionTarea) query.uniqueResult();
 	}
 	
-	/*
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<UsuarioNotificacionTareaDTO> getUsuariosNotificacionTareaPorIdTareaSQL(long idTarea) {
-		SQLQuery query = getSession().createSQLQuery("SELECT DISTINCT l.\"D_FECHA_CREACION\" as dFechaCreacion, n.\"ID_USUARIO\" as idUsuario , l.\"ID_TAREA\" as idTarea "
-				+ " FROM \"SGDP_USUARIO_NOTIFICACION_TAREA\" l RIGHT join \"SGDP_USUARIOS_ROLES\" n on l.\"ID_USUARIO\" = n.\"ID_USUARIO\" " 
-				+ " WHERE (l.\"ID_TAREA\" = :idTarea or l.\"ID_TAREA\" is null) AND n.\"B_ACTIVO\" = true ");				
-		query.addScalar("dFechaCreacion", StandardBasicTypes.DATE);
-		query.addScalar("idUsuario", StandardBasicTypes.STRING);
-		query.addScalar("idTarea", StandardBasicTypes.LONG);
-		query.setResultTransformer(Transformers.aliasToBean(UsuarioNotificacionTareaDTO.class));
-		query.setLong("idTarea", idTarea);
-		return query.list();
-	}*/
-
 }

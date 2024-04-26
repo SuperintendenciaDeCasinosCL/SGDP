@@ -12,9 +12,12 @@ public interface ProcesoService {
 
 	List<ProcesoDTO> buscarTodosProcesoVigenteOrderPorCod(boolean vigente);
 	
+	List<ProcesoDTO> buscarTodosProcesoVigente(boolean vigente);
+	
 	List<ProcesoDTO> getTodosProcesos();
 	
 	List<ProcesoDTO> getBuscarTodosProcesosPorVigencia(boolean vigente);
 	
 	List<ProcesoDTO> getProcesosPorVigencia(Usuario usuario, boolean vigente);
+	
 }

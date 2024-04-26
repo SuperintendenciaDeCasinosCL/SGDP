@@ -5,8 +5,9 @@ import java.util.List;
 import cl.gob.scj.sgdp.model.LogFueraDeOficina;
 import cl.gob.scj.sgdp.model.Tarea;
 import cl.gob.scj.sgdp.model.UsuarioRol;
+import cl.gob.scj.sgdp.model.VinculacionExp;
 
-public interface UsuarioRolDao {
+public interface UsuarioRolDao extends GenericDao<UsuarioRol> {
 
 	List<UsuarioRol> getUsuarioRolesPorIdUsuario(String idUsuario, boolean activo);
 	
@@ -22,6 +23,10 @@ public interface UsuarioRolDao {
 	
 	List<UsuarioRol> getUsuariosRolesPosiblesPorIdInstanciaDeTarea(long idInstanciaDeTarea);
 	
+	List<UsuarioRol> getTodosLosUsuariosAsignadosPorIdRol(Long rolId);
+	
+	List<UsuarioRol> getTodosLosUsuariosActivos();
+	
 	UsuarioRol getUsuarioRolPorIdUsuarioIdRol(String idUsuario, long idRol);
 	
 	void insertLogFueraDeOficina(LogFueraDeOficina logFueraDeOficina);
@@ -31,5 +36,9 @@ public interface UsuarioRolDao {
 	List<String> getTodosLosIdUsuariosPorVigenciaOrdenadoPorUnidadYNombre(boolean vigente);
 	
 	List<String> getTodosLosIdUsuariosPorNombreRol(String nombreRol);
+	
+	List<UsuarioRol> getTodosLosUsuarios();
+	
+	UsuarioRol getUsuarioRolPorIdUsuarioRol(long idUsuarioRol);
 	
 }

@@ -66,6 +66,14 @@ public class InstanciaDeTareaDaoImpl implements InstanciaDeTareaDao {
 		query.setString("idUsuario", idUsuario);
 		return query.list();
 	}
+			
+	@Override
+	public long getTotalInstanciasDeTareasEnEjecucion(String idUsuario, long idEstadoFinalizada) {
+		Query query = getSession().getNamedQuery("InstanciaDeTarea.getTotalInstanciasDeTareasEnEjecucion");
+		query.setLong("idEstadoFinalizada", idEstadoFinalizada);
+		query.setString("idUsuario", idUsuario);		
+		return (long) query.uniqueResult();		
+	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -263,6 +271,7 @@ public class InstanciaDeTareaDaoImpl implements InstanciaDeTareaDao {
 		return query.list();
 	}
 	
+	@Override
 	public InstanciaDeTarea getInstanciaDeTareaPorIdDiagramaTareaNombreExpediente(String idDiagramaTarea, String nombreExpediente) {
 		Query query = getSession().getNamedQuery("InstanciaDeTarea.getInstanciaDeTareaPorIdDiagramaTareaNombreExpediente");
 		query.setString("idDiagramaTarea", idDiagramaTarea);
@@ -270,5 +279,25 @@ public class InstanciaDeTareaDaoImpl implements InstanciaDeTareaDao {
 		return (InstanciaDeTarea) query.uniqueResult();
 	}
 	
+	/**
+	 * Obtiene la primera ejecucion instancia de tarea por idInstanciaProceso y nombre de tarea
+	 */
+	@Override
+	public InstanciaDeTarea getInstanciaDeTareaPorIdInstanciaDeProcesoNombreTarea(long idInstanciaDeProceso, String nombreTarea) {
+		Query query = getSession().getNamedQuery("InstanciaDeTarea.getInstanciaDeTareaPorIdInstanciaDeProcesoNombreTarea");
+		query.setLong("idInstanciaDeProceso", idInstanciaDeProceso);
+		query.setString("nombreTarea", nombreTarea);
+		return (InstanciaDeTarea) query.uniqueResult();
+	}
+	
+	/**
+	 * Obtiene la primera ejecucion instancia de tarea distribuye por idInstanciaProceso
+	 */
+	//@Override
+	public InstanciaDeTarea getInstanciaDeTareaDistribuyePorIdInstanciaDeProceso(long idInstanciaDeProceso) {
+		Query query = getSession().getNamedQuery("InstanciaDeTarea.getInstanciaDeTareaDistribuyePorIdInstanciaDeProceso");
+		query.setLong("idInstanciaDeProceso", idInstanciaDeProceso);
+		return (InstanciaDeTarea) query.uniqueResult();
+	}
 
 }

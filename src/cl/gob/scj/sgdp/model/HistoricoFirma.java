@@ -80,7 +80,27 @@ import cl.gob.scj.sgdp.config.Constantes;
 			+ "WHERE hf.tipoFirma IN ('WEB_START', 'CENTRALIZADO') "
 			+ "AND hf.tipoDeDocumento.idTipoDeDocumento = :idTipoDeDocumento "
 			+ "AND hf.instanciaDeTarea.idInstanciaDeTarea = :idInstanciaDeTarea "
-			+ "AND hf.idUsuario = :idUsuario")
+			+ "AND hf.idUsuario = :idUsuario"),
+	
+	@NamedQuery(name="HistoricoFirma.getListArchivoByCodeExpedienteWithLimit", 
+	query="SELECT a "
+			+ " FROM HistoricoFirma a "
+			+ " INNER JOIN a.instanciaDeTarea i "
+			+ " INNER JOIN i.instanciaDeProceso p "
+			+ " INNER JOIN a.tipoDeDocumento t "
+			+ " WHERE (a.anulado != true or a.anulado is null) "
+			+ " AND a.tipoFirma in ('WEB_START', 'CENTRALIZADO') "
+			+ " and p.nombreExpediente LIKE :codeExpediente "),
+	
+	@NamedQuery(name="HistoricoFirma.getCountListArchivoByCodeExpedienteWithLimit", 
+	query="SELECT count(*) "
+			+ " FROM HistoricoFirma a "
+			+ " INNER JOIN a.instanciaDeTarea i "
+			+ " INNER JOIN i.instanciaDeProceso p "
+			+ " INNER JOIN a.tipoDeDocumento t "
+			+ " WHERE (a.anulado != true or a.anulado is null) "
+			+ " AND a.tipoFirma in ('WEB_START' ,'CENTRALIZADO') "
+			+ " AND p.nombreExpediente LIKE :codeExpediente ")
 	
 	})
 
@@ -115,6 +135,12 @@ public class HistoricoFirma {
 	
 	@Column(name="\"ID_DOCUMENTO_FIRMADO\"")
 	private Long idDocumentoFirmado;
+	
+	@Column(name="\"UUID\"")
+	private String  uuid;
+	
+	@Column(name="\"B_ANULADO\"")
+	private Boolean anulado;
 	
 	public long getIdHistoricoFirma() {
 		return idHistoricoFirma;
@@ -180,6 +206,22 @@ public class HistoricoFirma {
 		this.idDocumentoFirmado = idDocumentoFirmado;
 	}
 
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
+	public Boolean getAnulado() {
+		return anulado;
+	}
+
+	public void setAnulado(Boolean anulado) {
+		this.anulado = anulado;
+	}
+
 	@Override
 	public String toString() {
 		return "HistoricoFirma [idHistoricoFirma=" + idHistoricoFirma + ", instanciaDeTarea=" + instanciaDeTarea
@@ -187,6 +229,8 @@ public class HistoricoFirma {
 				+ ", tipoFirma=" + tipoFirma 
 				+ ", tipoDeDocumento=" + tipoDeDocumento
 				+ ", idDocumentoFirmado=" + idDocumentoFirmado 
+				+ ", uuid=" + uuid
+				+ ", anulado=" + anulado 
 				+ "]";
 	}	
 		

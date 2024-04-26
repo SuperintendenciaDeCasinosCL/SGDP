@@ -2,7 +2,7 @@ package cl.gob.scj.sgdp.dto;
 
 import java.io.Serializable;
 
-public class UsuarioRolDTO implements Serializable {
+public class UsuarioRolDTO extends RespuestaDTO implements Serializable {
 	
 	private long idUsuarioRol;
 	private String idUsuario;
@@ -12,7 +12,27 @@ public class UsuarioRolDTO implements Serializable {
 	private String nombreRol;
 	private long idUnidad;
 	private String nombreUnidad;
+	private String nombreCompleto;
+	private String rut;
+	private String dv;
 	
+	
+	
+	public UsuarioRolDTO() {
+		super();
+	}
+	public UsuarioRolDTO(long idUsuarioRol, String idUsuario, boolean activo, boolean fueraDeOficina, long idRol,
+			String nombreRol, long idUnidad, String nombreUnidad) {
+		super();
+		this.idUsuarioRol = idUsuarioRol;
+		this.idUsuario = idUsuario;
+		this.activo = activo;
+		this.fueraDeOficina = fueraDeOficina;
+		this.idRol = idRol;
+		this.nombreRol = nombreRol;
+		this.idUnidad = idUnidad;
+		this.nombreUnidad = nombreUnidad;
+	}
 	public long getIdUsuarioRol() {
 		return idUsuarioRol;
 	}
@@ -60,11 +80,34 @@ public class UsuarioRolDTO implements Serializable {
 	}
 	public void setNombreUnidad(String nombreUnidad) {
 		this.nombreUnidad = nombreUnidad;
+	}	
+	public String getNombreCompleto() {
+		return nombreCompleto;
+	}
+	public void setNombreCompleto(String nombreCompleto) {
+		this.nombreCompleto = nombreCompleto;
+	}
+	public String getRut() {
+		return rut;
+	}
+	public void setRut(String rut) {
+		this.rut = rut;
+	}	
+	public String getDv() {
+		return dv;
+	}
+	public void setDv(String dv) {
+		this.dv = dv;
 	}
 	@Override
 	public String toString() {
 		return "UsuarioRolDTO [idUsuarioRol=" + idUsuarioRol + ", idUsuario=" + idUsuario + ", activo=" + activo
-				+ ", fueraDeOficina=" + fueraDeOficina + ", idRol=" + idRol + ", nombreRol=" + nombreRol + ", idUnidad="
-				+ idUnidad + ", nombreUnidad=" + nombreUnidad + "]";
+				+ ", fueraDeOficina=" + fueraDeOficina + ", idRol=" + idRol + ", nombreRol=" + nombreRol 
+				+ ", idUnidad="	+ idUnidad 				
+				+ ", nombreUnidad=" + nombreUnidad
+				+ ", nombreCompleto=" + nombreCompleto 
+				+ ", rut=" + rut 
+				+ ", dv=" + dv 
+				+ "]";
 	}
 }

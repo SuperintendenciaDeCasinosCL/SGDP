@@ -21,4 +21,10 @@ public interface HistoricoArchivosInstDeTareaDao {
 	
 	//List<ArchivosInstDeTareaDTO> getTodosLosDocSubidosPorIdExpedienteHistoricoDestino(String idExpediente);
 	
+
+	HistoricoArchivosInstDeTarea getPorIdArchivoCMS(String idCMS);
+
+	public List<HistoricoArchivosInstDeTarea> getHistoricoDeArchivosPorIdArchivoCMS(String idArchivoCms);
+	
+
 }

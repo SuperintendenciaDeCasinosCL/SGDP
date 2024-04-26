@@ -2,10 +2,14 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="sf" uri="http://www.springframework.org/tags/form"%>
 
+<%@ page import= "cl.gob.scj.sgdp.control.AppContextControl" %>
+
+<c:set var="urlFuncPhp" value="<%=AppContextControl.getUrlFuncPhp()%>"/>
+
 <c:url value="/verificarSession" var="sessionURL" />
 <c:url value="/" var="raizURL" />
-<c:url value="http://sgdocb/proceso/bpm/this_task.php?idTask=${instanciaDeTareaDTO.idDiagrama}&idProc=${instanciaDeTareaDTO.idProceso}&idInsProc=${instanciaDeTareaDTO.idInstanciaDeProceso}&t=s" var="urlDiagramaSubProceso" />
-<c:url value="http://sgdocb/proceso/bpm/this_task.php?idTask=${instanciaDeTareaDTO.idDiagrama}&idProc=${instanciaDeTareaDTO.idProceso}&idInsProc=${instanciaDeTareaDTO.idInstanciaDeProceso}" var="urlDiagramaSubProcesoBoton" />
+<c:url value="http://${urlFuncPhp}/proceso/bpm/this_task.php?idTask=${instanciaDeTareaDTO.idDiagrama}&idProc=${instanciaDeTareaDTO.idProceso}&idInsProc=${instanciaDeTareaDTO.idInstanciaDeProceso}&t=s" var="urlDiagramaSubProceso" />
+<c:url value="http://${urlFuncPhp}/proceso/bpm/this_task.php?idTask=${instanciaDeTareaDTO.idDiagrama}&idProc=${instanciaDeTareaDTO.idProceso}&idInsProc=${instanciaDeTareaDTO.idInstanciaDeProceso}" var="urlDiagramaSubProcesoBoton" />
 
 <div class="modal fade" id="infoDeProcesoModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
 
@@ -32,7 +36,7 @@
 					<br>
 					<br>
 					<div class="col-sm-12">
-						<%-- <c:import url="http://sgdocb/proceso/bpm/this_task.php?idTask=${instanciaDeTareaDTO.idDiagrama}&idProc=${instanciaDeTareaDTO.idProceso}"></c:import>--%>
+						<%-- <c:import url="http://${urlFuncPhp}/proceso/bpm/this_task.php?idTask=${instanciaDeTareaDTO.idDiagrama}&idProc=${instanciaDeTareaDTO.idProceso}"></c:import>--%>
 						<c:import url="${urlDiagramaSubProceso}"></c:import>
 					</div>
 				</div>

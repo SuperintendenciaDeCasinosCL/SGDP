@@ -37,7 +37,7 @@
 			        	<th>Plazo Total</th>
 			        	<th>Fecha Creaci&oacute;n Expediente</th>
 			        	<th>Materia</th>
-			        	<th>Acciones</th>
+			        	<th></th>
 			        	<%-- 
 				        	<c:if test = "${permisos[permisoReasignaTarea] eq permisoReasignaTarea}">
 				        		<th>Reasignar</th>

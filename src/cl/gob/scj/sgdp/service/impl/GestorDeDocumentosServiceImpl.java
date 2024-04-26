@@ -6,11 +6,14 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Properties;
+import java.util.UUID;
 
 import javax.annotation.Resource;
-
+import javax.imageio.ImageIO;
+	
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.Writer;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.FontFactory;
@@ -78,9 +85,10 @@ import cl.gob.scj.sgdp.ws.alfresco.rest.response.SubirArchivoResponse;
 import cl.gob.scj.sgdp.ws.firmaElectronica.rest.client.FirmaAvanzadaInterService;
 import cl.gob.scj.sgdp.ws.firmaElectronica.rest.request.FirmaAvanzadaArchivoRequest;
 import cl.gob.scj.sgdp.ws.firmaElectronica.rest.request.FirmaAvanzadaRequest;
-import cl.gob.scj.sgdp.ws.firmaElectronica.rest.response.File;
-import cl.gob.scj.sgdp.ws.firmaElectronica.rest.response.FirmaAvanzadaMinSegPresResponse;
-import cl.gob.scj.sgdp.ws.firmaElectronica.rest.response.TokenResponse;
+import cl.gob.scj.sgdp.ws.firmaElectronica.rest.response.FileV3;
+import cl.gob.scj.sgdp.ws.firmaElectronica.rest.response.FirmaAvanzadaMinSegPresResponseV3;
+import java.awt.image.BufferedImage;
+
 
 @Service
 @Transactional(rollbackFor = Throwable.class)
@@ -228,8 +236,10 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 			PdfStamper stamper = new PdfStamper(reader, ba);	
 			PdfContentByte over = stamper.getOverContent(reader.getNumberOfPages());
 			
+
 			String colocaImagenFea = parametroService.getParametroPorID(Constantes.ID_PARAM_COLOCA_IMAGEN_DE_FIRMA).getValorParametroChar();
-			String textoVerificaValidezFea = parametroService.getParametroPorID(Constantes.ID_PARAM_URL_VERIFICACION_DOC_FEA).getValorParametroChar();
+
+			//String textoVerificaValidezFea = parametroService.getParametroPorID(Constantes.ID_PARAM_URL_VERIFICACION_DOC_FEA).getValorParametroChar();
 			
 			Font font = FontFactory.getFont(FontFactory.HELVETICA, 9); 
 		
@@ -250,10 +260,35 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 				PdfImage stream = new PdfImage(img, "", null);            
 	            PdfIndirectObject ref = stamper.getWriter().addToBody(stream);
 	            img.setDirectReference(ref.getIndirectReference());
-	            img.setAbsolutePosition(130, 175);            
-	            img.scalePercent(50);
+	            img.setAbsolutePosition(215, 55);            
+	            img.scalePercent(30);     	            
 	            over.addImage(img); 
 			}			   
+	            
+            //QR	           
+            String uuid = UUID.randomUUID().toString();	            
+            ParametroDTO parametroDTODescargaDocumento = parametroService.getParametroPorID(Constantes.ID_PARAM_URL_DESCARGA_DOCUMENTO);	            
+            String urlDescarga = parametroDTODescargaDocumento.getValorParametroChar() + uuid;	           
+            
+            BitMatrix matrix;
+            Writer writer = new QRCodeWriter();
+            matrix = writer.encode(urlDescarga, BarcodeFormat.QR_CODE, 145, 145);	            
+            BufferedImage imagen = new BufferedImage(145, 145, BufferedImage.TYPE_INT_RGB);
+            
+            for(int y = 0; y < 145; y++) {
+                for(int x = 0; x < 145; x++) {
+                    int grayValue = (matrix.get(x, y) ? 0 : 1) & 0xff;
+                    imagen.setRGB(x, y, (grayValue == 0 ? 0 : 0xFFFFFF));
+                }
+            }
+            
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(imagen, "png", baos);
+            Image imagenQR = Image.getInstance(baos.toByteArray());	            
+            imagenQR.setAbsolutePosition(215, 4);            
+            imagenQR.scalePercent(35);
+            over.addImage(imagenQR); 	            	            
+            //QR
             
             if (numeraAutoTipoDoc == true && numeraAutoTarea == true) {  
             	
@@ -306,15 +341,18 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
                     ColumnText.showTextAligned(overLogoSCJ, Element.ALIGN_LEFT, new Phrase("P\u00E1gina " + i + " de " + reader.getNumberOfPages() , fontCabeceraNumPag), posXNumPag , Math.abs(posYNombreExpediente), 0);
                     ColumnText.showTextAligned(overLogoSCJ, Element.ALIGN_LEFT, new Phrase("SANTIAGO, " + FechaUtil.simpleDateFormatForm.format(new Date()) + " " + instanciaDeProceso.getNombreExpediente() , fontCabeceraNumDoc), posXFecha , Math.abs(posYFecha), 0);                
                 }  
-                
-                ColumnText.showTextAligned(over, Element.ALIGN_LEFT, new Phrase(textoVerificaValidezFea, font), 60 , 20, 0);            	
+                               	
+              //MIG
+               // ColumnText.showTextAligned(over, Element.ALIGN_LEFT, new Phrase(textoVerificaValidezFea, font), 60 , 20, 0);            	
             
-            } 
-                  
-            //ColumnText.showTextAligned(over, Element.ALIGN_LEFT, new Phrase(firmaAvanzadaDTO.getIdDocumento(), font), 60 , 30, 0);
+            }                   
             
-            long idDocumentoFirmado = historicoFirmaService.getIdDocumentoFirmado();
-            ColumnText.showTextAligned(over, Element.ALIGN_LEFT, new Phrase("ID: " + Long.toString(idDocumentoFirmado), font), 60 , 30, 0);
+
+            //MIG
+           // long idDocumentoFirmado = historicoFirmaService.getIdDocumentoFirmado();
+       
+            //MIG
+           // ColumnText.showTextAligned(over, Element.ALIGN_LEFT, new Phrase("ID: " + Long.toString(idDocumentoFirmado), font), 60 , 30, 0);
             
             Date fechaPieFea = new Date();
             
@@ -327,12 +365,19 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
             log.info("Reason: " + reason);
             log.info("Location: " + location);
           
-            Font font2 = FontFactory.getFont(FontFactory.HELVETICA, 8);       
-            ColumnText.showTextAligned(over, Element.ALIGN_LEFT, new Phrase("Digitally signed by " + usuario.getNombreCompleto(), font2), 300 , 41, 0);
-            ColumnText.showTextAligned(over, Element.ALIGN_LEFT, new Phrase("Date: " + fechaPieFeaS, font2), 300 , 32, 0);
-            ColumnText.showTextAligned(over, Element.ALIGN_LEFT, new Phrase("Reason: " + reason, font2), 300 , 23, 0);
-            ColumnText.showTextAligned(over, Element.ALIGN_LEFT, new Phrase("Location: " + location, font2), 300 , 14, 0);
+            Font font2 = FontFactory.getFont(FontFactory.HELVETICA, 7);       
+            ColumnText.showTextAligned(over, Element.ALIGN_LEFT, new Phrase("Digitally signed by " + usuario.getNombreCompleto(), font2), 265 , 40, 0);
+            ColumnText.showTextAligned(over, Element.ALIGN_LEFT, new Phrase("Date: " + fechaPieFeaS, font2), 265 , 30, 0);
+            ColumnText.showTextAligned(over, Element.ALIGN_LEFT, new Phrase("Reason: " + reason, font2), 265 , 20, 0);
+            ColumnText.showTextAligned(over, Element.ALIGN_LEFT, new Phrase("Location: " + location, font2), 265 , 10, 0);
             
+            Font font3 = FontFactory.getFont(FontFactory.HELVETICA, 6);
+            ColumnText.showTextAligned(over, Element.ALIGN_JUSTIFIED_ALL, new Phrase("Este documento est\u00E1 firmado con  una firma electr\u00f3nica ", font3), 46 , 34, 0);
+            ColumnText.showTextAligned(over, Element.ALIGN_JUSTIFIED_ALL, new Phrase("avanzada, seg\u00FAn lo indica la ley N\u00B0 19.799. Su validez ", font3), 46 , 28, 0);
+            ColumnText.showTextAligned(over, Element.ALIGN_JUSTIFIED_ALL, new Phrase("puede ser consultada a trav\u00E9s del c\u00f3digo QR, con el que ", font3), 46 , 22, 0);
+            ColumnText.showTextAligned(over, Element.ALIGN_JUSTIFIED_ALL, new Phrase("puede obtener una copia del documento original desde el ", font3), 46 , 16, 0);
+            ColumnText.showTextAligned(over, Element.ALIGN_JUSTIFIED_ALL, new Phrase("sitio Web de la Corporaci\u00f3n Nacional de Desarrollo Ind\u00edgena.", font3), 46 , 10, 0);
+           
             stamper.close();
             reader.close();
             
@@ -352,11 +397,18 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 			
 			firmaAvanzadaRequest.setApi_token_key(parametroService.getParametroPorID(Constantes.ID_PARAM_API_TOKEN_KEY_FEA).getValorParametroChar());	
 			
-			String expiracion = FechaUtil.toFormat(new Date(), FechaUtil.simpleDateFormatUTCISOFEA);
+			//String expiracion = FechaUtil.toFormat(new Date(), FechaUtil.simpleDateFormatUTCISOFEA);
 			
+			//log.debug("expiracion: " + expiracion);
+			
+			Calendar date = Calendar.getInstance();
+			long timeInSecs = date.getTimeInMillis();
+			Date expiracionD = new Date(timeInSecs + (2 * 60 * 1000));
+			String expiracion = FechaUtil.toFormat(expiracionD, FechaUtil.simpleDateFormatUTCISOFEA);
 			log.debug("expiracion: " + expiracion);
 			
 			firmaAvanzadaDTO.setExpiracion(expiracion);
+			
 			firmaAvanzadaDTO.setEntidad(parametroService.getParametroPorID(Constantes.ID_PARAM_ENTIDAD_TOKEN_FEA).getValorParametroChar());	
 			
 			log.debug(firmaAvanzadaDTO.toString());
@@ -372,13 +424,16 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 			
 			log.info("firmaAvanzadaRequest.getToken(): " + firmaAvanzadaRequest.getToken());
 			
-			TokenResponse tokenResponse = firmaAvanzadaInterService.firmarDocumentoConFEA(firmaAvanzadaRequest);
+			//TokenResponse tokenResponse = firmaAvanzadaInterService.firmarDocumentoConFEA(firmaAvanzadaRequest);
 			
-			log.info("tokenResponse.getSession_token(): " + tokenResponse.getSession_token());
+			//log.info("tokenResponse.getSession_token(): " + tokenResponse.getSession_token());
 			
-			FirmaAvanzadaMinSegPresResponse firmaAvanzadaMinSegPresResponse = firmaAvanzadaInterService.getDocumentosFEA(tokenResponse, firmaAvanzadaDTO.getOtp());
+			//FirmaAvanzadaMinSegPresResponse firmaAvanzadaMinSegPresResponse = firmaAvanzadaInterService.getDocumentosFEA(tokenResponse, firmaAvanzadaDTO.getOtp());
 			
-			for (File fileMinSegPres : firmaAvanzadaMinSegPresResponse.getFiles()) {
+			FirmaAvanzadaMinSegPresResponseV3 firmaAvanzadaMinSegPresResponse = firmaAvanzadaInterService.firmarDocumentoConFEAV3(firmaAvanzadaRequest, firmaAvanzadaDTO.getOtp());
+			
+			//for (File fileMinSegPres : FirmaAvanzadaMinSegPresResponse.getFiles()) {
+			for (FileV3 fileMinSegPres : firmaAvanzadaMinSegPresResponse.getFiles()) {
 				
 				log.info("Leyendo archivos");
 				
@@ -387,16 +442,18 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 					
 					log.info("Checksum original");
 					log.info("firmaAvanzadaArchivoRequest.getChecksum(): "+ firmaAvanzadaArchivoRequest.getChecksum());
-					log.info("fileMinSegPres.getChecksumOriginal(): "+ fileMinSegPres.getChecksumOriginal());
+					//log.info("fileMinSegPres.getChecksumOriginal(): "+ fileMinSegPres.getChecksumOriginal());
+					log.info("fileMinSegPres.getChecksumOriginal(): "+ fileMinSegPres.getChecksum_original());
 					
 					byte[] archivoFirmadoByteArray = FileUtil.decodeBase64ToByteArray(fileMinSegPres.getContent(), parametroService.getParametroPorID(Constantes.ID_PARAM_ENCODE_CHARACTER_TRANSFORMATION_FEA).getValorParametroChar());
 														
 					String checkSumGet = FileUtil.checkSum(archivoFirmadoByteArray);
 					
-					log.info("fileMinSegPres.getChecksum(): " + fileMinSegPres.getChecksum());
+					log.info("fileMinSegPres.getChecksum(): " + fileMinSegPres.getChecksum_original());
 					log.info("checkSumGet Calculado con FileUtil.checkSum: " + checkSumGet);
 					
-					if (checkSumGet.equals(fileMinSegPres.getChecksum())) {						
+					//if (checkSumGet.equals(fileMinSegPres.getChecksum())) {
+					if (firmaAvanzadaArchivoRequest.getChecksum().equals(fileMinSegPres.getChecksum_original())) {
 						log.info("checkSumGet.equals(fileMinSegPres.getChecksum())");
 						sgdpMultipartFile.setBytes(archivoFirmadoByteArray);
 						sgdpMultipartFile.setContentType(firmaAvanzadaDTO.getMimeType());
@@ -426,7 +483,8 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 						historicoFirmaDTO.setIdUsuario(usuario.getIdUsuario());
 						historicoFirmaDTO.setTipoFirma(firmaTypeCentralizado);
 						historicoFirmaDTO.setIdTipoDeDocumento(firmaAvanzadaDTO.getIdTipoDeDocumento());
-						historicoFirmaDTO.setIdDocumentoFirmado(idDocumentoFirmado);
+						historicoFirmaDTO.setIdDocumentoFirmado(null);
+						historicoFirmaDTO.setUuid(uuid);//ID PARA QR
 						registraFirma(usuario.getIdUsuario(), historicoFirmaDTO);
 					} else {
 						log.info("checkSumGet.distinto(fileMinSegPres.getChecksum())");
@@ -439,7 +497,7 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 				}
 			}
 			
-			firmaAvanzadaDTO.setSessionToken(tokenResponse.getSession_token());
+			//firmaAvanzadaDTO.setSessionToken(tokenResponse.getSession_token());
 			firmaAvanzadaDTO.setResultadoFirmarDocumentoConFEA(configProps.getProperty("seFirmoCorrectamenteElDocumento"));
 			firmaAvanzadaDTO.setCssStatus(configProps.getProperty("cssSucess"));
 			
@@ -514,14 +572,22 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 			String idLogoSCJ = parametroDTOIdLogoSCJ.getValorParametroChar();
 			ParametroDTO parametroDTONombreCarpetaImagenesFEA = parametroService.getParametroPorID(Constantes.ID_PARAM_NOMBRE_CARPETA_IMAGENES_FEA);
 			String nombreCarpetaImagenesFEA = parametroDTONombreCarpetaImagenesFEA.getValorParametroChar();						
-			IdArchivoPorIdUsrNomCarpetaResponse idArchivoDefirma = null;
+			IdArchivoPorIdUsrNomCarpetaResponse idArchivoDefirma = gestorDeDocumentosCMSService.getIdArchivoPorIdUsrNomCarpeta(usuario, nombreCarpetaImagenesFEA);	
 			String colocaImagenFea = parametroService.getParametroPorID(Constantes.ID_PARAM_COLOCA_IMAGEN_DE_FIRMA).getValorParametroChar();			
-			if (colocaImagenFea!=null && colocaImagenFea.equals("SI")) {
-				idArchivoDefirma = gestorDeDocumentosCMSService.getIdArchivoPorIdUsrNomCarpeta(usuario, nombreCarpetaImagenesFEA);	
-			} else {
-				idArchivoDefirma = new IdArchivoPorIdUsrNomCarpetaResponse();
-				idArchivoDefirma.setIdArchivo("0");
-			}			
+			//MIG
+			//	if (colocaImagenFea!=null && colocaImagenFea.equals("SI")) {
+			//	idArchivoDefirma = gestorDeDocumentosCMSService.getIdArchivoPorIdUsrNomCarpeta(usuario, nombreCarpetaImagenesFEA);	
+			//} else {
+			//	idArchivoDefirma = new IdArchivoPorIdUsrNomCarpetaResponse();
+			//	idArchivoDefirma.setIdArchivo("0");
+			//}	
+				
+			//MIG
+			String uuid = UUID.randomUUID().toString();	            
+	        ParametroDTO parametroDTODescargaDocumento = parametroService.getParametroPorID(Constantes.ID_PARAM_URL_DESCARGA_DOCUMENTO);	            
+	        String urlDescarga = parametroDTODescargaDocumento.getValorParametroChar() + uuid;	
+	        String nombreUsuario = usuario.getNombreCompleto();	
+	        
 			String textoVerificaValidezFea = parametroService.getParametroPorID(Constantes.ID_PARAM_URL_VERIFICACION_DOC_FEA).getValorParametroChar();			
 			long idDocumentoFirmado = historicoFirmaService.getIdDocumentoFirmado();
 			log.info("urlCodeBaseJNLPFea: " + urlCodeBaseJNLPFea);
@@ -543,6 +609,9 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 			log.info("textoVerificaValidezFea: " + textoVerificaValidezFea);
 			log.info("textoVerificaValrutidezFea: " + usuario.getRut());
 			log.info("idDocumentoFirmado: " + idDocumentoFirmado);
+			log.info("urlDescarga: " + urlDescarga);
+			log.info("nombreUsuario: " + usuario.getNombreCompleto());
+			log.info("uuid: " + uuid);
 			return "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n" +		       
 		         "<jnlp codebase=" + urlCodeBaseJNLPFea + " >\n" +
 		              "<information>\n"+
@@ -569,6 +638,7 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 	        					"<jar href=\"lib2/jackson-core-2.6.3.jar\"/>\n"+
 	        					"<jar href=\"lib2/jackson-databind-2.6.3.jar\"/>\n"+
 	        					"<jar href=\"lib2/org.apache.tika.jar\"/>\n"+
+	        					"<jar href=\"lib2/core-3.3.3.jar\"/>\n"+
 		              " </resources>\n"+
 		              "<property name=\"jnlp.deleteJnlpFileOnExit\" value=\"true\" />\n" +
 		              "<application-desc main-class=\"scj.firmaavanzada.FirmaAvanzada\">\n" +
@@ -592,6 +662,9 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 							"<argument>"+textoVerificaValidezFea+"</argument>\n" +
 							"<argument>"+usuario.getRut()+"</argument>\n" +
 							"<argument>"+idDocumentoFirmado+"</argument>\n" +
+							"<argument>"+urlDescarga+"</argument>\n" + 
+							"<argument>"+nombreUsuario+"</argument>\n" + 
+							"<argument>"+uuid+"</argument>\n" +
 		              "</application-desc>" +
 		              "</jnlp>";
 	}
@@ -610,6 +683,8 @@ public class GestorDeDocumentosServiceImpl implements GestorDeDocumentosService 
 		historicoFirma.setTipoFirma(historicoFirmaDTO.getTipoFirma().getNombreFirma());
 		historicoFirma.setTipoDeDocumento(tipoDeDocumento);
 		historicoFirma.setIdDocumentoFirmado(historicoFirmaDTO.getIdDocumentoFirmado());
+		historicoFirma.setUuid(historicoFirmaDTO.getUuid());
+		
         switch (historicoFirmaDTO.getTipoFirma().getCodigoFirma()) {
         	/*VISACION*/
         	case 1: {

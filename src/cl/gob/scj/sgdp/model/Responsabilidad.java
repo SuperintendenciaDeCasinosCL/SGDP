@@ -10,6 +10,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
@@ -21,7 +22,9 @@ import cl.gob.scj.sgdp.config.Constantes;
 
 @Entity
 @Table(name="\"SGDP_RESPONSABILIDAD\"")
-@NamedQuery(name="Responsabilidad.findAll", query="SELECT R FROM Responsabilidad R")
+@NamedQueries({
+	@NamedQuery(name="Responsabilidad.findAll", query="SELECT R FROM Responsabilidad R"), 
+})
 public class Responsabilidad implements Serializable  {
 
 	@Id

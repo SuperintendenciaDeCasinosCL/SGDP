@@ -2,7 +2,12 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="sf" uri="http://www.springframework.org/tags/form"%>
 
-<%@ page import="cl.gob.scj.sgdp.control.AppContextControl"%>
+<%@ page import= "cl.gob.scj.sgdp.config.Constantes" %>
+<%@ page import= "cl.gob.scj.sgdp.tipos.PermisoType" %>
+
+<c:set var="tipoComplejidadPorDefecto" value="<%=Constantes.TIPO_COMPLEJIDAD_POR_DEFECTO%>" />
+<c:set var="permisoIngresarComplejidadAlCrearExpediente" value="<%=PermisoType.PUEDE_INGRESAR_COMPLEJIDAD_AL_CREAR_EXPEDIENTE.getNombrePermiso()%>"/>
+
 
 <!-- Modal Crear Expediente -->
 <div class="modal fade" id="crearExpedienteModal" tabindex="-1"
@@ -60,7 +65,43 @@
 						</select>
 					</div>
 					</div>
-
+					
+					<c:if test = "${permisos[permisoIngresarComplejidadAlCrearExpediente] eq permisoIngresarComplejidadAlCrearExpediente}"> 
+					
+						<div class="form-group">
+							<div>
+								<spring:message
+									code="bandejaDeEntrada.modal.crearExpediente.form.select.complejidad.seleccione"
+									var="complejidadSeleccione" />
+								<label for="complejidad"><spring:message
+										code="bandejaDeEntrada.modal.crearExpediente.form.input.complejidad.label" /></label>
+								<select class="form-control"
+									style="width: 100%" name="idComplejidadCrearExpediente" id="idComplejidadCrearExpediente">
+									<c:forEach items="${todasLasComplejidades}" var="complejidadDTO">
+										<c:choose>
+											<c:when test="${complejidadDTO.complejidad eq tipoComplejidadPorDefecto}">
+												<option selected="selected" value="${complejidadDTO.complejidad}">${complejidadDTO.complejidad}</option>
+											</c:when>
+											<c:otherwise>
+												<option value="${complejidadDTO.complejidad}">${complejidadDTO.complejidad}</option>
+											</c:otherwise>
+										</c:choose>
+										
+									</c:forEach>
+								</select>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label for="motivoComplejidadCrearExpediente"><spring:message
+									code="bandejaDeEntrada.modal.crearExpediente.form.input.motivoComplejidad.label" /></label>
+							<input type="text" class="form-control validate[required]"
+								id="motivoComplejidadCrearExpediente" name="motivoComplejidadCrearExpediente"
+								placeholder='<spring:message code="bandejaDeEntrada.modal.crearExpediente.form.input.motivoComplejidad.placeholder"/>'>
+						</div>
+					
+					</c:if>
+					
 				   <div class="row">
 	                <div class="col-sm-10">	                
 						<div class="form-group">
@@ -180,30 +221,19 @@ $("#idProcesosVigente").select2({
 							<spring:message
 								code="bandejaDeEntrada.modal.subirDocumento.form.select.tipoDeDocumento.seleccione"
 								var="tipoDeDocumentoSeleccione" />
-							<select class="form-control validate[required]"
+							<select class="form-control"
 								style="width: 100%" id="idTipoDeDocumentoSubirExpediente">								
-								<%--<c:forEach items="${tiposDeDocumentosDTO}"
-									var="tipoDeDocumentoDTO">
-									<option value="${tipoDeDocumentoDTO.idTipoDeDocumento}">${tipoDeDocumentoDTO.nombreDeTipoDeDocumento}</option>
-								</c:forEach>--%>
+
 							</select>
 						</div>
 					</div>
-					<div class="form-group">
-						<label class="control-label col-sm-4" for="cdrExpediente"><spring:message
-								code="bandejaDeEntrada.modal.subirDocumento.form.label.cdr" /></label>
-						<div class="col-sm-8">
-							<input type="text" class="form-control validate[required]"
-								id="cdrExpediente" name="cdr"
-								placeholder='<spring:message code="bandejaDeEntrada.modal.subirDocumento.form.input.cdr.placeholder"/>'>
-						</div>
-					</div>
+
 					<div class="form-group">
 						<label class="control-label col-sm-4"
 							for="numeroDocumentoExpediente"><spring:message
-								code="bandejaDeEntrada.modal.subirDocumento.form.label.numeroDocumento" /></label>
+								code="bandejaDeEntrada.modal.subirDocumento.form.label.numeroDocumento.noRequired" /></label>
 						<div class="col-sm-8">
-							<input type="text" class="form-control validate[required]"
+							<input type="text" class="form-control"
 								id="numeroDocumentoExpediente" name="numeroDocumento"
 								placeholder='<spring:message code="bandejaDeEntrada.modal.subirDocumento.form.input.numeroDocumento.placeholder"/>'>
 						</div>
@@ -211,12 +241,14 @@ $("#idProcesosVigente").select2({
 					<div class="form-group">
 						<label class="control-label col-sm-4"
 							for="fechaDeCreacionDocumentoExpediente"><spring:message
-								code="bandejaDeEntrada.modal.subirDocumento.form.label.fechaDeCreacion" /></label>
+								code="bandejaDeEntrada.modal.subirDocumento.form.label.fechaDeCreacion.noRequired" /></label>
 						<div class="col-sm-8">
 							<div class='input-group date'
 								id='fechaCreacionDocumentoExpedienteDiv'>
-								<input type='text' class="form-control validate[required]"
+								<input type='text' class="form-control"
 									id="fechaDeCreacionDocumentoExpediente"
+									onkeyup
+									="return false;"
 									name="fechaDeCreacionDocumento"
 									placeholder='<spring:message code="bandejaDeEntrada.modal.subirDocumento.form.input.fechaDeCreacion.placeholder"/>' />
 								<span class="input-group-addon"> <span
@@ -228,13 +260,14 @@ $("#idProcesosVigente").select2({
 					<div class="form-group">
 						<label class="control-label col-sm-4"
 							for="fechaRecepcionDocumentoExpediente"><spring:message
-								code="bandejaDeEntrada.modal.subirDocumento.form.label.fechaDeRecepcion" /></label>
+								code="bandejaDeEntrada.modal.subirDocumento.form.label.fechaDeRecepcion.noRequired" /></label>
 						<div class="col-sm-8">
 							<div class='input-group date'
 								id='fechaRecepcionDocumentoExpedienteDiv'>
-								<input type='text' class="form-control validate[required]"
+								<input type='text' class="form-control"
 									id="fechaRecepcionDocumentoExpediente"
 									name="fechaRecepcionDocumento"
+									onkeyup="return false;"
 									placeholder='<spring:message code="bandejaDeEntrada.modal.subirDocumento.form.input.fechaDeRecepcion.placeholder"/>' />
 								<span class="input-group-addon"> <span
 									class="glyphicon glyphicon-calendar"></span>
@@ -245,12 +278,12 @@ $("#idProcesosVigente").select2({
 					<div class="form-group">
 						<label class="control-label col-sm-4"
 							for="idAutorSubirDocumentoExpediente"><spring:message
-								code="bandejaDeEntrada.modal.subirDocumento.form.label.autor" /></label>
+								code="bandejaDeEntrada.modal.subirDocumento.form.label.autor.noRequired" /></label>
 						<spring:message
 							code="bandejaDeEntrada.modal.subirDocumento.form.select.autor.seleccione"
 							var="autorSubirDocumentoSeleccione" />
 						<div class="col-sm-8">
-							<select class="form-control validate[required]"
+							<select class="form-control"
 								style="width: 100%" name="idAutorSubirDocumento"
 								id="idAutorSubirDocumentoExpediente">
 								<option value="">${autorSubirDocumentoSeleccione}</option>
@@ -263,9 +296,9 @@ $("#idProcesosVigente").select2({
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-4" for="descripcionExpediente"><spring:message
-								code="bandejaDeEntrada.modal.subirDocumento.form.input.descripcion.label" /></label>
+								code="bandejaDeEntrada.modal.subirDocumento.form.input.descripcion.label.noRequired" /></label>
 						<div class="col-sm-8">
-							<textarea class="form-control validate[required]"
+							<textarea class="form-control"
 								id="descripcionExpediente" name="descripcion"
 								placeholder='<spring:message code="bandejaDeEntrada.modal.subirDocumento.form.input.descripcion.placeholder"/>'
 								rows="10"></textarea>
@@ -929,6 +962,7 @@ function agregarDocumentoAdjunto(){
 	        dataType: 'json',
 	        url: '/sgdp/guardarAdjuntoTabla',
 	        add: function (e, data) {
+	        	var nombreArchivoFileUpload;
 				var descripcion = "#descripcionAntecedenteTabla" + (fila -1);	        	
 	         	if ($("#descripcionAntecedenteTabla" + (fila -1)).validationEngine('validate') == false ||
 	         		$("#idTipoDeDocumentoSubirAntecedenteTabla" + (fila -1)).validationEngine('validate') == false ||
@@ -936,16 +970,17 @@ function agregarDocumentoAdjunto(){
 	         	   	$("#fechaCreacionArchivoAntecedenteTabla" + (fila -1)).validationEngine('validate') == false ||
 	         	   	$("#idAutorSubirDocumentoAntecedenteTabla" + (fila -1)).validationEngine('validate') == false )	{
 	         		
-		         		$("#descripcionAntecedenteTabla" + (fila -1)).validationEngine('validate');
-		         		$("#idTipoDeDocumentoSubirAntecedenteTabla" + (fila -1)).validationEngine('validate');
-		         		$("#numeroDocumentoAntecedenteTabla" + (fila -1)).validationEngine('validate');
-		         		$("#fechaCreacionArchivoAntecedenteTabla" + (fila -1)).validationEngine('validate');
-		         		$("#idAutorSubirDocumentoAntecedenteTabla" + (fila -1)).validationEngine('validate');
-						return;
+	         		$("#descripcionAntecedenteTabla" + (fila -1)).validationEngine('validate');
+	         		$("#idTipoDeDocumentoSubirAntecedenteTabla" + (fila -1)).validationEngine('validate');
+	         		$("#numeroDocumentoAntecedenteTabla" + (fila -1)).validationEngine('validate');
+	         		$("#fechaCreacionArchivoAntecedenteTabla" + (fila -1)).validationEngine('validate');
+	         		$("#idAutorSubirDocumentoAntecedenteTabla" + (fila -1)).validationEngine('validate');
+					return;
 	         	}
 
 	         	$.each(data.files, function (index, file) {	               
-	                tamanoDeArchivo = file.size;            
+	                tamanoDeArchivo = file.size;
+	                nombreArchivoFileUpload = file.name;
 	            });	
 
 	         	if (tamanoDeArchivo<=0) {
@@ -970,8 +1005,9 @@ function agregarDocumentoAdjunto(){
 	     					idExpedienteSubirArchivo : $("#idExpedienteSubirArchivoAntecedenteTabla").val(),
 	     					idInstanciaDeTareaSubirArchivo : $("#idInstanciaDeTareaSubirArchivoAntecedenteTabla").val(),
 	     					cartaRelacionada : encodeURIComponent($("#cartaRelacionadaAntecedentesTabla").val()),
-	     					tipoDeDocumento : encodeURIComponent($(this).find('#idTipoDeDocumentoSubirAntecedenteTabla' + (fila -1) + ' :selected').text())	     					
-	     				});		
+	     					tipoDeDocumento : encodeURIComponent($(this).find('#idTipoDeDocumentoSubirAntecedenteTabla' + (fila -1) + ' :selected').text()),	     					
+	     					nombreArchivoFileUpload : encodeURIComponent(nombreArchivoFileUpload)
+	     				 });		
 	             });  
      		 	console.log(SubirAntecedenteDTO); 
      			data.formData = {"subirArhivoDTO" : JSON.stringify(SubirAntecedenteDTO)};

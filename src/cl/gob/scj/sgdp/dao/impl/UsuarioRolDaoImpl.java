@@ -14,16 +14,10 @@ import cl.gob.scj.sgdp.dao.UsuarioRolDao;
 import cl.gob.scj.sgdp.model.LogFueraDeOficina;
 import cl.gob.scj.sgdp.model.Tarea;
 import cl.gob.scj.sgdp.model.UsuarioRol;
+import cl.gob.scj.sgdp.model.VinculacionExp;
 
 @Repository
-public class UsuarioRolDaoImpl implements UsuarioRolDao {
-
-	@Autowired
-	private SessionFactory sessionFactory;// para que se comunique con el DAO
-
-	public Session getSession() {
-		return sessionFactory.getCurrentSession();
-	}
+public class UsuarioRolDaoImpl extends GenericDaoImpl<UsuarioRol> implements UsuarioRolDao {
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -139,6 +133,37 @@ public class UsuarioRolDaoImpl implements UsuarioRolDao {
 		query.setString("nombreRol", nombreRol);
 		List<String> resultado = (List<String>)query.list();
 		return resultado;
+	}
+
+
+	@Override
+	public List<UsuarioRol> getTodosLosUsuarios() {
+		Query query = getSession().getNamedQuery("UsuarioRol.getTodosLosUsuarios");
+		return query.list();
+}
+
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<UsuarioRol> getTodosLosUsuariosAsignadosPorIdRol(Long rolId) {
+		Query query = getSession().getNamedQuery("UsuarioRol.getTodosLosUsuariosAsignadosPorIdRol");
+		query.setLong("rol", rolId);
+		return query.list();
+	}
+
+	@Override
+	public List<UsuarioRol> getTodosLosUsuariosActivos() {
+		Query query = getSession().getNamedQuery("UsuarioRol.getTodosLosIdUsuariosactivos");
+		return query.list();
 	}	
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public UsuarioRol getUsuarioRolPorIdUsuarioRol(long idUsuarioRol) {
+		Query query = getSession().createQuery(
+				"from UsuarioRol r where r.idUsuarioRol =:idUsuarioRol");
+		query.setLong("idUsuarioRol", idUsuarioRol);
+		return (UsuarioRol) query.uniqueResult();
+	}
 	
 }

@@ -1,6 +1,7 @@
 package cl.gob.scj.sgdp.dto;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class FinalizaProcesoDTO implements Serializable {
 	
@@ -18,7 +19,18 @@ public class FinalizaProcesoDTO implements Serializable {
 	private boolean cierra;
 	private short horasOcupadas;
 	private short minutosOcupados;
-	
+	private String correosHiden;
+	private String correosApiDocJSON;
+	private List<String> ruts;
+	private String tipoDistribucion;
+	private String direccionesDeCorreosApiDoc;
+	private String nombreExpediente;
+	private String direccionesDeCorreoParaDistribuir;
+	private String nombreArchivosADistribuir;
+	private String idEntidadDestinataria;
+	private boolean condifencialDocdigital;
+
+
 	public long getIdInstanciaDeTarea() {
 		return idInstanciaDeTarea;
 	}
@@ -91,20 +103,91 @@ public class FinalizaProcesoDTO implements Serializable {
 	public void setMinutosOcupados(short minutosOcupados) {
 		this.minutosOcupados = minutosOcupados;
 	}
+	public String getCorreosHiden() {
+		return correosHiden;
+	}
+	public void setCorreosHiden(String correosHiden) {
+		this.correosHiden = correosHiden;
+	}
+	public String getCorreosApiDocJSON() {
+		return correosApiDocJSON;
+	}
+	public void setCorreosApiDocJSON(String correosApiDocJSON) {
+		this.correosApiDocJSON = correosApiDocJSON;
+	}
+	public List<String> getRuts() {
+		return ruts;
+	}
+	public void setRuts(List<String> ruts) {
+		this.ruts = ruts;
+	}
+	public String getTipoDistribucion() {
+		return tipoDistribucion;
+	}
+	public void setTipoDistribucion(String tipoDistribucion) {
+		this.tipoDistribucion = tipoDistribucion;
+	}
+	public String getDireccionesDeCorreosApiDoc() {
+		return direccionesDeCorreosApiDoc;
+	}
+	public void setDireccionesDeCorreosApiDoc(String direccionesDeCorreosApiDoc) {
+		this.direccionesDeCorreosApiDoc = direccionesDeCorreosApiDoc;
+	}
+	public String getNombreExpediente() {
+		return nombreExpediente;
+	}
+	public void setNombreExpediente(String nombreExpediente) {
+		this.nombreExpediente = nombreExpediente;
+	}
+	public String getDireccionesDeCorreoParaDistribuir() {
+		return direccionesDeCorreoParaDistribuir;
+	}
+	public void setDireccionesDeCorreoParaDistribuir(String direccionesDeCorreoParaDistribuir) {
+		this.direccionesDeCorreoParaDistribuir = direccionesDeCorreoParaDistribuir;
+	}
+	public String getNombreArchivosADistribuir() {
+		return nombreArchivosADistribuir;
+	}
+	public void setNombreArchivosADistribuir(String nombreArchivosADistribuir) {
+		this.nombreArchivosADistribuir = nombreArchivosADistribuir;
+	}
+
+	public String getIdEntidadDestinataria() {
+		return idEntidadDestinataria;
+	}
+
+	public void setIdEntidadDestinataria(String idEntidadDestinataria) {
+		this.idEntidadDestinataria = idEntidadDestinataria;
+	}
+
+	public boolean isCondifencialDocdigital() {
+		return condifencialDocdigital;
+	}
+
+	public void setCondifencialDocdigital(boolean condifencialDocdigital) {
+		this.condifencialDocdigital = condifencialDocdigital;
+	}
+
+
 	@Override
 	public String toString() {
-		return "FinalizaProcesoDTO [idInstanciaDeTarea=" + idInstanciaDeTarea
-				+ ", comentario=" + comentario
-				+ ", parametrosMapParaGuardarJSON=" + parametrosMapParaGuardarJSON
-				+ ", aTodos=" + aTodos 
-				+ ", correosDeDistribucionJSON=" + correosDeDistribucionJSON 
-				+ ", idArchivosADistribuirJSON=" + idArchivosADistribuirJSON
-				+ ", asuntoCorreoDistribucion=" + asuntoCorreoDistribucion
-				+ ", recarga=" + recarga 
-				+ ", respuestaFinalizaProceso=" + respuestaFinalizaProceso
-				+ ", cierra=" + cierra
-				+ ", horasOcupadas=" + horasOcupadas
-				+ ", minutosOcupados=" + minutosOcupados
+		return "FinalizaProcesoDTO [idInstanciaDeTarea=" + idInstanciaDeTarea + ", comentario=" + comentario
+				+ ", parametrosMapParaGuardarJSON=" + parametrosMapParaGuardarJSON + ", aTodos=" + aTodos
+				+ ", correosDeDistribucionJSON=" + correosDeDistribucionJSON + ", idArchivosADistribuirJSON="
+				+ idArchivosADistribuirJSON + ", asuntoCorreoDistribucion=" + asuntoCorreoDistribucion + ", recarga="
+				+ recarga + ", respuestaFinalizaProceso=" + respuestaFinalizaProceso + ", cierra=" + cierra
+				+ ", horasOcupadas=" + horasOcupadas + ", minutosOcupados=" + minutosOcupados + ", correosHiden="
+				+ correosHiden 
+				+ ", correosApiDocJSON=" + correosApiDocJSON 
+				+ ", ruts=" + ruts
+				+ ", tipoDistribucion=" + tipoDistribucion
+				+ ", direccionesDeCorreosApiDoc=" + direccionesDeCorreosApiDoc
+				+ ", nombreExpediente=" + nombreExpediente
+				+ ", direccionesDeCorreoParaDistribuir=" + direccionesDeCorreoParaDistribuir
+				+ ", nombreArchivosADistribuir=" + nombreArchivosADistribuir
+				+ ", idEntidadDestinataria=" + idEntidadDestinataria
+				+ ", condifencialDocdigital=" + condifencialDocdigital
 				+ "]";
-	}	
+	}
+	 
 }

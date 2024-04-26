@@ -38,6 +38,8 @@ public interface InstanciaDeTareaService {
 	
 	InstanciaDeTareaDTO getInstanciaDeTareaPorIdDiagramaTareaNombreExpediente(String idDiagramaTarea, String nombreExpediente);
 	
+	List<ArchivosInstDeTareaDTO> archivosInstanciaTarea(int idInstanciaDeTarea, List<ArchivosInstDeTareaDTO> todosLosDocSubidos);
+	
 	//void cargaInstanciaDeTareaDTO(InstanciaDeTarea instanciaDeTarea, InstanciaDeTareaDTO instanciaDeTareaDTO);
 
 }

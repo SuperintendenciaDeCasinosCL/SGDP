@@ -118,6 +118,13 @@ public class TipoDeDocumentoDaoImpl implements TipoDeDocumentoDao {
 	}
 	
 	@Override
+	public List<TipoDeDocumento> getTiposDeDocumentosPorIdProceso(Long idProceso) {
+		Query query = getSession().getNamedQuery("TipoDeDocumento.getTiposDeDocumentosPorIdProceso");	
+		query.setLong("idProceso", idProceso);			
+		return query.list();
+	}
+	
+	@Override
 	public List<TipoDeDocumento> getTiposDeDocumentosPorNombreExpediente(String nombreExpediente) {
 		Query query = getSession().getNamedQuery("TipoDeDocumento.getTiposDeDocumentosPorNombreExpediente");	
 		query.setString("nombreExpediente", nombreExpediente);			
@@ -131,5 +138,20 @@ public class TipoDeDocumentoDaoImpl implements TipoDeDocumentoDao {
 		return query.list();
 	}
 
+	@Override
+	public Long guardar(TipoDeDocumento td, Session session) {
+		if (session == null ) {
+			session = getSession();
+		}
+		return (Long) session.save(td);
+	}
+
+	@Override
+	public List<TipoDeDocumento> getTiposDeDocumentosPorCodigoPlantilla(String codigoPlantilla, boolean vigente) {
+		Query query = getSession().getNamedQuery("TipoDeDocumento.getTiposDeDocumentosPorCodigoPlantilla");	
+		query.setString("codigoPlantilla", codigoPlantilla);	
+		query.setBoolean("vigente", vigente);
+		return query.list();
+	}
 
 }

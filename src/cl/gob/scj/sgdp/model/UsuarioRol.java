@@ -46,7 +46,23 @@ import cl.gob.scj.sgdp.config.Constantes;
 			+ "WHERE ur.activo = true "
 			+ "AND ur.fueraDeOficina = false "
 			+ "AND ur.rol.nombreRol = :nombreRol "			
-			+ "AND strpos(( SELECT p.valorParametroChar FROM Parametro p WHERE p.idParametro = 73 ), ur.idUsuario ) = 0")
+			+ "AND strpos(( SELECT p.valorParametroChar FROM Parametro p WHERE p.idParametro = 73 ), ur.idUsuario ) = 0"),
+	
+
+	@NamedQuery(name="UsuarioRol.getTodosLosUsuarios", 
+	query="SELECT distinct ur FROM UsuarioRol ur"),
+
+	@NamedQuery(name="UsuarioRol.getTodosLosUsuariosAsignadosPorIdRol", 
+	query="SELECT distinct ur "
+			+ "FROM UsuarioRol ur, "
+			+ " UsuarioResponsabilidad ures "
+			+ "WHERE "
+			+ " ur.idUsuario = ures.idUsuario"
+			+ " and ur.activo = true "
+			+ " and ures.responsabilidad.idResponsabilidad = :rol"
+	),
+	@NamedQuery(name="UsuarioRol.getTodosLosIdUsuariosactivos", 
+	query="SELECT distinct ur FROM UsuarioRol ur WHERE ur.activo = true ")
 
 })
 public class UsuarioRol implements Serializable {
@@ -83,6 +99,9 @@ public class UsuarioRol implements Serializable {
 	
 	@Column(name="\"A_RUT\"")
 	private String rut;
+	
+	@Column(name="\"A_DV\"")
+	private String dv;
 
 	public UsuarioRol() {
 	}
@@ -149,6 +168,14 @@ public class UsuarioRol implements Serializable {
 
 	public void setRut(String rut) {
 		this.rut = rut;
+	}	
+
+	public String getDv() {
+		return dv;
+	}
+
+	public void setDv(String dv) {
+		this.dv = dv;
 	}
 
 	@Override
@@ -158,6 +185,7 @@ public class UsuarioRol implements Serializable {
 				 		+ ", fueraDeOficina=" + fueraDeOficina
 				 		+ ", nombreCompleto=" + nombreCompleto
 				 		+ ", rut=" + rut
+				 		+ ", dv=" + dv
 						+ "]";
 	}
 		

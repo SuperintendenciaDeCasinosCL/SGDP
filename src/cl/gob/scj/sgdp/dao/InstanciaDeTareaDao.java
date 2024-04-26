@@ -72,4 +72,10 @@ public interface InstanciaDeTareaDao {
 	
 	InstanciaDeTarea getInstanciaDeTareaPorIdDiagramaTareaNombreExpediente(String idDiagramaTarea, String nombreExpediente);
 	
+	long getTotalInstanciasDeTareasEnEjecucion(String idUsuario, long idEstadoFinalizada);
+	
+	InstanciaDeTarea getInstanciaDeTareaPorIdInstanciaDeProcesoNombreTarea(long idInstanciaProceso, String nombreTarea);
+	
+	InstanciaDeTarea getInstanciaDeTareaDistribuyePorIdInstanciaDeProceso(long idInstanciaProceso);
+	
 }

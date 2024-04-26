@@ -25,8 +25,8 @@
 	   <property name="order" value="0" />
 	</bean>	
 
-	<!-- Configuracion para SSO DesComentar -->
-	<!--<mvc:interceptors>
+	<!-- Keycloack 	
+	<mvc:interceptors>
 		<mvc:interceptor>
 			<mvc:mapping path="/**" />
 			<mvc:exclude-mapping path="/verificarSession" />
@@ -36,9 +36,8 @@
 			<mvc:exclude-mapping path="/lib2/*" />
 	    	<bean class="cl.gob.scj.sgdp.interceptor.UserDataHandlerInterceptor"></bean>
     	</mvc:interceptor>
-    </mvc:interceptors>	   
-    -->
-	<!-- Configuracion para SSO DesComentar--> 
+    </mvc:interceptors>
+    Keycloack -->	    
 	    
 	<mvc:annotation-driven></mvc:annotation-driven>
 	<mvc:resources location="/WEB-INF/" mapping="/**" />

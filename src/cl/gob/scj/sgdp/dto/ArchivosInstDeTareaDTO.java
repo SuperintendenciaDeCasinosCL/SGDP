@@ -33,6 +33,8 @@ public class ArchivosInstDeTareaDTO extends RespuestaDTO implements Serializable
 	private Boolean estaFirmadoConFEACentralizada;
 	private Boolean conformaExpediente;
 	
+	private int cantAccionesEnBitacora = 0;
+	
 	public long getIdInstanciaDeTarea() {
 		return idInstanciaDeTarea;
 	}
@@ -208,5 +210,11 @@ public class ArchivosInstDeTareaDTO extends RespuestaDTO implements Serializable
 				+ ", estaFirmadoConFEACentralizada=" + estaFirmadoConFEACentralizada
 				+ ", conformaExpediente=" + conformaExpediente
 				+ "]";
+	}
+	public int getCantAccionesEnBitacora() {
+		return cantAccionesEnBitacora;
+	}
+	public void setCantAccionesEnBitacora(int cantAccionesEnBitacora) {
+		this.cantAccionesEnBitacora = cantAccionesEnBitacora;
 	}	
 }

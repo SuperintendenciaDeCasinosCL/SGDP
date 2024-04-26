@@ -84,7 +84,18 @@ public class Constantes {
 	public static final long ID_PARAM_ASUNTO_CREA_EXP = 97l;
 	public static final long ID_PARAM_BODY_MENSAJE_CREA_EXP = 98l;
 	public static final long ID_PARAM_URL_MANTENEDOR_AUTORES = 99l;
-	
+	public static final long ID_PARAM_URL_FEA_V2 = 101L;
+	public static final long ID_PARAM_URL_DESCARGA_DOCUMENTO = 102l;
+	public static final long ID_PARAM_URL_ENTIDAD_TOKEN = 103l;	
+	public static final long ID_PARAM_URL_ENTIDADES = 104l;
+	public static final long ID_PARAM_URL_USUARIOS = 105l;
+	public static final long ID_PARAM_INGERSAR_DOCUMENTO = 106l;
+
+	public static final long ID_PARAM_URL_ACUSE_RECIVO_DOC_DIGITAL = 129l;
+	public static final long ID_PARAM_URL_DEVUELVE_DOC_DIGITAL = 130l;
+
+
+
 	public static final String NOMBRE_PARAM_MIME_TYPES_EDITABLES = "MIME_TYPES_EDITABLES";
 	
 	public static final String NOMBRE_PARAM_MIME_TYPES_VISABLES = "MIME_TYPES_VISABLES";
@@ -119,6 +130,8 @@ public class Constantes {
 	public static final String FORMATO_FECHA_PIE_FEA = "yyyy.MM.dd HH:mm:ss z";
 	
 	public static final String FORMATO_FECHA_PARA_NOM_ARCH = "dd-MM-yyyy HH-mm-ss";
+	
+	public static final String FORMATO_FECHA_FORM_DMY_HMS = "dd/MM/yyyy HH:mm:ss";
 
 	public static final String POINT_CUT_INSERT_DAO = "execution ( public void cl.gob.scj.sgdp.dao.*.insert*(*, cl.gob.scj.sgdp.auth.user.Usuario) )";
 	
@@ -176,5 +189,12 @@ public class Constantes {
 	public static final String CSS_SUCESS = "cssSucess";
 	
 	public static final long DIFERENCIA_MILISEGUNDOS_INICIAL_ERROR_ID_ARCHIVO_VALIDADOR = 60000l;
+	
+	//Directorio de guardado de imagenes
+	public static final String DIRECTORIO_IMAGENES = "C:\\Users\\HUGOC";
+	
+	public static final String TIPO_COMPLEJIDAD_POR_DEFECTO = "Baja";
+
+	public static final String NOMBRE_USUARIO_DOC_DIGITAL = "api_doc_digital";
 	
 }

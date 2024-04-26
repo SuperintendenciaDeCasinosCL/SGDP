@@ -15,7 +15,14 @@ import cl.gob.scj.sgdp.config.Constantes;
 @Entity
 @Table(name="\"SGDP_HISTORICO_ARCHIVOS_INST_DE_TAREAS\"")
 @NamedQueries({
+	
+	@NamedQuery(name="HistoricoArchivosInstDeTarea.getHistoricoDeArchivosPorIdArchivoCMS",
+			query="SELECT HA FROM HistoricoArchivosInstDeTarea HA "
+			+ "WHERE HA.idArchivoCms =:idArchivoCms "),
+	
 	@NamedQuery(name="HistoricoArchivosInstDeTarea.findAll", query="SELECT a FROM HistoricoArchivosInstDeTarea a"),
+	
+	@NamedQuery(name="HistoricoArchivosInstDeTarea.findByIdCMS", query="SELECT a FROM HistoricoArchivosInstDeTarea a where a.idArchivoCms = :idArchivoCms"),
 	
 	@NamedQuery(name="HistoricoArchivosInstDeTarea.getHistoricoDeArchivosPorIdInstanciaDeTareaIdUsuario", 
 				query="SELECT HA FROM HistoricoArchivosInstDeTarea HA "
@@ -230,6 +237,8 @@ public class HistoricoArchivosInstDeTarea implements Serializable {
 	@Column(name="\"ID_USUARIO\"")
 	private String idUsuario;
 	
+	@Column(name="\"B_ANULADO\"")
+	private Boolean anulado;
 
 	public HistoricoArchivosInstDeTarea() {
 	}	
@@ -336,6 +345,14 @@ public class HistoricoArchivosInstDeTarea implements Serializable {
 	public void setFechaRecepcion(Date fechaRecepcion) {
 		this.fechaRecepcion = fechaRecepcion;
 	}
+	
+	public Boolean getAnulado() {
+		return anulado;
+	}
+
+	public void setAnulado(Boolean anulado) {
+		this.anulado = anulado;
+	}
 
 	@Override
 	public String toString() {
@@ -345,7 +362,8 @@ public class HistoricoArchivosInstDeTarea implements Serializable {
 				+ ", version=" + version 
 				+ ", fechaSubido=" + fechaSubido
 				+ ", fechaDocumento=" + fechaDocumento
-				+ ", fechaRecepcion=" + fechaRecepcion				
+				+ ", fechaRecepcion=" + fechaRecepcion
+				+ ", anulado=" + anulado	
 				+ "]";
 	}		
 

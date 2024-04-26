@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import cl.gob.scj.sgdp.dao.TipoDeDocumentoDao;
+import cl.gob.scj.sgdp.dto.TareaYTipoDeDocumentoDTO;
 import cl.gob.scj.sgdp.dto.TipoDeDocumentoDTO;
 import cl.gob.scj.sgdp.model.TipoDeDocumento;
 import cl.gob.scj.sgdp.service.TipoDeDocumentoService;
@@ -92,6 +93,21 @@ public class TipoDeDocumentoServiceImpl implements TipoDeDocumentoService {
 		for(TipoDeDocumento tipoDeDocumento: tiposDeDocumentos) {
 			TipoDeDocumentoDTO tipoDeDocumentoDTO = new TipoDeDocumentoDTO(tipoDeDocumento.getIdTipoDeDocumento(), tipoDeDocumento.getNombreDeTipoDeDocumento());
 			tiposDeDocumentosDTO.add(tipoDeDocumentoDTO);
+		}
+		return tiposDeDocumentosDTO;
+	}
+	
+	@Override
+	public List<TareaYTipoDeDocumentoDTO> getTiposDeDocumentosPorIdProceso(Long idProceso) {
+		List<TareaYTipoDeDocumentoDTO> tiposDeDocumentosDTO = new ArrayList<TareaYTipoDeDocumentoDTO>();
+		List<TipoDeDocumento> tiposDeDocumentos = tipoDeDocumentoDao.getTiposDeDocumentosPorIdProceso(idProceso);
+		
+		for(TipoDeDocumento td: tiposDeDocumentos) {
+			TareaYTipoDeDocumentoDTO tyt = new TareaYTipoDeDocumentoDTO();
+			tyt.setIdTarea(0);
+			tyt.setIdTipoDeDocumento(td.getIdTipoDeDocumento());
+			tyt.setNombreDeTipoDeDocumento(td.getNombreDeTipoDeDocumento());
+			tiposDeDocumentosDTO.add(tyt);
 		}
 		return tiposDeDocumentosDTO;
 	}

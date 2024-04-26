@@ -208,6 +208,8 @@
 		<!-- Modal Detalle Documento-->
 		
 	    <c:import url="/WEB-INF/jsp/modals/detalleDeDocumento.jsp"></c:import>
+	    
+	    <c:import url="/WEB-INF/jsp/modals/detalleBitacoraAcciones.jsp"></c:import>
 		
 	</body>
 	

@@ -16,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import cl.gob.scj.sgdp.interceptor.RequestApiDocDigital;
 import cl.gob.scj.sgdp.interceptor.RequestLoggingInterceptor;
 
 public class SingleObjectFactory {
@@ -24,29 +25,20 @@ public class SingleObjectFactory {
 	private static ObjectMapper mapper = new ObjectMapper();
 		
 	public static RestTemplate getRestTemplateInstance() {
-		
 		if (restTemplate == null) {	
-		    
-			restTemplate = new RestTemplate(new BufferingClientHttpRequestFactory(clientHttpRequestFactory()));			
-			//restTemplate.setRequestFactory(clientHttpRequestFactory());
-			
-			
+			restTemplate = new RestTemplate(new BufferingClientHttpRequestFactory(clientHttpRequestFactory()));	
 		    List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();
 	        messageConverters.add(new FormHttpMessageConverter());        
 	        messageConverters.add(new StringHttpMessageConverter());   
 	        messageConverters.add(new MappingJackson2HttpMessageConverter());
 	        messageConverters.add(new ByteArrayHttpMessageConverter());	        
-	        restTemplate.setMessageConverters(messageConverters);	        
-	        
+	        restTemplate.setMessageConverters(messageConverters);	  
 	        List<ClientHttpRequestInterceptor> listClientRequestInterceptor = new ArrayList<ClientHttpRequestInterceptor>();
 	        listClientRequestInterceptor.add(new RequestLoggingInterceptor());
-	       
-	        restTemplate.setInterceptors(listClientRequestInterceptor);	                
-	        
+	        listClientRequestInterceptor.add(new RequestApiDocDigital());
+	        restTemplate.setInterceptors(listClientRequestInterceptor);	 
 		}		
-		
 		return restTemplate;
-		
 	}
 
 	public static ObjectMapper getMapper() {

@@ -562,7 +562,7 @@ function cargaModalFEA(idExpediente,
             	if (estaDocumentoFirmado == true) {
             		bootbox.confirm({
         		    	title: "Firmar documento",
-        		        message: "El documento ya est&aacute; firmado por usted. Â¿Desea firmarlo nuevamente?",
+        		        message: "El documento ya est&aacute; firmado por usted. ¿Desea firmarlo nuevamente?",
         		        buttons: {
         		            confirm: {
         		                label: '<span class="glyphicon glyphicon-ok-circle font-icon-3"></span>',
@@ -600,7 +600,8 @@ function cargaModalFEA(idExpediente,
 							
 							bootbox.confirm({
 		        		    	title: "Firmar documento",
-		        		        message: "En esta tarea HOY ya se firm&oacute; un documento, Â¿desea firmar nuevamente?",
+
+		        		        message: "En esta tarea HOY ya se firm&oacute; un documentom ¿desea firmar nuevamente?",
 		        		        buttons: {
 		        		            confirm: {
 		        		                label: '<span class="glyphicon glyphicon-ok-circle font-icon-3"></span>',
@@ -653,7 +654,7 @@ function cargaModalFEA(idExpediente,
             });  
 	    } else {
 	        bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acci&oacute;n y hemos caducado tu sesi&oacute;n por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
-	                , function(){ window.open(raizURL, '_blank'); }
+	                , function(){ window.open(raizURL, '_self'); }
 	        );
 	    }    
 	});

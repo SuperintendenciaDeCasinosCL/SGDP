@@ -33,6 +33,29 @@ public class UsuarioResponsabilidadServiceImpl implements UsuarioResponsabilidad
 		}
 	}
 	
+	//MIG
+	@Override
+	public List<String> obtenerPosiblesUsuarios(long idUnidadOperativa, long idInstanciaTarea) {
+		List<UsuarioResponsabilidad> usuarioResponsabilidades = usuarioResponsabilidadDao.getUsuariosResponsabilidadesPorIdInstanciaDeTareaUnidad(idUnidadOperativa, idInstanciaTarea);
+		List<String> posiblesUsuariosUnidad = new ArrayList<String>();
+		for (UsuarioResponsabilidad usuarioResponsabilidad: usuarioResponsabilidades) {
+			posiblesUsuariosUnidad.add(usuarioResponsabilidad.getIdUsuario());
+		}
+		return posiblesUsuariosUnidad;
+	}
+	
+	@Override
+	public List<String> obtenerPosiblesUsuariosFueraOf(long idUnidadOperativa, long idInstanciaTarea) {
+		List<UsuarioResponsabilidad> usuarioResponsabilidadesFueraOf = usuarioResponsabilidadDao.getUsuariosResponsabilidadesPorIdInstanciaDeTareaUnidadOfi(idUnidadOperativa, idInstanciaTarea);
+		List<String> posiblesUsuariosUnidadFueraOfi = new ArrayList<String>();
+		for (UsuarioResponsabilidad usuarioResponsabilidad: usuarioResponsabilidadesFueraOf) {
+			posiblesUsuariosUnidadFueraOfi.add(usuarioResponsabilidad.getIdUsuario());
+		}
+		return posiblesUsuariosUnidadFueraOfi;
+	}
+	
+	
+	
 	public UsuarioResponsabilidadDTO getPrimerUsuarioResponsabilidadDTOPorIdInstanciaDeTarea(long idInstanciaDeTarea) {
 		UsuarioResponsabilidad usuarioResponsabilidad = usuarioResponsabilidadDao.getPrimerUsuarioResponsabilidadPorIdInstanciaDeTarea(idInstanciaDeTarea);
 		UsuarioResponsabilidadDTO usuarioResponsabilidadDTO = new UsuarioResponsabilidadDTO(usuarioResponsabilidad.getIdUsuarioResponsabilidad(), usuarioResponsabilidad.getIdUsuario(), usuarioResponsabilidad.getOrden());
@@ -70,5 +93,32 @@ public class UsuarioResponsabilidadServiceImpl implements UsuarioResponsabilidad
 			posiblesUsuariosFueaOficina.add(usuarioResponsabilidad.getIdUsuario());
 		}
 	}
+	
+	@Override
+
+	public List<UsuarioResponsabilidadDTO> getUsuariosRolesPosiblesPorIdInstanciaDeTarea(long idInstanciaDeTarea) {
+		List<UsuarioResponsabilidadDTO> usuariosResponsabilidadDTO = new ArrayList<UsuarioResponsabilidadDTO>();
+		List<UsuarioResponsabilidad> usuarioResponsabilidades = usuarioResponsabilidadDao.getUsuariosResponsabilidadesPorIdInstanciaDeTarea(idInstanciaDeTarea);
+		for (UsuarioResponsabilidad usuarioResponsabilidad: usuarioResponsabilidades) {
+			UsuarioResponsabilidadDTO usuarioResponsabilidadDTO = new UsuarioResponsabilidadDTO();
+			BeanUtils.copyProperties(usuarioResponsabilidad, usuarioResponsabilidadDTO);
+			usuariosResponsabilidadDTO.add(usuarioResponsabilidadDTO);
+		}
+		return usuariosResponsabilidadDTO;
+	}
+
+	public Integer eliminaUsuarioResponsabilidadPorIdResponsabilidad(long idResponsabilidad) {
+		return usuarioResponsabilidadDao.eliminarUsuarioResponsabilidadPorIdresponsabilidad(idResponsabilidad);
+	}
+
+	@Override
+	public void guardar(UsuarioResponsabilidad ur) {
+		usuarioResponsabilidadDao.guardar(ur);
+	}
+
+	
+
+	
+
 
 }

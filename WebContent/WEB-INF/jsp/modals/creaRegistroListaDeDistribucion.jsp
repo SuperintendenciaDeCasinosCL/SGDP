@@ -16,27 +16,70 @@
 					
 						<form class="form-horizontal" id="formCreaRegistroListaDeDistribucion">
 							<div class="form-group">  		
-						  		<label class="control-label col-sm-3" id="creaNombreCompletoLabel" for="creaNombreCompleto">Nombre Completo: </label>
+						  		<label class="control-label col-sm-3" id="creaNombreCompletoLabel" for="creaNombreCompleto">Nombre Completo (*): </label>
 						  		<div class="col-sm-9">  			
 						  			<input type="text" class="form-control validate[required]" id="creaNombreCompleto">
 						  		</div>  		
 						  	</div>
 						  	<div class="form-group">  		
-						  		<label class="control-label col-sm-3" id="creaOrganizacionLabel" for="creaOrganizacion">Organizaci&oacute;n: </label>
+						  		<label class="control-label col-sm-3" id="creaOrganizacionLabel" for="creaOrganizacion">Organizaci&oacute;n (*): </label>
 						  		<div class="col-sm-9">  			
 						  			<input type="text" class="form-control validate[required]" id="creaOrganizacion">
 						  		</div>  		
 						  	</div>
 						  	<div class="form-group">  		
-						  		<label class="control-label col-sm-3" id="creaCargoLabel" for="creaCargo">Cargo: </label>
+						  		<label class="control-label col-sm-3" id="creaCargoLabel" for="creaCargo">Cargo (*): </label>
 						  		<div class="col-sm-9">  			
 						  			<input type="text" class="form-control validate[required]" id="creaCargo">
 						  		</div>  		
 						  	</div>
 							<div class="form-group">  		
-								<label class="control-label col-sm-3" id="creaEmailLabel" for="creaEmail">Email: </label>
+								<label class="control-label col-sm-3" id="creaEmailLabel" for="creaEmail">Email (*): </label>
 								<div class="col-sm-9">  			
 									<input type="text" class="form-control validate[required, custom[email]]" id="creaEmail">
+								</div>  		
+						  	</div>
+						  	<div class="form-group">
+						    	<label class="control-label col-sm-3" for="fechaInicioVigencia">Fecha Inicio Vigencia (*):</label>
+						    	<div class="col-sm-9">
+						    		 <div class="input-group date fecha-desde-hasta-destinatario-modal">
+										<input type="text" class="form-control validate[required]" id="fechaInicioVigencia" placeholder="Ej: 12/08/2023">
+											<span class="input-group-addon"> <span class="glyphicon glyphicon-calendar"></span>
+											</span>
+									</div>
+						    	</div>
+						    </div>
+						    <div class="form-group">
+						    	<label class="control-label col-sm-3" for="fechaFinVigencia">Fecha Fin Vigencia (*):</label>
+						    	<div class="col-sm-9">
+						    		 <div class="input-group date fecha-desde-hasta-destinatario-modal">
+										<input type="text" class="form-control validate[required]" id="fechaFinVigencia" placeholder="Ej: 12/08/2023">
+											<span class="input-group-addon"> <span class="glyphicon glyphicon-calendar"></span>
+											</span>
+									</div>
+						    	</div>
+						    </div>
+						    <div class="form-group">  		
+								<label class="control-label col-sm-3" id="numeroTelefono1Label" for="numeroTelefono1">N&uacute;mero T&eacute;lefono 1 : </label>
+								<div class="col-sm-9">  			
+									<input type="text" maxlength="15" class="form-control validate[custom[onlyNumberSp]]" id="numeroTelefono1">
+								</div>  		
+						  	</div>
+						  	<div class="form-group">  		
+								<label class="control-label col-sm-3" id="numeroTelefono2Label" for="numeroTelefono2">N&uacute;mero T&eacute;lefono 2 : </label>
+								<div class="col-sm-9">  			
+									<input type="text" maxlength="15" class="form-control validate[custom[onlyNumberSp]]" id="numeroTelefono2">
+								</div>  		
+						  	</div>
+						  	<div class="form-group">  		
+								<label class="control-label col-sm-3" id="creaTipoDestinatarioLabel" for="creaEmail">Tipo de Destinatario (*): </label>
+								<div class="col-sm-9">  			
+									<select class="form-control validate[required]" id="tipoDestinatario" name="tipoDestinatario">
+							        	<option value="">Seleccione Destinatario</option>
+									    <c:forEach items="${listaTipoDeDestinatarioDTO}" var="tipoDeDestinatarioDTO">
+											   <option value="${tipoDeDestinatarioDTO.idTipoDestinatario}">${tipoDeDestinatarioDTO.nombreTipoDestinatario}</option>
+									   </c:forEach>	
+									</select>	  
 								</div>  		
 						  	</div>
 						  	<div class="col-sm-3">						  	
@@ -93,6 +136,11 @@ function creaRegistroDeListaDeDistribucion() {
 	                        registroListaDeDistribucionDTO["email"] = $("#creaEmail").val();
 	                        registroListaDeDistribucionDTO["organizacion"] = $("#creaOrganizacion").val();
 	                        registroListaDeDistribucionDTO["cargo"] = $("#creaCargo").val();
+	                        registroListaDeDistribucionDTO["idTipoDestinatario"] = $("#tipoDestinatario").val();
+	                        registroListaDeDistribucionDTO["fechaInicioVigenciaS"] = $("#fechaInicioVigencia").val();
+	                        registroListaDeDistribucionDTO["fechaFinVigenciaS"] = $("#fechaFinVigencia").val();
+	                        registroListaDeDistribucionDTO["numeroTelefono1"] = $("#numeroTelefono1").val();
+	                        registroListaDeDistribucionDTO["numeroTelefono2"] = $("#numeroTelefono2").val();
 	                        console.log(JSON.stringify(registroListaDeDistribucionDTO));			      			       
 	                        $.ajax( {
 	                            url: urlCreaRegistroDeListaDeDistribucion,
@@ -101,14 +149,18 @@ function creaRegistroDeListaDeDistribucion() {
 	                            dataType: 'json',
 	                            contentType: "application/json",                	    
 	                            beforeSend: function(xhr) {
-	                                $("#listaDeDistribucionCuerpo").css("position", "relative").css("min-height", "200px").prepend($("<div />").addClass("cargando"));
+	                            	if (document.getElementById('listaDeDistribucionCuerpo') !== null) {
+	                            		$("#listaDeDistribucionCuerpo").css("position", "relative").css("min-height", "200px").prepend($("<div />").addClass("cargando"));
+	                                }
 	                            },
 	                            success: function (returnData) {
 	                                console.log("SUCCESS -- crea registro: ", returnData);	    	
 	                            },
 	                            error : function(e) {
 	                                console.log("ERROR: ", e);
-	                                $("#listaDeDistribucionCuerpo").find(".cargando").remove();			
+	                                if (document.getElementById('listaDeDistribucionCuerpo') !== null) {
+	                                	$("#listaDeDistribucionCuerpo").find(".cargando").remove();	
+	                                }	
 	                            },
 	                            done : function(e) {
 	                                console.log("DONE");
@@ -116,6 +168,23 @@ function creaRegistroDeListaDeDistribucion() {
 	                            complete : function(returnData) {
 	                                console.log("COMPLETE -- crea registro: ", returnData);
 	                                if (returnData.responseJSON.respuesta=="OK") {
+	                                	if ($("#detalleDeExpedienteEnDistribucionModal").length>0 && $('#correosDist').length>0) {
+	                                		$("#detalleDeExpedienteEnDistribucionModal").css("position", "relative").prepend($("<div />").addClass("cargando"));
+	                                		$.get("${sessionURL}", function(haySession){
+	                                	        console.log("haySession: " + haySession);
+	                                	        if(haySession) {
+	                                	        	$('#correosDist').load("${pageContext.request.contextPath}"+ "/getListaDistribucionCorreo", function() {
+	                                					$("#detalleDeExpedienteEnDistribucionModal").find(".cargando").remove();
+	                                					});	
+	                                	        } else {
+	                                	              bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+	                                	                            , function(){
+	                                	                                  window.open('${raizURL}', '_self');
+	                                	                            }
+	                                	               );
+	                                	        }
+	                                	  	});		
+	                                	}
 	                                    $.notify({
 	                                        message: "Registro creado"
 	                                    },{
@@ -123,15 +192,17 @@ function creaRegistroDeListaDeDistribucion() {
 	                                    });
 	                                } else {
 	                                    $.notify({
-	                                        message: "Ocurrio un error al crear el registro"
+	                                        message: returnData.responseJSON.respuesta
 	                                    },{
 	                                        type: 'danger'
 	                                    });
-	                                }                			
-	                                $("#listaDeDistribucionCuerpo").load(urlCargaListaDeDistribucion,
-	                                        function() {
-	                                            $("#listaDeDistribucionCuerpo").find(".cargando").remove();                			                       
-	                                });	
+	                                }          
+	                                if (document.getElementById('listaDeDistribucionCuerpo') !== null) {
+	                                	$("#listaDeDistribucionCuerpo").load(urlCargaListaDeDistribucion,
+		                                        function() {
+		                                            $("#listaDeDistribucionCuerpo").find(".cargando").remove();                			                       
+		                                });	
+	                                }
 	                                $('#creaRegistroListaDeDistribucionModal').modal('hide'); 	            					
 	                            }                		
 	                        });
@@ -140,7 +211,7 @@ function creaRegistroDeListaDeDistribucion() {
 	            });
 	        }
 	    } else {
-	          bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu última acción y hemos caducado tu sesión por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+	          bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
 	                        , function(){
 	                              window.open('${raizURL}', '_blank');
 	                        }
@@ -148,5 +219,16 @@ function creaRegistroDeListaDeDistribucion() {
 	    }
 	});
 }
+
+$(document).ready(function() {
+	$(inicializaFechasDesdeHastaDestinatario);
+});
+
+var inicializaFechasDesdeHastaDestinatario = function() {
+	$('.fecha-desde-hasta-destinatario-modal').datetimepicker({
+		locale : 'es',
+		format : 'DD/MM/YYYY'
+	});
+};
 
 </script> 

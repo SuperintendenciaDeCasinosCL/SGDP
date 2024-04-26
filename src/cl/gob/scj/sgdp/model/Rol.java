@@ -31,6 +31,12 @@ public class Rol implements Serializable {
 	@Column(name="\"A_NOMBRE_ROL\"")
 	private String nombreRol;
 
+	//bi-directional many-to-one association to Unidad
+		@ManyToOne
+		@JoinColumn(name="\"ID_UNIDAD\"")
+		private Unidad unidad;
+		
+	
 	//bi-directional many-to-one association to UsuarioRol
 	@JsonIgnore
 	@OneToMany(mappedBy="rol", cascade={CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch=FetchType.EAGER)
@@ -130,9 +136,22 @@ public class Rol implements Serializable {
 		return tarea;
 	}*/
 
+	
+
+	public Unidad getUnidad() {
+		return unidad;
+	}
+
+	public void setUnidad(Unidad unidad) {
+		this.unidad = unidad;
+	}
+	
+	
+	
+
 	@Override
 	public String toString() {
-		return "Rol [idRol=" + idRol + ", nombreRol=" + nombreRol + "]";
+		return "Rol [idRol=" + idRol + ", nombreRol=" + nombreRol + ", unidad=" + unidad.toString() + "]";
 	}
 
 	@Override

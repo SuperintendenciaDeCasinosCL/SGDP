@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -24,6 +25,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 
+import cl.gob.scj.sgdp.control.AppContextControl;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -93,13 +95,13 @@ public class EmailServiceImpl implements EmailService {
 	private FechaFeriadoDao fechaFeriadoDao;
 	
 	@Autowired
-    JavaMailSender mailSender;
+	private JavaMailSender mailSender;
 	
 	@Autowired
-	LogErrorDao logErrorDao;
+	private LogErrorDao logErrorDao;
 	
 	@Autowired
-	UsuarioRolDao usuarioRolDao;
+	private UsuarioRolDao usuarioRolDao;
 	
 	@Override
 	public RespuestaMailDTO enviarMail(Usuario usuario, InstanciaDeTarea instanciaDeTareaDeOrigen, List<String> listaDeUsuariosAsignados, String comentario, InstanciaDeTarea instanciaDeTareaDeDestino) throws SgdpException {
@@ -176,7 +178,7 @@ public class EmailServiceImpl implements EmailService {
 			}
 			
 			for (String to : listaDeUsuariosAsignados) {
-				enviarCorreo (usuario.getIdUsuario()+configProps.getProperty("dominio.correo"), to+configProps.getProperty("dominio.correo"), parametroMailSmtpHost.getValorParametroChar(), asuntoMensaje, 
+				enviarCorreo (usuario.getIdUsuario()+AppContextControl.getDominioCorreo(), to+AppContextControl.getDominioCorreo(), parametroMailSmtpHost.getValorParametroChar(), asuntoMensaje,
 						bodyMensaje, parametroMailTipoContenido.getValorParametroChar());				
 			}	
 			
@@ -217,7 +219,7 @@ public class EmailServiceImpl implements EmailService {
 			ParametroDTO parametroMailTipoContenido = parametroService.getParametroPorID(Constantes.ID_PARAM_TIPO_CONTENIDO_CORREO);
 			
 			for (String to : listaDeUsuariosAsignados) {
-				enviarCorreo (usuario.getIdUsuario()+configProps.getProperty("dominio.correo"), to+configProps.getProperty("dominio.correo"), parametroMailSmtpHost.getValorParametroChar(), asunto, 
+				enviarCorreo (usuario.getIdUsuario()+AppContextControl.getDominioCorreo(), to+AppContextControl.getDominioCorreo(), parametroMailSmtpHost.getValorParametroChar(), asunto,
 						cuerpo, parametroMailTipoContenido.getValorParametroChar());				
 			}
 			
@@ -276,11 +278,11 @@ public class EmailServiceImpl implements EmailService {
 		
 		try {
 			MimeMessage mimeMessage = mailSender.createMimeMessage();
-	        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false);
+			MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
 	        mimeMessage.setContent(mensaje, tipoDeContenido);
 	        helper.setTo(new InternetAddress(to));	       
 	        helper.setSubject(asunto);
-	        helper.setFrom(new InternetAddress(from));	        
+	        helper.setFrom(new InternetAddress(from));		      
 	        mailSender.send(mimeMessage);	        
 			log.info("Fin enviarCorreo");		
 		} catch (Exception e) {
@@ -306,12 +308,13 @@ public class EmailServiceImpl implements EmailService {
 	
 	@Override
 	public void enviarCorreosConAdjuntosAListaDeDistribucion (List<String> correosDeDistribucion,
-																List<String> idArchivosADistribuir,
+																Set<String> idArchivosADistribuir,
 																String idExpediente,
 																String nombreExpediente,
 																long idInstanciaDeTarea,
 																Usuario usuario,
-																String asunto) throws Exception { 
+																String asunto,
+																List<String> nombreArchivosADistribuir) throws Exception { 
 		
 		log.info("Inicio enviarCorreosConAdjuntoAListaDeDistribucion");
 		
@@ -344,6 +347,7 @@ public class EmailServiceImpl implements EmailService {
 			BodyPart messageBodyPartArchivo = new MimeBodyPart();
 			byte[] contenidoArchivo = gestorDeDocumentosService.getContenidoArchivo(idArchivo, usuario);
 			DetalleDeArchivoDTO detalleDeArchivoDTO = obtenerDetalleDeArchivoService.obtenerDetalleDeArchivo(usuario, idArchivo);
+			nombreArchivosADistribuir.add(detalleDeArchivoDTO.getNombre());
 			DataSource dataSource = new ByteArrayDataSource(contenidoArchivo, detalleDeArchivoDTO.getMimeType());
 			DataHandler dataHandler = new DataHandler(dataSource);
 			messageBodyPartArchivo.setDataHandler(dataHandler);
@@ -530,7 +534,7 @@ public class EmailServiceImpl implements EmailService {
 		
 		try {
 			MimeMessage mimeMessage = mailSender.createMimeMessage();
-	        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false);
+	        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
 	        mimeMessage.setContent(mensaje, tipoDeContenido);
 	        helper.setTo(new InternetAddress(to));
 	        helper.setSubject(asunto);
@@ -633,7 +637,7 @@ public class EmailServiceImpl implements EmailService {
 		
 		try {			
 			MimeMessage mimeMessage = mailSender.createMimeMessage();
-	        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false);
+	        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
 	        mimeMessage.setContent(mensaje, tipoDeContenido);	       
 	        helper.setTo(to);	       
 	        helper.setSubject(asunto);

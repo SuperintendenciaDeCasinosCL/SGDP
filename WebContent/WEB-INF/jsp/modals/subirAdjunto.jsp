@@ -119,6 +119,7 @@ var inicializaFileUploadDocAdjunto = function(){
 	console.log("urlSubirArchivo: " + urlSubirArchivo);	
     var notify = "";
     var tamanoDeArchivo;
+    var nombreArchivoFileUpload;
 	$('#archivoAdjuntoModal').fileupload({
 		dataType: 'json',
         url: urlSubirArchivo,
@@ -127,6 +128,7 @@ var inicializaFileUploadDocAdjunto = function(){
             $( "#nombreArchivoSubirAdjuntoModal" ).empty();       
         	$.each(data.files, function (index, file) {
                 $('#nombreArchivoSubirAdjuntoModal').text(file.name);   
+                nombreArchivoFileUpload = file.name;
                 tamanoDeArchivo = file.size;
                 console.log("tamanoDeArchivo: " + tamanoDeArchivo);             
             });  
@@ -135,6 +137,7 @@ var inicializaFileUploadDocAdjunto = function(){
         		console.log('$("#tagsDocumentoAdjuntoModal").val(): ' + $("#tagsDocumentoAdjuntoModal").val());
         		cerrarModal = true;
         		var validaTamanoDeArchivo = true;
+        		
         		data.formData = {
             			"idExpedienteSubirArchivo" : $(this).attr("data-idexpediente") , 
             			"idTipoDeDocumentoSubir" : $("#idTipoDeDocumentoSubirAdjuntoModal").val(),
@@ -148,7 +151,8 @@ var inicializaFileUploadDocAdjunto = function(){
             			"tipoDeDocumento" : encodeURIComponent($('#idTipoDeDocumentoSubirAdjuntoModal :selected').text()),
             			"esRequerido" : false,
             			"idTags" : $("#tagsDocumentoAdjuntoModal").val(),
-            			"validaInstanciaDeTareaEnBE": true
+            			"validaInstanciaDeTareaEnBE": true,
+            			"nombreArchivoFileUpload" : encodeURIComponent(nombreArchivoFileUpload)
             			};        		
         		if ($('#nombreArchivoSubirAdjuntoModal').text() == "Seleccionar archivo") {
         			$("#spanArchivoAdjuntoModal").validationEngine('showPrompt', '* Este campo es obligatorio', 'error');

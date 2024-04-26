@@ -12,7 +12,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Controller;	
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,12 +21,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import cl.gob.scj.sgdp.auth.user.Usuario;
-import cl.gob.scj.sgdp.config.Constantes;
-import cl.gob.scj.sgdp.dto.ParametroDTO;
 import cl.gob.scj.sgdp.dto.RolDTO;
-import cl.gob.scj.sgdp.service.ParametroService;
 import cl.gob.scj.sgdp.service.UsuarioRolService;
 import cl.gob.scj.sgdp.ws.alfresco.rest.client.AutenticacionService;
+import cl.gob.scj.sgdp.dto.ParametroDTO;
+import cl.gob.scj.sgdp.service.ParametroService;
+import cl.gob.scj.sgdp.config.Constantes;
 
 @Controller
 public class LoginControl {
@@ -36,40 +36,56 @@ public class LoginControl {
 	@Autowired
 	private UsuarioRolService usuarioRolService;
 	
-	//Configuracion para SSO Comentar -->
-	@Autowired
-	private AutenticacionService autenticacionService;
-	
 	@Autowired
 	private ParametroService parametroService;
+	
+	@Autowired
+	private AutenticacionService autenticacionService;
 	
 	@Resource(name = "configProps")
 	private Properties configProps;
 	
-	//Configuracion para SSO Comentar -->
-	@RequestMapping("/")
+	/**
+	 * Para LDAP
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/autenticar")
 	public String login(HttpServletRequest request, HttpServletResponse response, Model model) {	
 			
 		return "login";	
 		
-	}	
+	}
 	
-	//Configuracion para SSO DesComentar -->
+	/**
+	 * Para Keycloack
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @return
+	 */
 	/*@RequestMapping("/")
 	public ModelAndView login(HttpServletRequest request, HttpServletResponse response, Model model) {	
 			
 		return new ModelAndView("forward:/bandejaDeEntrada");
 		
-	}*/
+	}
 	
 	@RequestMapping(value="/login/getRolesUsuario", method=RequestMethod.GET)
 	public @ResponseBody List<RolDTO> getRolesUsuario(@RequestParam("idUsuario") String idUsuario) {	
 		List<RolDTO> roles = new ArrayList<RolDTO>();
 		roles = usuarioRolService.getRolesUsuarioPorIdUsuario(idUsuario, roles);
 	    return roles;
-	}
+	}*/
 	
-	//Configuracion para SSO DesComentar -->
+	/**
+	 * Para LDAP
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping("/verificarSession")
     public @ResponseBody boolean verificarSession(Model model, Principal principal, HttpServletRequest request){
 		log.debug("verificarSession...");
@@ -98,9 +114,13 @@ public class LoginControl {
 		}          
     }
 	
-	//Configuracion para SSO DesComentar -->
-	/*
-	@RequestMapping("/verificarSession")
+	/**
+	 * Para Keycloack
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	/*@RequestMapping("/verificarSession")
     public @ResponseBody boolean verificarSession(Model model, HttpServletRequest request){
 		log.debug("verificarSession...");
 		Usuario usuario = (Usuario)request.getSession().getAttribute("usuario");		
@@ -117,8 +137,12 @@ public class LoginControl {
           return "sessionTimeout";
     }
     
-    //Configuracion para SSO DesComentar -->
-    /*@RequestMapping(value="/logout" , method = RequestMethod.GET)
+    /**
+     * Para Keycloack
+     * @param request
+     * @return
+     */
+  /*  @RequestMapping(value="/logout" , method = RequestMethod.GET)
     public ModelAndView logout(HttpServletRequest request) {
  
     	log.debug("logout");
@@ -143,6 +167,6 @@ public class LoginControl {
         request.getSession().removeAttribute("usuario");
                 
         return new ModelAndView("redirect:" + urlSSO + urlLogout + urlSGDP);
-    }   */ 
+    }    */
 
 }

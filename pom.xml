@@ -259,18 +259,61 @@
 		    <artifactId>integracion-client-api</artifactId>
 		    <version>0.0.2</version>
 		</dependency>	
-		<!-- Configuracion para SSO DesComentar -->
-		<!--  
 		<dependency>
 		    <groupId>org.keycloak</groupId>
 		    <artifactId>keycloak-eap6-adapter-dist</artifactId>
 		    <version>7.0.1</version>
 		    <type>pom</type>
+		</dependency>	
+		<dependency>
+    		<groupId>com.google.zxing</groupId>
+    		<artifactId>core</artifactId>
+   		 	<version>3.3.3</version>
+		</dependency>		
+		<dependency>
+		    <groupId>com.vladmihalcea</groupId>
+		    <artifactId>hibernate-types-43</artifactId>
+		    <version>2.19.2</version>
 		</dependency>
-		-->	
 	</dependencies>
 	<!-- Profiles start here -->
   <profiles>
+
+	<!-- despliegue -->
+
+	<profile>
+    
+      <id>despliegue</id>
+      
+      <build>
+            <plugins>
+                   <plugin>
+                    <groupId>org.jboss.as.plugins</groupId>
+                    <artifactId>jboss-as-maven-plugin</artifactId>
+                    <version>7.9.Final</version>
+                    <configuration>
+                        <hostname>${scj.jboss.hostname}</hostname>
+                        <port>9999</port>
+                        <username>admin</username>
+                        <password>${scj.jboss.password}</password>
+                        <name>${project.build.finalName}.war</name>
+                        <filename>${project.build.finalName}.war</filename>
+                        <skip>${skipDeployment}</skip>
+                        <timeout>15000</timeout>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>deploy-jar</id>
+                            <phase>install</phase>
+                            <goals>
+                                <goal>deploy</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+      </build>
+    </profile>
   
   	<!-- localhost -->
     
@@ -307,6 +350,42 @@
             </plugins>
       </build>
     </profile>
+    
+    <!-- WildFly -->
+    
+    <profile>
+    
+      <id>wildfly_desa</id>
+      
+      <build>
+            <plugins>
+                   <plugin>
+                    <groupId>org.jboss.as.plugins</groupId>
+                    <artifactId>jboss-as-maven-plugin</artifactId>
+                    <version>7.9.Final</version>
+                    <configuration>
+                        <hostname>172.16.150.15</hostname>
+                        <port>9999</port>
+                        <username>adminscj</username>
+                        <password>${scj.jboss.password}</password>
+                        <name>${project.build.finalName}.war</name>
+                        <filename>${project.build.finalName}.war</filename>
+                        <skip>${skipDeployment}</skip>
+                        <timeout>15000</timeout>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>deploy-jar</id>
+                            <phase>install</phase>
+                            <goals>
+                                <goal>deploy</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+      </build>
+    </profile>
   
     <!-- desarrollo -->
     
@@ -320,7 +399,7 @@
                     <artifactId>jboss-as-maven-plugin</artifactId>
                     <version>7.9.Final</version>
                     <configuration>
-                        <hostname>172.16.10.77</hostname>
+                        <hostname>172.16.150.77</hostname>
                         <port>9999</port>
                         <username>admin</username>
                         <password>${scj.jboss.password}</password>
@@ -342,74 +421,7 @@
             </plugins>
       </build>
     </profile>
-    
-    <!-- qa -->
-    <profile>
-      <id>qa1</id>
-      
-      <build>
-            <plugins>
-                   <plugin>
-                    <groupId>org.jboss.as.plugins</groupId>
-                    <artifactId>jboss-as-maven-plugin</artifactId>
-                    <version>7.9.Final</version>
-                    <configuration>
-                        <hostname>172.16.10.19</hostname>
-                        <port>9999</port>
-                        <username>admin</username>
-                        <password>${scj.jboss.password}</password>
-                        <name>${project.build.finalName}.war</name>
-                        <filename>${project.build.finalName}.war</filename>
-                        <skip>${skipDeployment}</skip>
-                        <timeout>15000</timeout>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>deploy-jar</id>
-                            <phase>install</phase>
-                            <goals>
-                                <goal>deploy</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>                
-            </plugins>
-      </build>
-    </profile> 
-    
-    <profile>
-      <id>qa2</id>
-      
-      <build>
-            <plugins>                   
-                <plugin>
-                    <groupId>org.jboss.as.plugins</groupId>
-                    <artifactId>jboss-as-maven-plugin</artifactId>
-                    <version>7.9.Final</version>
-                    <configuration>
-                        <hostname>172.16.10.251</hostname>
-                        <port>9999</port>
-                        <username>admin</username>
-                        <password>${scj.jboss.password}</password>
-                        <name>${project.build.finalName}.war</name>
-                        <filename>${project.build.finalName}.war</filename>
-                        <skip>${skipDeployment}</skip>
-                        <timeout>15000</timeout>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>deploy-jar</id>
-                            <phase>install</phase>
-                            <goals>
-                                <goal>deploy</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-      </build>
-    </profile>
-    
+
     <profile>
       <id>qa_1</id>      
       <build>

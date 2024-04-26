@@ -46,8 +46,8 @@ public class ProcesoDaoImpl implements ProcesoDao {
 	}
 	
 	@Override
-	public void insertaProceso(Proceso proceso) {
-		getSession().save(proceso);
+	public Long insertaProceso(Proceso proceso) {
+		return (Long) getSession().save(proceso);
 	}
 
 	@Override
@@ -61,11 +61,11 @@ public class ProcesoDaoImpl implements ProcesoDao {
 
 	@Override
 	public List<Proceso> getBuscarTodosProcesosVigente(boolean vigente) {
-		Query query = getSession().getNamedQuery("Proceso.buscarTodosProcesoVigente");		
+		Query query = getSession().getNamedQuery("Proceso.buscarTodosProcesoPorVigencia");		
 		query.setBoolean("vigente", vigente);
 		return query.list();
 	}
-
+	
 	@Override
 	public List<String> getBuscarTodosLosNombresdeLosProcesoVigente(boolean vigente) {
 		Query query = getSession().getNamedQuery("Proceso.getBuscarTodosLosNombresdeLosProcesoVigente");		
@@ -92,11 +92,43 @@ public class ProcesoDaoImpl implements ProcesoDao {
 		return query.list();
 	}
 	
+	
+	@Override
+	public List<Proceso> buscarTodosProcesoVigente(boolean vigente) {
+		Query query = getSession().getNamedQuery("Proceso.buscarTodosProcesoVigente");		
+		query.setBoolean("vigente", vigente);
+		return query.list();
+	}
+	
 	@Override
 	public List<Proceso> buscarTodosProcesoVigenteOrderPorCod(boolean vigente) {
 		Query query = getSession().getNamedQuery("Proceso.buscarTodosProcesoVigenteOrderPorCod");		
 		query.setBoolean("vigente", vigente);
 		return query.list();
+	}
+
+	@Override
+	public Long insertaProceso(Proceso proceso, Session session) {
+		return (Long) session.save(proceso);
 	}	
+	
+	@Override
+	public Integer deshabilitaProceso(Long idProcesoNuevo, String codigoProceso, Session session) {
+		if (session == null ) {
+			session = getSession();
+		}
+		
+		Query query = session.getNamedQuery("Proceso.deshabilitaProceso");
+		query.setLong("idProceso", idProcesoNuevo);
+		query.setString("codigoProceso", codigoProceso);
+		return query.executeUpdate();
+	}
+
+	@Override
+	public List<Proceso> getProcesosPorSuperProceso(long idSuperProceso) {
+		Query query = getSession().getNamedQuery("Proceso.findAllBiSuperProceso");		
+		query.setLong("idSuperProceso", idSuperProceso);
+		return query.list();	
+	}
 	
 }

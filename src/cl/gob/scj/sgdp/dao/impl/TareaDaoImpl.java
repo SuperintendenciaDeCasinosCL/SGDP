@@ -66,5 +66,11 @@ public class TareaDaoImpl implements TareaDao {
 		query.setLong("idProceso", idProceso);
 		return query.list();
 	}
+
+	@Override
+	public Long guardarTarea(Tarea t, Session session) {
+		return (Long) session.save(t);
+	}
 	
 }
+

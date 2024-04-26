@@ -43,108 +43,11 @@ function cargarProcesos() {
 	
 }
 
-/*
-function crearExpediente() {
-	
-	var validaForm = $("#formCrearExpediente").validationEngine('validate');
-	console.log("validaForm: " + validaForm);
-	
-	if (!validaForm) {
-		return;
-	}
-	
-	$('#buttonCrearExpediente').addClass('disabled');
-	
-
-	
-	var urlCrearExpediente = $("#urlCrearExpediente").val();
-	var urlGetInstanciasDeTarea = $("#urlGetInstanciasDeTarea").val();
-	var urlGetTareasEnEjecucion = $("#urlGetTareasEnEjecucion").val();
-	
-	console.log("urlCrearExpediente: " + urlCrearExpediente);
-	console.log("urlGetInstanciasDeTarea: " + urlGetInstanciasDeTarea);
-	console.log("urlGetTareasEnEjecucion: " + urlGetTareasEnEjecucion);
-	
-	var form = $('#formCrearExpediente')[0]; 
-	var formData = new FormData(form);
-		 
-	  $.ajax({
-	    url: urlCrearExpediente,
-	    type: 'POST',
-	    data: formData,
-	    async: true,
-	    cache: false,
-	    contentType: false,
-	    processData: false,
-	    success: function (returnData) {
-	    	console.log("SUCCESS -- crearExpediente: ", returnData);	    	
-	    },
-	    error : function(e) {
-			console.log("ERROR: ", e);			
-		},
-		done : function(e) {
-			console.log("DONE");
-		},
-		complete : function(returnData) {
-			console.log("COMPLETE -- crearExpediente: " + returnData.responseText);
-			console.log("COMPLETE -- crearExpediente 2 : " + returnData.responseJSON);
-			console.log("COMPLETE -- crearExpediente 2 : " + returnData.responseJSON.mensajeRespuesta);
-		 
-			// dialog.find('.bootbox-body').html(returnData.responseJSON.mensajeRespuesta);
-			
-			
-			//Cargar Tareas
-			 $('#tareasBandejaDeEntrada').each(function(){        	 
-			        $(this).fadeOut("slow").load(urlGetInstanciasDeTarea).fadeIn('slow');
-			    });
-			//Cargar Tareas en Ejecucion
-			 if ($('#tareasEnEjecucion') != 'undefined' || $('#tareasEnEjecucion') != null ) {
-				 $('#tareasEnEjecucion').each(function(){        	 
-				        $(this).fadeOut("slow").load(urlGetTareasEnEjecucion).fadeIn('slow');
-				    });	
-			 }	
-			 
-			 $('#buttonCrearExpediente').removeClass('disabled');
-			 
-			 
-			  //  cerrar el mensaje de cargando			
-			  //  dialog.modal('hide');
-				
-				// esconder el modal
-				$('#crearExpedienteModal').modal('hide');
-				
-				if (returnData.responseJSON.mensajeError == "OK"){
-					$.notify({
-						message: returnData.responseJSON.mensajeRespuesta
-					},{
-						type: 'success'
-					});
-					
-					  document.getElementById("materia").value = "";
-					  $("#idAutor").val("").trigger("change");
-					  document.getElementById("idMacroProceso").value = "";
-				 //  $("#idProceso").val("").trigger("change");
-					  
-				}else{
-					$.notify({
-						message: returnData.responseJSON.mensajeRespuesta
-					},{
-						type: 'danger'
-					});				
-				}
-				
-			 ///////////////////////////
-		}
-	  });
-}
-
-*/
 function crearExpedienteSubirArchivo() {
 	
 	$("#buttonSubirCrearExpediente").attr("disabled", "disabled");
 	
 	var validaForm = $("#formCrearExpediente").validationEngine('validate');
-	console.log("validaForm: " + validaForm);
 	
 	if (!validaForm) {
 		return;
@@ -166,6 +69,13 @@ function crearExpedienteSubirArchivo() {
 	expedienteDTO["materia"] =  $("#materia").val();
 	expedienteDTO["idAutor"] = $("#idAutor").val();
 	expedienteDTO["idProceso"] = $("#idProcesosVigente").val();
+	
+	if( $('#idComplejidadCrearExpediente').length ) {
+		expedienteDTO['idComplejidad'] = $("#idComplejidadCrearExpediente").val();
+		expedienteDTO['motivoComplejidad'] = $("#motivoComplejidadCrearExpediente").val();
+	}
+	
+	const selectedAutor = $("#idAutor").val();
 
     $.ajax({
         type : "POST",
@@ -175,21 +85,21 @@ function crearExpedienteSubirArchivo() {
         dataType : 'json',
         timeout : 100000,
 	    success: function (returnData) {
-	    	console.log("SUCCESS -- crearExpediente: ", returnData);	    	
-	    },
+	    	console.log("SUCCESS -- crearExpediente: ", returnData);	 
+		},
 	    error : function(e) {
-			console.log("ERROR: ", e);			
+			console.log("ERROR: ", e);	
+			$("#buttonSubirCrearExpediente").prop("disabled", false);	
 		},
 		done : function(e) {
 			console.log("DONE");
 		},
 		complete : function(returnData) {
-			
 			console.log("COMPLETE -- crearExpediente: " + returnData.responseText);
 			console.log("COMPLETE -- crearExpediente 2 : " + returnData.responseJSON);
 			console.log("COMPLETE -- crearExpediente 2 : " + returnData.responseJSON.mensajeRespuesta);
 		 
-			// dialog.find('.bootbox-body').html(returnData.responseJSON.mensajeRespuesta);
+			
 			
 	        $("#tablaFirmas").fadeOut("slow").load(urlGetInstanciasDeTarea).fadeIn('slow');
 	
@@ -238,13 +148,21 @@ function crearExpedienteSubirArchivo() {
 					document.getElementById("idExpedienteSubirArchivoAntecedenteTabla").value =	returnData.responseJSON.idExpediente;				
 					document.getElementById("idInstanciaDeTareaSubirArchivoAntecedenteTabla").value = returnData.responseJSON.idInstanciaDeTareaSalida;
 					
+					// agregado por Hugo Cifuentes para seleccionar de manera automatica el autor
+					$("#idAutorSubirDocumentoExpediente").val(selectedAutor).change();
+					$("#idAutorSubirDocumentoExpediente").attr("disabled", "disabled");
+									
 					$("#cabeceraSubirDocumentoExpdienteModal").html("Subir Documento " + returnData.responseJSON.nombreExpediente);
 			
 					$('#fechaDeCreacionDocumentoExpediente').val(moment(new Date().getTime()).format('DD/MM/YYYY'));
 					$('#fechaRecepcionDocumentoExpediente').val(moment(new Date().getTime()).format('DD/MM/YYYY'));
-					  
+					
+					$('#fechaDeCreacionDocumentoExpediente').on('keyup keypress', function(e) { e.preventDefault(); return false;  })
+					$('#fechaRecepcionDocumentoExpediente').on('keyup keypress', function(e) { e.preventDefault(); return false; 
+					 })
+					
 					$('#crearExpedienteModal').modal('hide');
-					 
+					   
 					setTimeout(function(){
 						 $('#subirDocumentoExpdienteModal').modal({backdrop: 'static', keyboard: false});    
 					}, 500);
@@ -256,6 +174,7 @@ function crearExpedienteSubirArchivo() {
 						type: 'danger'
 					});				
 				}		
+				$("#buttonSubirCrearExpediente").prop("disabled", false);
 		}
 	  });
 	  
@@ -284,11 +203,13 @@ function cargaTipoDeDocumentoSubirExpediente(idProcesoSeleccionado) {
 }
 
 function subirDocumentoConductor() {
+	$("#idAutorSubirDocumentoExpediente").removeAttr("disabled");
 	$("#botonSubirDocumentoConductor").attr("disabled", "disabled");
+	
 	var urlGetInstanciasDeTarea = $("#urlGetInstanciasDeTarea").val();
 	var urlGetTareasEnEjecucion = $("#urlGetTareasEnEjecucion").val();	
 	var validaForm = $("#formSubirDocumentoExpediente").validationEngine('validate');
-	console.log("validaForm: " + validaForm);
+
 	if (!validaForm) {
 		return;
 	}
@@ -297,9 +218,11 @@ function subirDocumentoConductor() {
 	$("#idTipoDeDocumentoSubirExpedienteHidden").val($("#idTipoDeDocumentoSubirExpediente").val());
 	$("#tipoDeDocumentoSubirExpediente").val(encodeURIComponent($('#idTipoDeDocumentoSubirExpediente :selected').text()));
 	console.log($("#tipoDeDocumentoSubirExpediente").val());
-	console.log($("#idTipoDeDocumentoSubirExpedienteHidden").val());	
+	console.log($("#idTipoDeDocumentoSubirExpedienteHidden").val());
+	$("#numeroDocumentoExpediente").val($("#numeroDocumentoExpediente").val() === '' ? 0 : $("#numeroDocumentoExpediente").val());	
 	var form = $('#formSubirDocumentoExpediente')[0]; 
 	var formData = new FormData(form);
+
 	var urlSubirDocumento = $('#urlSubirDocumento').val();	
 	console.log("urlSubirDocumento: " + urlSubirDocumento);	
 	  $.ajax({
@@ -314,12 +237,14 @@ function subirDocumentoConductor() {
 	    	console.log("SUCCESS -- subirArhivoModal: ", returnData);	    	 
 	    },
 	    error : function(e) {
-			console.log("ERROR: ", e);			
+			console.log("ERROR: ", e);		
+			$("#botonSubirDocumentoConductor").prop("disabled", false);	
 		},
 		done : function(e) {
 			console.log("DONE");
 		},
 		complete : function(returnData){
+			
 			console.log("COMPLETE -- subirArhivoModal: ", returnData.responseJSON);	
 			
 			//Cargar Tareas
@@ -373,8 +298,11 @@ function subirDocumentoConductor() {
 				 $("#idAutorSubirDocumentoExpediente").val("").trigger("change");			
 				 document.getElementById("descripcionExpediente").value = ""; 
 		   	}
+			$("#botonSubirDocumentoConductor").prop("disabled", false);
 		}
+		
 	  });	
+$("#idAutorSubirDocumentoExpediente").attr("disabled", "disabled");
 }
 
 
@@ -405,6 +333,7 @@ function buscarNumeroTareas(tipoCreacion) {
 				},{
 					type: 'warning'
 				});
+
                 if (tipoCreacion == 0){
 			       document.getElementById("buttonSubirCrearExpediente").disabled = true;
                 }else if (tipoCreacion == 1){
@@ -436,7 +365,6 @@ function subirDocumentoAdjuntoModal(accion) {
 	var urlGetTareasEnEjecucion = $("#urlGetTareasEnEjecucion").val();
 	
 	var validaForm = $("#formSubirDocumentoAntecedente").validationEngine('validate');
-	console.log("validaForm: " + validaForm);
 	
 	if (!validaForm) {
 		return;
@@ -557,7 +485,7 @@ function abrirCrearExpediente() {
 	      }	else {
 	            bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acci&oacute;n y hemos caducado tu sesi&oacute;n por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
 	                          , function(){
-	                                window.open(raizURL, '_blank');
+	                                window.open(raizURL, '_self');
 	                          }
 	             );
 	      }
@@ -577,7 +505,7 @@ function cerrarModalSubirAdjunto() {
 }
 
 
-// Estas funciones son para que el modal que se habra siempre salga en la primera posiciÃ³n
+// Estas funciones son para que el modal que se habra siempre salga en la primera posición
 
 $(document).ready(function () {
 
@@ -737,7 +665,6 @@ function buscarAyudaProceso() {
 function asignarProceso() {
 	
  	var validaForm = $("#formAyudaProcesoSubproceso").validationEngine('validate');
-	console.log("validaForm: " + validaForm);
 	
 	if (!validaForm) {
 		return;

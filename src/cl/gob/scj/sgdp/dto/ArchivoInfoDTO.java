@@ -3,11 +3,14 @@ package cl.gob.scj.sgdp.dto;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Date;
-
 import cl.gob.scj.sgdp.util.FechaUtil;
 
 public class ArchivoInfoDTO implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String nombre;
 	private String idArchivo;
 	private String cdr;
@@ -35,7 +38,7 @@ public class ArchivoInfoDTO implements Serializable {
 	private String cartaRelacionada;
 	private long idTipoDeDocumento;
 	private boolean conformaExpediente;
-	private boolean esDocumentoConductor;
+	private boolean esDocumentoConductor;	
 	private boolean subidoALaTareaPorElUsuario;
 	private String emisor;
 	private boolean aplicaFEAPorTipoDeDocumento;
@@ -47,6 +50,9 @@ public class ArchivoInfoDTO implements Serializable {
 	private String labelVersionEnInstanciaDeTarea;
 	private Date fechaDocumento;
 	private String esDocumentoOficial;
+	
+	private Boolean puedeVerPorRol;
+	private Boolean puedeVerPorUsuario;
 	
 	public String getNombre() {
 		return nombre;
@@ -289,6 +295,19 @@ public class ArchivoInfoDTO implements Serializable {
 	public void setEsDocumentoOficial(String esDocumentoOficial) {
 		this.esDocumentoOficial = esDocumentoOficial;
 	}
+	
+	public Boolean getPuedeVerPorRol() {
+		return puedeVerPorRol;
+	}
+	public void setPuedeVerPorRol(Boolean puedeVerPorRol) {
+		this.puedeVerPorRol = puedeVerPorRol;
+	}
+	public Boolean getPuedeVerPorUsuario() {
+		return puedeVerPorUsuario;
+	}
+	public void setPuedeVerPorUsuario(Boolean puedeVerPorUsuario) {
+		this.puedeVerPorUsuario = puedeVerPorUsuario;
+	}
 	@Override
 	public String toString() {
 		return "ArchivoInfoDTO [nombre=" + nombre + ", idArchivo=" + idArchivo + ", cdr=" + cdr + ", mimeType="
@@ -313,6 +332,8 @@ public class ArchivoInfoDTO implements Serializable {
 				+ ", fechaUltimaModificacionCompleta=" + fechaUltimaModificacionCompleta
 				+ ", labelVersionEnInstanciaDeTarea=" + labelVersionEnInstanciaDeTarea
 				+ ", esDocumentoOficial=" + esDocumentoOficial
+				+ ", puedeVerPorRal=" + puedeVerPorRol
+				+ ", puedeVerPorUsuario=" + puedeVerPorUsuario
 				+ "]";
 	}	
 }

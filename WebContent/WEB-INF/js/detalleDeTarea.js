@@ -9,49 +9,57 @@
 /*$(document).ready(function() {
 	$("#botonEditarDocumento").click(editarDocumento);
 });*/
-function editarDocumento(){
+function editarDocumento(modulo){
 
 	var codigoMimeType = $("#botonEditarDocumento").attr("data-codigomimetype"); 
 	var linkSharpoint = $("#botonEditarDocumento").attr("data-linksharpoint");
+	var idArchivo = $("#botonEditarDocumento").attr("data-idarchivo");
 	
-	console.log("codigoMimeType: " + codigoMimeType);
-	console.log("linkSharpoint: " + linkSharpoint);
+	var raizURL = $("#raizURL").val();
+	var urlPuedeVerDocumento = raizURL + "confidencialidadDocumento/puedeVerDocumento/" + idArchivo;
 	
-	if(!(window.ActiveXObject)) {			
-		if(codigoMimeType==1) { //word
-			var miwindow = window.open("ms-word:ofe|u|"+linkSharpoint,"_self");
-			miwindow.locate;
-		}
-		else if (codigoMimeType==2) { //excel
-			var miwindow = window.open("ms-excel:ofe|u|"+linkSharpoint,"_self");
-			miwindow.locate;
-		}
-   } else {
-	   if(codigoMimeType==1) { //word
-			/*var miwindow = window.open("ms-word:ofe|u|"+linkSharpoint,"_self");
-			miwindow.locate;*/
-			var wdApp = new ActiveXObject("Word.Application");
-			wdApp.Visible = true;
-			var wdDoc = wdApp.Documents;
-			wdDoc.Open(linkSharpoint);
-		}
-		else if (codigoMimeType==2) { //excel
-			/*var miwindow = window.open("ms-excel:ofe|u|"+linkSharpoint,"_self");
-			miwindow.locate;*/
-			var wdApp = new ActiveXObject("Excel.Application");
-			wdApp.Visible = true;
-			var wb = wdApp.Workbooks;
-			wb.Open(linkSharpoint);
-		}
-   }
-	
+	$.get(urlPuedeVerDocumento, function(puedeVerDocumento) {
+		  console.log("puedeVerDocumento: " + puedeVerDocumento);
+		  if (puedeVerDocumento == true) {
+			  if(!(window.ActiveXObject)) {			
+					if(codigoMimeType==1) { //word
+						var miwindow = window.open("ms-word:ofe|u|"+linkSharpoint,"_self");
+						miwindow.locate;
+						insertaLogDocumento(idArchivo, "EDITA", modulo);
+					}
+					else if (codigoMimeType==2) { //excel
+						var miwindow = window.open("ms-excel:ofe|u|"+linkSharpoint,"_self");
+						miwindow.locate;
+						insertaLogDocumento(idArchivo, "EDITA", modulo);
+					}
+				} else {
+				   if(codigoMimeType==1) { //word
+						var wdApp = new ActiveXObject("Word.Application");
+						wdApp.Visible = true;
+						var wdDoc = wdApp.Documents;
+						wdDoc.Open(linkSharpoint);
+						insertaLogDocumento(idArchivo, "EDITA", modulo);
+					}
+					else if (codigoMimeType==2) { //excel
+						var wdApp = new ActiveXObject("Excel.Application");
+						wdApp.Visible = true;
+						var wb = wdApp.Workbooks;
+						wb.Open(linkSharpoint);
+						insertaLogDocumento(idArchivo, "EDITA", modulo);
+					}
+				}
+		  } else {
+			  bootbox.alert("Lo sentimos, no tiene acceso al documento.");
+		  }
+	  });
 }
+
 
 function muestraEjecucionDeTareaDesdeApp() {	
 	$("#divDetalleDeTareaDesdeAppContenido").removeClass('hide');	
 }
 
-function cargaDetalleDeTarea(nombreExpediente, idInstanciaDeTarea, muestraSoloDocumentosDeSalida, idExpediente, urlControl) {
+function cargaDetalleDeTarea(nombreExpediente, idInstanciaDeTarea, muestraSoloDocumentosDeSalida, idExpediente, urlControl, idEstadoInstanciaTarea) {
 	
 	var sessionURL = $("#urlSessionValida").val();
 	var raizURL = $("#raizURL").val();
@@ -73,6 +81,8 @@ function cargaDetalleDeTarea(nombreExpediente, idInstanciaDeTarea, muestraSoloDo
     		
     		var urlGetTablaHistorialDeDocumentoPorIdExpediente = $("#urlGetTablaHistorialDeDocumentoPorIdExpediente").val();
     		
+			var urlBitacoraSubTareas =  $("#urlBitacoraSubTareas").val();
+			
     		console.log("urlGetHistoricoDeInstDeTareaPorIdExpedienteBusqueda: " + urlGetHistoricoDeInstDeTareaPorIdExpedienteBusqueda);
 
 			resetCondicioDeSatisFaccion();
@@ -84,10 +94,14 @@ function cargaDetalleDeTarea(nombreExpediente, idInstanciaDeTarea, muestraSoloDo
 		 	$("#divDetalleDeTarea").empty();
 		 	$("#divTablaHistorialDeInstanciaDeProceso").empty();
 		 	$("#divTablaHistorialDeDocumentos").empty();	
+			$("#divBitacoraSubTareas").empty();	
+		
 		
 		 	$("#liTabDivDetalleDeTarea").addClass("active");
 		 	$("#liTabHistorialDeTareas").removeClass("active");   
 		 	$("#liTabHistorialDeDocumentos").removeClass("active");
+			$("#liBitacoraDeSubTareas").removeClass("active");
+
 		
 		 	$("#tabDivDetalleDeTarea").addClass("active");
 		 	$("#tabDivDetalleDeTarea").addClass("in");
@@ -97,7 +111,11 @@ function cargaDetalleDeTarea(nombreExpediente, idInstanciaDeTarea, muestraSoloDo
 		
 		 	$("#tabDivHistorialDeDocumentos").removeClass("active");
 		 	$("#tabDivHistorialDeDocumentos").removeClass("in");
-    		
+		
+			$("#tabDivBitacoraSubTareas").removeClass("active");
+		 	$("#tabDivBitacoraSubTareas").removeClass("in");
+
+
     		if (urlControl!=null && urlControl!="") {
     					
     			$('#tablaTareas').DataTable().rows('.selected').nodes().to$().removeClass('selected');			
@@ -129,6 +147,10 @@ function cargaDetalleDeTarea(nombreExpediente, idInstanciaDeTarea, muestraSoloDo
     		    });
     		    
     		    $('#divTablaHistorialDeInstanciaDeProcesoForm').load(urlGetHistoricoDeInstDeTareaPorIdExpedienteBusqueda, function(){
+    		    	dialogForm.modal('hide');
+    		    });
+
+				$('#divBitacoraDeSubTareas').load(urlBitacoraSubTareas + idInstanciaDeTarea + "/" + idEstadoInstanciaTarea  , function(){
     		    	dialogForm.modal('hide');
     		    });
     			
@@ -166,12 +188,16 @@ function cargaDetalleDeTarea(nombreExpediente, idInstanciaDeTarea, muestraSoloDo
     		    $('#divTablaHistorialDeInstanciaDeProceso').load(urlGetHistoricoDeInstDeTareaPorIdExpedienteBusqueda, function(){
     		    	$( "#tabHistorialDeDocumentos" ).prepend( "<br>" );
     		    });
+
+				$('#divBitacoraSubTareas').load(urlBitacoraSubTareas + idInstanciaDeTarea + "/" + idEstadoInstanciaTarea, function(){
+    		    	$( "#tabDivBitacoraSubTareas" ).prepend( "<br>" );
+    		    });
     		    
     		}    		
     		
        	} else {
              bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acci&oacute;n y hemos caducado tu sesi&oacute;n por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
-             	, function(){ window.open(raizURL, '_blank');}
+             	, function(){ window.open(raizURL, '_self');}
              );
        	}
 	});

@@ -58,6 +58,7 @@ import cl.gob.scj.sgdp.config.Constantes;
 			+ "AND t.idTarea IN ( "
 			+ " SELECT rt.tareaSiguiente.idTarea FROM ReferenciaDeTarea rt WHERE rt.tarea.orden = 1 AND rt.tarea.proceso.idProceso =:idProceso "		
 			+ ") ")
+	
 })
 
 public class Tarea implements Serializable, Comparable<Tarea> {
@@ -114,6 +115,7 @@ public class Tarea implements Serializable, Comparable<Tarea> {
 	@Column(name="\"B_NUMERACION_AUTO\"")
 	private Boolean numAuto;
 	
+
 	//bi-directional many-to-one association to InstanciaDeTarea
 	@JsonIgnore
 	@OneToMany(mappedBy="tarea", cascade={CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch=FetchType.LAZY)
@@ -611,7 +613,7 @@ public class Tarea implements Serializable, Comparable<Tarea> {
 			return false;
 		return true;
 	}
-
+	
 	@Override
 	public String toString() {
 		return "Tarea [idTarea=" + idTarea + ", descripcionTarea="

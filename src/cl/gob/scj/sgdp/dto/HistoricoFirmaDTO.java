@@ -14,7 +14,8 @@ public class HistoricoFirmaDTO implements Serializable  {
 	private Date fechaFirma;
 	private FirmaType tipoFirma;
 	private long idTipoDeDocumento;
-	private long idDocumentoFirmado;
+	private Long idDocumentoFirmado;
+	private String uuid;
 	
 	public long getIdHistoricoFirma() {
 		return idHistoricoFirma;
@@ -58,12 +59,23 @@ public class HistoricoFirmaDTO implements Serializable  {
 	public void setIdTipoDeDocumento(long idTipoDeDocumento) {
 		this.idTipoDeDocumento = idTipoDeDocumento;
 	}	
-	public long getIdDocumentoFirmado() {
+	
+	
+	public Long getIdDocumentoFirmado() {
 		return idDocumentoFirmado;
 	}
-	public void setIdDocumentoFirmado(long idDocumentoFirmado) {
+	public void setIdDocumentoFirmado(Long idDocumentoFirmado) {
 		this.idDocumentoFirmado = idDocumentoFirmado;
 	}
+	public String getUuid() {
+		return uuid;
+	}
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+
+		
+	
 	@Override
 	public String toString() {
 		return "HistoricoFirmaDTO [idHistoricoFirma=" + idHistoricoFirma + ", idInstanciaDeTarea=" + idInstanciaDeTarea
@@ -71,6 +83,6 @@ public class HistoricoFirmaDTO implements Serializable  {
 				+ ", tipoFirma=" + tipoFirma.getNombreFirma() 
 				+ ", idTipoDeDocumento=" + idTipoDeDocumento
 				+ ", idDocumentoFirmado=" + idDocumentoFirmado 
-				+ "]";
+				+ ", uuid=" + uuid +"]";
 	}
 }

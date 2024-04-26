@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import cl.gob.scj.sgdp.dto.UsuarioResponsabilidadDTO;
+import cl.gob.scj.sgdp.model.UsuarioResponsabilidad;
 
 @Service
 public interface UsuarioResponsabilidadService {
@@ -20,5 +21,16 @@ public interface UsuarioResponsabilidadService {
 	List<UsuarioResponsabilidadDTO> getUsuariosResponsabilidadDTODeSegundasTareaPorIdProceso(long idProceso);
 	
 	void cargaUsuariosFueraOficinaRolesPosiblesPorIdInstanciaDeTarea(long idInstanciaDeTarea, List<String> posiblesUsuariosFueaOficina);
+
+	Integer eliminaUsuarioResponsabilidadPorIdResponsabilidad(long idResponsabilidad);
+	
+	void guardar(UsuarioResponsabilidad ur);
+	
+	List<UsuarioResponsabilidadDTO> getUsuariosRolesPosiblesPorIdInstanciaDeTarea(long idInstanciaDeTarea);
+	
+	
+	List<String> obtenerPosiblesUsuarios (long idUnidadOperativa, long idInstanciaTarea);
+	
+	List<String> obtenerPosiblesUsuariosFueraOf (long idUnidadOperativa, long idInstanciaTarea);
 	
 }

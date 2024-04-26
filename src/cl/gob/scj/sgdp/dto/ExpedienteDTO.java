@@ -25,6 +25,9 @@ public class ExpedienteDTO implements Serializable {
 	private String idUsuarioCrea;
 	private String codigoProceso;
 	
+	private String idComplejidad;
+	private String motivoComplejidad;
+	
 	public Long getIdMacroProceso() {
 		return idMacroProceso;
 	}
@@ -160,6 +163,22 @@ public class ExpedienteDTO implements Serializable {
 	public void setCodigoProceso(String codigoProceso) {
 		this.codigoProceso = codigoProceso;
 	}
+	
+	public String getIdComplejidad() {
+		return idComplejidad;
+	}
+
+	public void setIdComplejidad(String idComplejidad) {
+		this.idComplejidad = idComplejidad;
+	}
+
+	public String getMotivoComplejidad() {
+		return motivoComplejidad;
+	}
+
+	public void setMotivoComplejidad(String motivoComplejidad) {
+		this.motivoComplejidad = motivoComplejidad;
+	}
 
 	@Override
 	public String toString() {
@@ -176,6 +195,8 @@ public class ExpedienteDTO implements Serializable {
 				+ ", fechaDeInicioInstProc=" + fechaDeInicioInstProc
 				+ ", idUsuarioCrea=" + idUsuarioCrea
 				+ ", codigoProceso=" + codigoProceso
+				+ ", complejidad=" + idComplejidad
+				+ ", motivoComplejidad=" + motivoComplejidad
 				+ "]";
 	}
 		

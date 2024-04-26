@@ -37,10 +37,10 @@
 				<div class="col-sm-12">
 				
 					<label class="radio-inline">
-				      <input type="radio" onclick="cargaDetalleDeTarea(${instanciaDeTareaDTO.idInstanciaDeTarea}, 'true', '${instanciaDeTareaDTO.idExpediente}', '${instanciaDeTareaDTO.urlControl}') " id="muestraDocumentosObligatorios" name="muestraTodosLosDocumento" ${instanciaDeTareaDTO.muestraDocumentosObligatoriosChecked}>Solo los documentos obligatorios
+				      <input type="radio" onclick="cargaDetalleDeTarea(${instanciaDeTareaDTO.idInstanciaDeTarea}, 'true', '${instanciaDeTareaDTO.idExpediente}', '${instanciaDeTareaDTO.urlControl}', '${instanciaDeTareaDTO.idEstadoTarea}') " id="muestraDocumentosObligatorios" name="muestraTodosLosDocumento" ${instanciaDeTareaDTO.muestraDocumentosObligatoriosChecked}>Solo los documentos obligatorios
 				    </label>
 				    <label class="radio-inline">
-				      <input type="radio" onclick="cargaDetalleDeTarea(${instanciaDeTareaDTO.idInstanciaDeTarea}, 'false', '${instanciaDeTareaDTO.idExpediente}', '${instanciaDeTareaDTO.urlControl}')" id="muestraTodosDocumentos" name="muestraTodosLosDocumento" ${instanciaDeTareaDTO.muestraTodosDocumentosChecked}>Todos los documentos
+				      <input type="radio" onclick="cargaDetalleDeTarea(${instanciaDeTareaDTO.idInstanciaDeTarea}, 'false', '${instanciaDeTareaDTO.idExpediente}', '${instanciaDeTareaDTO.urlControl}', '${instanciaDeTareaDTO.idEstadoTarea}')" id="muestraTodosDocumentos" name="muestraTodosLosDocumento" ${instanciaDeTareaDTO.muestraTodosDocumentosChecked}>Todos los documentos
 				    </label>
 				
 				</div>	

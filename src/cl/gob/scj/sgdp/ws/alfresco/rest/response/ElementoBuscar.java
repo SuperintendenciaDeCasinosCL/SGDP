@@ -28,6 +28,7 @@ public class ElementoBuscar implements Serializable   {
 	private String esConfidencial;
 	private List<String> usuariosQueHanModificado;
 	private String usuariosQueHanParticipado;
+	private String complejidad;
 	
 	public String getTipoObjeto() {
 		return tipoObjeto;
@@ -168,6 +169,12 @@ public class ElementoBuscar implements Serializable   {
 	public void setUsuariosQueHanParticipado(String usuariosQueHanParticipado) {
 		this.usuariosQueHanParticipado = usuariosQueHanParticipado;
 	}
+	public String getComplejidad() {
+		return complejidad;
+	}
+	public void setComplejidad(String complejidad) {
+		this.complejidad = complejidad;
+	}
 	@Override
 	public String toString() {
 		return "ElementoBuscar [tipoObjeto=" + tipoObjeto + ", nombreDeObjeto="
@@ -186,6 +193,7 @@ public class ElementoBuscar implements Serializable   {
 				+ ", esConfidencial=" + esConfidencial
 				+ ", usuariosQueHanModificado=" + usuariosQueHanModificado
 				+ ", usuariosQueHanParticipado=" + usuariosQueHanParticipado
+				+ ", complejidad=" + complejidad
 				+ "]";
 	}	
 }

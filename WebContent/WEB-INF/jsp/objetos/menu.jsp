@@ -7,6 +7,9 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
+<%@ page import= "cl.gob.scj.sgdp.control.AppContextControl" %>
+
+<c:set var="urlFuncPhp" value="<%=AppContextControl.getUrlFuncPhp()%>"/>
 <c:set var="permisoPuedeVerDashBoard" value="<%=PermisoType.PUEDE_VER_DASHBOARD.getNombrePermiso()%>"/>
 <c:set var="permisoPuedeVerMantenedores" value="<%=PermisoType.PUEDE_VER_MANTENEDORES.getNombrePermiso()%>"/>
 <c:set var="permisoPuedeMantenerAutores" value="<%=PermisoType.PUEDE_MANTENER_AUTORES.getNombrePermiso()%>"/>
@@ -15,8 +18,22 @@
 <c:set var="permisoPuedeVerIndicaodres" value="<%=PermisoType.PUEDE_VER_INDICADORES.getNombrePermiso()%>"/>
 <c:set var="permisoPuedeMantenerListaDistribucion" value="<%=PermisoType.PUEDE_MANTENER_LISTA_DISTRIBUCION.getNombrePermiso()%>"/>
 <c:set var="permisoPuedeMantenerParametros" value="<%=PermisoType.PUEDE_MANTENER_PARAMETROS.getNombrePermiso()%>"/>
+<c:set var="permisoPuedeMantenerTipoDeDestinatario" value="<%=PermisoType.PUEDE_MANTENER_TIPO_DE_DESTINATARIO.getNombrePermiso()%>"/>
+<c:set var="permisoPuedeMantenerUsuarios" value="<%=PermisoType.PUEDE_MANTENER_USUARIOS.getNombrePermiso()%>"/>
+<c:set var="permisoPuedeMantenerCargos" value="<%=PermisoType.PUEDE_MANTENER_CARGOS.getNombrePermiso()%>"/>
+<c:set var="permisoPuedeMantenerUnidades" value="<%=PermisoType.PUEDE_MANTENER_UNIDADES.getNombrePermiso()%>"/>
+<c:set var="permisoPuedeMantenerUnidadesOperativas" value="<%=PermisoType.PUEDE_MANTENER_UNIDADES_OPERATIVAS.getNombrePermiso()%>"/>
+<c:set var="permisoPuedeMantenerTiposSubtareasBitacora" value="<%=PermisoType.PUEDE_MANTENER_TIPOS_SUBTAREAS_BITACORA.getNombrePermiso()%>"/>
+<c:set var="permisoPuedeMantenerSeriesDocumentales" value="<%=PermisoType.PUEDE_MANTENER_SERIES_DOCUMENTALES.getNombrePermiso()%>"/>
+<c:set var="permisoPuedeMantenerPlantillas" value="<%=PermisoType.PUEDE_MANTENER_PLANTILLAS.getNombrePermiso()%>"/>
+<c:set var="permisoPuedeCargarProseso" value="<%=PermisoType.PUEDE_CARGAR_PROCESO.getNombrePermiso()%>"/>
+<c:set var="permisoPuedeEditarAsunto" value="<%=PermisoType.PUEDE_EDITAR_ASUNTO.getNombrePermiso()%>"/>
+<c:set var="permisoPuedeVerReportLogDocumento" value="<%=PermisoType.PUEDE_VER_LOG_DOCUMENTOS.getNombrePermiso()%>"/>
+<c:set var="permisoPuedeVerAnuladorDocumentos" value="<%=PermisoType.PUEDE_ANULAR_DOCUMENTOS.getNombrePermiso()%>"/>
+
 <c:set var="urlReporteSGDP" value="<%=AppContextControl.getUrlReporteSGDP()%>"/>
 <c:set var="urlIndicadoresIgestion" value="<%=AppContextControl.getUrlIndicadoresIgestion()%>"/>
+<c:set var="urlFuncPhp" value="<%=AppContextControl.getUrlFuncPhp()%>"/>
 
 <c:url value="/verificarSession" var="sessionURL" />
 <c:url value="/" var="raizURL" />
@@ -29,11 +46,6 @@
    <c:param name="linkActivo" value="buscador" />
 </c:url>
 
-<c:url value="mantenedorAutor" var="mantenedorAutorURL">
-   <c:param name="linkActivo" value="mantenedores" />
-   <c:param name="linkActivoMant" value="mantenedorAutor" />
-</c:url>
-
 <c:url value="notificadorTarea" var="notificadorTareaURL">
    <c:param name="linkActivo" value="notificacionPredeterminada" />
 </c:url>
@@ -42,12 +54,13 @@
    <c:param name="linkActivo" value="indicador" />
 </c:url>
 
-<c:url value="listaDeDistribucion" var="listaDeDistribucionURL">
-   <c:param name="linkActivo" value="listaDeDistribucion" />
+<c:url value="listaDeDistribucion" var="listaDeDistribucionURL">	
+   	<c:param name="linkActivo" value="listaDeDistribucion" />
 </c:url>
 
 <c:url value="mantenedorParametros" var="mantenedorParametrosURL">
-   <c:param name="linkActivo" value="mantenedorParametros" />
+	<c:param name="linkActivo" value="mantenedores" />
+   	<c:param name="linkActivoMant" value="mantenedorParametros" />
 </c:url>
 
 <c:url value="solicitudesCreacionExp" var="solicitudesCreacionExpURL">
@@ -58,6 +71,78 @@
    <c:param name="linkActivo" value="mantenedores" />
    <c:param name="linkActivoMant" value="mantenedorProcSolCreaExp" />
    <c:param name="vistaCompleta" value="true" />
+</c:url>
+
+<c:url value="mantenedorAutores" var="mantenedorAutoresURL">
+   <c:param name="linkActivo" value="mantenedores" />
+   <c:param name="linkActivoMant" value="mantenedorAutores" />
+   <c:param name="vistaCompleta" value="true" />
+</c:url>
+
+<c:url value="mantenedorUsuarios" var="mantenedorUsuariosURL">
+	<c:param name="linkActivo" value="mantenedores" />
+   	<c:param name="linkActivoMant" value="mantenedorUsuarios" />
+</c:url>
+
+<!-- MIG -->
+<c:url value="mantenedorRoles" var="mantenedorRolesURL">
+	<c:param name="linkActivo" value="mantenedores" />
+   	<c:param name="linkActivoMant" value="mantenedorRoles" />
+</c:url>
+
+<c:url value="mantenedorUnidades" var="mantenedorUnidadesURL">
+	<c:param name="linkActivo" value="mantenedores" />
+   	<c:param name="linkActivoMant" value="mantenedorUnidades" />
+</c:url>
+
+<c:url value="mantenedorUnidadesOperativas" var="mantenedorUnidadesOperativasURL">
+	<c:param name="linkActivo" value="mantenedores" />
+   	<c:param name="linkActivoMant" value="mantenedorUnidadesOperativas" />
+</c:url>
+
+<c:url value="mantenedorTiposSubtareaBitacora" var="mantenedorTiposSubtareaBitacoraURL">
+	<c:param name="linkActivo" value="mantenedores" />
+   	<c:param name="linkActivoMant" value="mantenedorTiposSubtareaBitacora" />
+</c:url>
+
+
+<c:url value="mantenedorTipoDestinatario" var="mantenedorTipoDestinatarioURL">
+	<c:param name="linkActivo" value="mantenedores" />
+   	<c:param name="linkActivoMant" value="mantenedorTipoDestinatario" />
+</c:url>
+
+<c:url value="cargaProcesos" var="cargaProcesosURL">
+	<c:param name="linkActivo" value="cargaProcesos" />
+</c:url>
+
+<c:url value="plantillaDocumento" var="plantillaDocumentoURL">
+	<c:param name="linkActivo" value="plantillaDocumento" />
+</c:url>
+
+<c:url value="reportes" var="reportesURL">
+	<c:param name="linkActivo" value="reportes" />
+</c:url>
+
+<c:url value="serieDocumental" var="serieDocumentalURL">
+	<c:param name="linkActivo" value="mantenedores" />
+	<c:param name="linkActivoMant" value="serieDocumental" />
+</c:url>
+
+<c:url value="mantenedorPlantillas" var="mantenedorPlantillasURL">
+	<c:param name="linkActivo" value="mantenedores" />
+   	<c:param name="linkActivoMant" value="mantenedorPlantillas" />
+</c:url>
+
+<c:url value="editorDeAsunto" var="editorDeAsuntoURL">
+	<c:param name="linkActivo" value="editorDeAsunto" />
+</c:url>
+
+<c:url value="reportLogDocumento" var="reportLogDocumentoURL">
+   <c:param name="linkActivoMant" value="reportLogDocumento" />
+</c:url>
+
+<c:url value="anuladorDocumentos" var="anuladorDocumentosURL">
+   <c:param name="linkActivo" value="anuladorDocumentos" />
 </c:url>
 
 <c:url var="urlVideoInicioSesion" value="/cargaVideo?idVideo=Login.mp4" />
@@ -106,7 +191,7 @@
 			  	</div>
 			  	
                 <span><a href="#">${not empty usuario ? usuario.unidadDTO.codigoUnidad : 'Anonima'}</a></span>
-                <span><br><a href="http://sgdocb/proceso/bpm/roles_user_all.php" target="_blank" >Roles</a></span>
+                <span><br><a href="http://${urlFuncPhp}/proceso/bpm/roles_user_all.php" target="_blank" >Roles</a></span>
             </div>                        
 
         </div>
@@ -127,18 +212,57 @@
 		     <c:when test="${param.linkActivo.equals('dashboard')}">
 		       <c:set var="classDashBoardActive" value="active"/>
 		    </c:when>	
+		    <c:when test="${param.linkActivoMant.equals('mantenedorAutores')}">
+	       		<c:set var="classMantenedorAutoresActive" value="active"/>
+	       	</c:when>
 		    <c:when test="${param.linkActivo.equals('mantenedores')}">
 		       <c:set var="classMantendorActive" value="active"/>		       
 		       <c:choose>
-		       	<c:when test="${param.linkActivoMant.equals('mantenedorAutor')}">
-		       		<c:set var="classMantenedorAutorActive" value="active"/>
+		       	<c:when test="${param.linkActivoMant.equals('mantenedorAutores')}">
+		       		<c:set var="classMantenedorAutoresActive" value="active"/>
 		       	</c:when>
 		       	<c:when test="${param.linkActivoMant.equals('mantenedorProcSolCreaExp')}">
 		       		<c:set var="classMantenedorProcSolCreaExp" value="active"/>
 		       	</c:when>
+		       	<c:when test="${param.linkActivoMant.equals('mantenedorParametros')}">
+			       <c:set var="classMantenedorParametrosActive" value="active"/>
+			    </c:when>
+			    <c:when test="${param.linkActivoMant.equals('mantenedorTipoDestinatario')}">
+			       <c:set var="classMantenedorTipoDestinatarioActive" value="active"/>
+			    </c:when>
+			    <c:when test="${param.linkActivoMant.equals('mantenedorUsuarios')}">
+			       <c:set var="classMantenedorUsuariosActive" value="active"/>
+			    </c:when>
+			    <c:when test="${param.linkActivoMant.equals('mantenedorRoles')}">
+			       <c:set var="classMantenedorRolesActive" value="active"/>
+			    </c:when>
+			     <c:when test="${param.linkActivoMant.equals('mantenedorUnidades')}">
+			       <c:set var="classMantenedorUnidadesActive" value="active"/>
+			    </c:when>		       
+		       	 <c:when test="${param.linkActivoMant.equals('mantenedorUnidadesOperativas')}">
+			       <c:set var="classMantenedorUnidadesOperativasActive" value="active"/>
+			    </c:when>
+			    <c:when test="${param.linkActivoMant.equals('mantenedorTiposSubtareaBitacora')}">
+			       <c:set var="classMantenedorTiposSubtareaBitacoraActive" value="active"/>
+			    </c:when>
+			     <c:when test="${param.linkActivoMant.equals('mantenedorPlantillas')}">
+			       <c:set var="classMantenedorPlantillasActive" value="active"/>
+			    </c:when>
+			     <c:when test="${param.linkActivoMant.equals('serieDocumental')}">
+		       		<c:set var="classserieDocumental" value="active"/>
+		    	</c:when>
 		       	<c:otherwise>
 		       		<c:set var="classMantenedorAutorActive" value=""/>
 		       		<c:set var="classMantenedorProcSolCreaExp" value=""/>
+		       		<c:set var="classMantenedorParametrosActive" value=""/>
+		       		<c:set var="classMantenedorTipoDestinatarioActive" value=""/>
+		       		<c:set var="classMantenedorUsuariosActive" value=""/>
+		       		<c:set var="classMantenedorRolesActive" value=""/>
+		       		<c:set var="classMantenedorUnidadesActive" value=""/>
+		       		<c:set var="classMantenedorUnidadesOperativasActive" value=""/>
+		       		<c:set var="classMantenedorTiposSubtareaBitacoraActive" value=""/>
+		       		<c:set var="classMantenedorPlantillasActive" value=""/>
+		       		<c:set var="classserieDocumental" value=""/>
 		       	</c:otherwise>
 		       </c:choose>		       
 		    </c:when>		
@@ -150,14 +274,25 @@
 		    </c:when>	
 		    <c:when test="${param.linkActivo.equals('listaDeDistribucion')}">
 		       <c:set var="classListaDeDistribucionActive" value="active"/>
-		    </c:when>	
-		    <c:when test="${param.linkActivo.equals('mantenedorParametros')}">
-		       <c:set var="classMantenedorParametrosActive" value="active"/>
-		    </c:when>
+		    </c:when>			    
 		    <c:when test="${param.linkActivo.equals('solicitudesCreacionExp')}">
 		       <c:set var="classSolicitudesCreacionExpActive" value="active"/>
+		    </c:when>	
+		    <c:when test="${param.linkActivo.equals('cargaProcesos')}">
+		       <c:set var="classCargaProcesos" value="active"/>
+		    </c:when>	
+		    <c:when test="${param.linkActivo.equals('reportes')}">
+		       <c:set var="classReportes" value="active"/>
 		    </c:when>
-		    		    
+		    <c:when test="${param.linkActivo.equals('editorDeAsunto')}">
+		       <c:set var="classEditorDeAsunto" value="active"/>
+		    </c:when>
+		    <c:when test="${param.linkActivoMant.equals('reportLogDocumento')}">
+					<c:set var="classReportLogDocumento" value="active"/>
+			</c:when>
+			<c:when test="${param.linkActivo.equals('anuladorDocumentos')}">
+				<c:set var="classAnuladorDocumentosActive" value="active"/>
+			</c:when>	      
 		    <c:otherwise>
 		        <c:set var="classBEActive" value="active"/>
 		        <c:set var="classBuscadorActive" value=""/>
@@ -167,87 +302,140 @@
 		        <c:set var="classMantenedorParametrosActive" value=""/>
 		        <c:set var="classSolicitudesCreacionExpActive" value=""/>
 		        <c:set var="classMantenedorAutorActive" value=""/>
-		         <c:set var="classMantenedorProcSolCreaExp" value=""/>
+		        <c:set var="classMantenedorProcSolCreaExp" value=""/>
+		        <c:set var="classMantenedorTipoDestinatarioActive" value=""/>
+		        <c:set var="classMantenedorUsuariosActive" value=""/>
+		        <c:set var="classMantenedorRolesActive" value=""/>
+		        <c:set var="classMantenedorUnidadesActive" value=""/>
+		        <c:set var="classMantenedorUnidadesOperativasActive" value=""/>
+		        <c:set var="classMantenedorTiposSubtareaBitacoraActive" value=""/>
+		        <c:set var="classCargaProcesos" value=""/>
+		        <c:set var="classPlantillaDocumento" value=""/>
+		        <c:set var="classReportes" value=""/>
+		        <c:set var="classserieDocumental" value=""/>
+		        <c:set var="classEditorDeAsunto" value=""/>
+		        <c:set var="classReportLogDocumento" value=""/>
+		        <c:set var="classAnuladorDocumentosActive" value=""/>
 		    </c:otherwise>
 		</c:choose>
 		
       
         <li class="${classBEActive} liMenu">
 	    	<a href="${bandejaDeEntradaURL}"><i class="glyphicon glyphicon-inbox"></i> <spring:message code="menu.principal.link.nombre.bandejaDeEntrada"/><span id="cantidadDeTareas" class="badge">${cantidadDeTareas}</span></a>
-	    </li>
-	    
+	    </li>	    
 	    <li class="${classBuscadorActive} liMenu">
 	    	<a href="${buscadorURL}"><i class="glyphicon glyphicon-search"></i> B&uacute;squeda</a>
-	    </li>	    
+	    </li>	   
 	    
 	    <c:if test = "${usuario.permisos[permisoPuedeMantenerNotificacionesPredeterminadas] eq permisoPuedeMantenerNotificacionesPredeterminadas}">
 		    <li class="${classNotificacionPredeterminadaActive} liMenu">
 		    	<a href="${notificadorTareaURL}"><i class="glyphicon glyphicon-envelope"></i> Notificaci&oacute;n Predeterminada</a>
 		    </li>
 	    </c:if>
-	   	  
-	   	<c:if test = "${usuario.permisos[permisoPuedeVerIndicaodres] eq permisoPuedeVerIndicaodres}">
-		   	<li class="${indicadorActive} liMenu">
-		   		<a href="indicador?linkActivo=indicador"><i class="glyphicon glyphicon-th-list"></i> Indicadores</a>
-		  	</li>
-	   	</c:if> 
-	 	
 	   <c:if test = "${usuario.permisos[permisoPuedeMantenerListaDistribucion] eq permisoPuedeMantenerListaDistribucion}">
 		   	<li class="${classListaDeDistribucionActive} liMenu">
-		   		<a href="${listaDeDistribucionURL}"><i class="glyphicon glyphicon-list-alt"></i> Lista de Distribuci&oacute;n</a>
+		   		<a href="${listaDeDistribucionURL}"><i class="glyphicon glyphicon-plane"></i> Lista de Distribuci&oacute;n</a>
 		  	</li>
 	   	</c:if>
-
 	    <c:if test = "${usuario.permisos[permisoPuedeVerDashBoard] eq permisoPuedeVerDashBoard}">	    
 	    	<li class="${classDashBoardActive} liMenu">
 		    	<a href="${bandejaDeEntradaURL}"><i class="glyphicon glyphicon-dashboard"></i> DashBoard</a>
 		    </li>	    
-	    </c:if>	   
-	    
+	    </c:if>	
 	    <c:if test = "${usuario.permisos[permisoPuedeVerMantenedores] eq permisoPuedeVerMantenedores}">
 		 	<li class="${classMantendorActive} liMenu">
 		 		<a href="#"><i class="glyphicon glyphicon-cog"></i> Mantenedores</a>     
-		 	</li>		 	
+		 	</li>
 		 	<c:if test = "${usuario.permisos[permisoPuedeMantenerAutores] eq permisoPuedeMantenerAutores}">
-		 		<li class="${classMantenedorAutorActive} liMenu li-sub-menu">
-					<a onclick="cargaManAutores('${pageContext.request.contextPath}'+'/'+'${mantenedorAutorURL}')" href="#"><i class="glyphicon glyphicon-briefcase"></i> Autores</a>
+		 		<li class="${classMantenedorAutoresActive} liMenu li-sub-menu">					
+					<a href="${mantenedorAutoresURL}"><i class="glyphicon glyphicon-briefcase"></i> Mantenedor de Autores</a>
 				</li>
-		 	</c:if>	
+			</c:if>	
 		 	<c:if test = "${usuario.permisos[permisoPuedeMantenerProcSolCreaExp] eq permisoPuedeMantenerProcSolCreaExp}">
 		 		<li class="${classMantenedorProcSolCreaExp} liMenu li-sub-menu">					
-					<a href="${mantenedorProcSolCreaExpURL}"><i class="glyphicon glyphicon-transfer"></i> Subprocesos solicitud de creaci&oacute;n expediente</a>
+					<a href="${mantenedorProcSolCreaExpURL}"><i class="glyphicon glyphicon-transfer"></i> Subprocesos solicitud de creaci&oacute;n Expediente</a>
 				</li>
-		 	</c:if> 
-	    </c:if>
-	    
+		 	</c:if>
+		 	<c:if test = "${usuario.permisos[permisoPuedeMantenerParametros] eq permisoPuedeMantenerParametros}">
+			   	<li class="${classMantenedorParametrosActive} li-sub-menu">
+			   		<a href="${mantenedorParametrosURL}"><i class="glyphicon glyphicon-record"></i> Mantenedor de Par&aacute;metros</a>
+			  	</li>
+		   	</c:if>
+		   	<c:if test = "${usuario.permisos[permisoPuedeMantenerTipoDeDestinatario] eq permisoPuedeMantenerTipoDeDestinatario}">
+		    	<li class="${classMantenedorTipoDestinatarioActive} li-sub-menu">
+		        	<a href="${mantenedorTipoDestinatarioURL}"><i class="glyphicon glyphicon-list-alt"></i> Mantenedor Tipo de Destinatario</a>
+		    	</li>
+		    </c:if>		   	
+		   	<c:if test = "${usuario.permisos[permisoPuedeMantenerUsuarios] eq permisoPuedeMantenerUsuarios}">
+			   	<li class="${classMantenedorUsuariosActive} li-sub-menu">
+			   		<a href="${mantenedorUsuariosURL}"><i class="glyphicon glyphicon-user"></i> Mantenedor Usuarios</a>
+			  	</li>
+		   	</c:if>	
+		   	<c:if test = "${usuario.permisos[permisoPuedeMantenerCargos] eq permisoPuedeMantenerCargos}">
+			   	<li class="${classMantenedorRolesActive} li-sub-menu">
+			   		<a href="${mantenedorRolesURL}"><i class="glyphicon glyphicon-tasks"></i> Mantenedor Cargos</a>
+			  	</li>
+		   	</c:if>		
+		   	<c:if test = "${usuario.permisos[permisoPuedeMantenerUnidades] eq permisoPuedeMantenerUnidades}">
+			   	<li class="${classMantenedorUnidadesActive} li-sub-menu">
+			   		<a href="${mantenedorUnidadesURL}"><i class="glyphicon glyphicon-align-justify"></i> Mantenedor Unidades</a>
+			  	</li>
+		   	</c:if>	 
+		   	<c:if test = "${usuario.permisos[permisoPuedeMantenerUnidadesOperativas] eq permisoPuedeMantenerUnidadesOperativas}">
+			   	<li class="${classMantenedorUnidadesOperativasActive} li-sub-menu">
+			   		<a href="${mantenedorUnidadesOperativasURL}"><i class="glyphicon glyphicon-grain"></i> Mantenedor Unidades Operativas</a>
+			  	</li>
+		   	</c:if>	 
+		   	<c:if test = "${usuario.permisos[permisoPuedeMantenerTiposSubtareasBitacora] eq permisoPuedeMantenerTiposSubtareasBitacora}">
+			   	<li class="${classMantenedorTiposSubtareaBitacoraActive} li-sub-menu">
+			   		<a href="${mantenedorTiposSubtareaBitacoraURL}"><i class="glyphicon glyphicon-th-large"></i> Mantenedor Tipos Subtareas en bit&aacute;cora</a>
+			  	</li>
+		   	</c:if>
+		   	<c:if test = "${usuario.permisos[permisoPuedeMantenerPlantillas] eq permisoPuedeMantenerPlantillas}">
+			   	<li class="${classMantenedorPlantillasActive} li-sub-menu">
+			   		<a href="${mantenedorPlantillasURL}"><i class="glyphicon glyphicon-file"></i> Mantenedor Plantillas Documentos</a>
+			  	</li>
+		   	</c:if>
+		   	<c:if test = "${usuario.permisos[permisoPuedeMantenerSeriesDocumentales] eq permisoPuedeMantenerSeriesDocumentales}">
+			   	<li class="${classserieDocumental} li-sub-menu">
+				   		<a href="${serieDocumentalURL}"><i class="glyphicon glyphicon-folder-open"></i> Mantenedor Series Documentales</a>
+				</li>
+		   	</c:if>	 		 	
+	    </c:if>	    
     	<li class="liMenu">
 	    	<a target="_blank" href="${urlReporteSGDP}"><i class="glyphicon glyphicon-signal"></i> Reporte</a>
 	    </li>
-	    
-	    <c:if test = "${usuario.permisos[permisoPuedeVerIndicaodres] eq permisoPuedeVerIndicaodres}">
-	    	<li class="liMenu">
-	    		<a target="_blank" href="${urlIndicadoresIgestion}"><i class="glyphicon glyphicon-random"></i> Indicadores Igesti&oacute;n</a>
-	    	</li>	    
-	    </c:if>
-	    
-	    <c:if test = "${usuario.permisos[permisoPuedeMantenerParametros] eq permisoPuedeMantenerParametros}">
-		   	<li class="${classMantenedorParametrosActive} liMenu">
-		   		<a href="${mantenedorParametrosURL}"><i class="glyphicon glyphicon-list-alt"></i> Mantenedor de par&aacute;metros</a>
-		  	</li>
-	   	</c:if>
-	   	
-	   	
 	   	 <li class="${classSolicitudesCreacionExpActive} liMenu">
 		 	<a href="${solicitudesCreacionExpURL}"><i class="glyphicon glyphicon-bullhorn"></i> Solicitudes de Creaci&oacute;n Expedientes</a>
-		 </li>		 
-	     
-	     
+		 </li>
+		 <c:if test = "${usuario.permisos[permisoPuedeCargarProseso] eq permisoPuedeCargarProseso}">
+			<li class="${classCargaProcesos} liMenu">
+			 	<a href="${cargaProcesosURL}"><i class="glyphicon glyphicon-object-align-horizontal"></i> Carga de Procesos</a>
+			</li>    
+		</c:if>
+		<c:if test = "${usuario.permisos[permisoPuedeEditarAsunto] eq permisoPuedeEditarAsunto}">
+			 <li class="${classEditorDeAsunto} liMenu">
+		 		<a href="${editorDeAsuntoURL}"><i class="glyphicon glyphicon-comment"></i> Editor de Asunto</a>
+		 	</li>    
+		</c:if>
+		<li class="${classReportes} liMenu">
+	 		<a href="${reportesURL}"><i class="glyphicon glyphicon-file"></i> Reportes</a>
+		</li> 
+		<c:if test = "${usuario.permisos[permisoPuedeVerReportLogDocumento] eq permisoPuedeVerReportLogDocumento}">
+	 		<li class="${classReportLogDocumento} liMenu">
+				<a href="${reportLogDocumentoURL}"><i class="glyphicon glyphicon-road"></i> Reporte Log Documentos</a>
+			</li>
+	 	</c:if>
+	 	<c:if test = "${usuario.permisos[permisoPuedeVerAnuladorDocumentos] eq permisoPuedeVerAnuladorDocumentos}">
+	 		<li class="${classAnuladorDocumentosActive} liMenu">
+				<a href="${anuladorDocumentosURL}"><i class="glyphicon glyphicon-eye-close"></i> Anulador Documentos</a>
+			</li>
+	 	</c:if>	 
       </ul>
-      <br>
-      
-       <span>          
+      <br>      
+      <span>          
          <a class="btn btn-danger" href="logout"><i class="glyphicon glyphicon-off"></i> <spring:message code="menu.principal.salir.nombre"/></a>
-       </span>
+      </span>
       
 	<!-- Modal Crear Expediente -->
 		
@@ -326,7 +514,7 @@ var inicializaLiCheckBoxFueraDeOficina = function() {
 					   		}
 
 					   		if (document.getElementById("h2MensajeAreaDeTrabajo") !== null) {
-					   			$('#h2MensajeAreaDeTrabajo').text("Área de Trabajo (Fuera de Oficina)");
+					   			$('#h2MensajeAreaDeTrabajo').text("rea de Trabajo (Fuera de Oficina)");
 							}
 
 					   		if (document.getElementById("h2MensajeBuscador") !== null) {
@@ -346,7 +534,7 @@ var inicializaLiCheckBoxFueraDeOficina = function() {
 					   		}
 					   		
 					   		if (document.getElementById("h2MensajeAreaDeTrabajo") !== null) {
-					   			$('#h2MensajeAreaDeTrabajo').text("Área de Trabajo");
+					   			$('#h2MensajeAreaDeTrabajo').text("rea de Trabajo");
 					   		}
 
 					   		if (document.getElementById("h2MensajeBuscador") !== null) {
@@ -359,7 +547,7 @@ var inicializaLiCheckBoxFueraDeOficina = function() {
 		            }
 		        });
 		   } else {
-		         bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acción y hemos caducado tu sesión por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+		         bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
 		             , function(){ window.open('${raizURL}', '_blank');}
 		         );
 		   }

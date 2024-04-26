@@ -2,18 +2,22 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="sf" uri="http://www.springframework.org/tags/form"%>
 
+<%@ page import= "cl.gob.scj.sgdp.control.AppContextControl" %>
+
+<c:set var="urlFuncPhp" value="<%=AppContextControl.getUrlFuncPhp()%>"/>
+
 <c:url value="/verificarSession" var="sessionURL" />
 <c:url value="/" var="raizURL" />
 
 
 	<c:choose>
 		<c:when test = "${flagBuscarDiagrama eq 0}">
-			<c:url value="http://sgdocb/proceso/bpm/this_task.php?idTask=${idDiagrama}&idProc=${idProceso}&idInsProc=${idInstanciaDeProceso}&t=s" var="urlDiagramaSubProceso2" />
-			<c:url value="http://sgdocb/proceso/bpm/this_task.php?idTask=${idDiagrama}&idProc=${idProceso}&idInsProc=${idInstanciaDeProceso}" var="urlDiagramaSubProcesoBoton2" />
+			<c:url value="http://${urlFuncPhp}/proceso/bpm/this_task.php?idTask=${idDiagrama}&idProc=${idProceso}&idInsProc=${idInstanciaDeProceso}&t=s" var="urlDiagramaSubProceso2" />
+			<c:url value="http://${urlFuncPhp}/proceso/bpm/this_task.php?idTask=${idDiagrama}&idProc=${idProceso}&idInsProc=${idInstanciaDeProceso}" var="urlDiagramaSubProcesoBoton2" />
 		</c:when>
 		<c:when test = "${flagBuscarDiagrama eq 1}">
-				<c:url value="http://sgdocb/proceso/bpm/this_task.php?nomExp=${instanciaDeProcesoDTO.nombreExpediente}&t=s" var="urlDiagramaSubProceso2" />
-				<c:url value="http://sgdocb/proceso/bpm/this_task.php?nomExp=${instanciaDeProcesoDTO.nombreExpediente}" var="urlDiagramaSubProcesoBoton2" />
+				<c:url value="http://${urlFuncPhp}/proceso/bpm/this_task.php?nomExp=${instanciaDeProcesoDTO.nombreExpediente}&t=s" var="urlDiagramaSubProceso2" />
+				<c:url value="http://${urlFuncPhp}/proceso/bpm/this_task.php?nomExp=${instanciaDeProcesoDTO.nombreExpediente}" var="urlDiagramaSubProcesoBoton2" />
 		</c:when>
 	</c:choose>
 	

@@ -5,7 +5,9 @@ import java.io.Serializable;
 public class AutorDTO implements Serializable {
 	
 	private long idAutor;
-	private String nombreAutor;	
+	private String nombreAutor;
+	private String respuesta;
+
 		
 	public AutorDTO() {
 		super();
@@ -57,5 +59,14 @@ public class AutorDTO implements Serializable {
 			return false;
 		return true;
 	}	
+	
+	public String getRespuesta() {
+		return respuesta;
+	}
+
+	public void setRespuesta(String respuesta) {
+		this.respuesta = respuesta;
+	}
+
 
 }

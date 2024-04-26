@@ -11,7 +11,33 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="\"SGDP_DOCUMENTOS_DE_SALIDA_DE_TAREAS\"")
-@NamedQuery(name="DocumentoDeSalidaDeTarea.findAll", query="SELECT d FROM DocumentoDeSalidaDeTarea d")
+
+@NamedQueries({
+	@NamedQuery(name="DocumentoDeSalidaDeTarea.findAll", query="SELECT d FROM DocumentoDeSalidaDeTarea d"),
+	
+	@NamedQuery(name="DocumentoDeSalidaDeTarea.findAllByIdProceso", 
+		query="SELECT "
+				+ "		d "
+				+ "	FROM "
+				+ "		DocumentoDeSalidaDeTarea d"
+				+ " WHERE"
+				+ "		d.id.tarea.proceso.idProceso = :idProceso"),
+	
+	@NamedQuery(name="DocumentoDeSalidaDeTarea.findByIdTipoDocumento", 
+	query="SELECT "
+			+ "		d "
+			+ "	FROM "
+			+ "		DocumentoDeSalidaDeTarea d"
+			+ " WHERE"
+			+ "		d.id.tipoDeDocumento.idTipoDeDocumento = :idTipoDeDocumento"
+			+ "		and d.id.tarea.idTarea = :idTarea"),
+	
+	@NamedQuery(name="DocumentoDeSalidaDeTarea.updatePlantilla", 
+	query="UPDATE DocumentoDeSalidaDeTarea d SET "
+			+ "	d.id.tipoDeDocumento.plantilla.idPlantillaDeDocumento = :plantilla WHERE d.id.tipoDeDocumento.idTipoDeDocumento = :idTipoDeDocumento"
+	),
+})
+	
 public class DocumentoDeSalidaDeTarea implements Serializable {
 	private static final long serialVersionUID = 1L;
 

@@ -80,7 +80,7 @@ function cargaResultadoBusqueda() {
 	      }	else {
 	            bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acci&oacute;n y hemos caducado tu sesi&oacute;n por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
 	                          , function(){
-	                                window.open(raizURL, '_blank');
+	                                window.open(raizURL, '_self');
 	                          }
 	             );
 	      }
@@ -136,10 +136,17 @@ function cargarDetalleDeProceso(idExpediente, nombreProceso, nombreExpediente) {
             $('#etapasInstanciaDeProcesoDetalleDeProcesoModal').each(function(){        	 
         			$(this).fadeOut("slow").load(urlGetVistaEtapasInstanciaDeProcesoPorIdExpediente).fadeIn('slow');
         	});
+ 		
+			$('#detalleDeProcesoModal')
+				.on('hidden.bs.modal', function () {
+    				$('#modalBitacora').modal('hide');
+			})
+
+
         } else {
               bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acci&oacute;n y hemos caducado tu sesi&oacute;n por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
                             , function(){
-                                  window.open(raizURL, '_blank');
+                                  window.open(raizURL, '_self');
                             }
                );
         }

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import cl.gob.scj.sgdp.dao.HistoricoFirmaDao;
+import cl.gob.scj.sgdp.dto.ReportFilterDTO;
 import cl.gob.scj.sgdp.model.HistoricoFirma;
 
 @Repository
@@ -76,6 +77,23 @@ public class HistoricoFirmaDaoImpl implements HistoricoFirmaDao {
 		query.setLong("idInstanciaDeTarea", idInstanciaDeTarea);
 		query.setString("idUsuario", idUsuario);
 		return query.list();
+	}
+	
+	@Override
+	public List<HistoricoFirma> getListArchivoByCodeExpedienteWithLimit(ReportFilterDTO reportFilterDTO) {
+		Query query = getSession().getNamedQuery("HistoricoFirma.getListArchivoByCodeExpedienteWithLimit");
+		query.setString("codeExpediente", "%" + reportFilterDTO.getTextFilter() + "%");
+		query.setFirstResult(reportFilterDTO.getStart());
+		query.setMaxResults(reportFilterDTO.getLength());
+		return query.list();
+	}
+	
+	@Override
+	public Long getCountListArchivoByCodeExpedienteWithLimit(ReportFilterDTO reportFilterDTO) {
+		Query query = getSession().getNamedQuery("HistoricoFirma.getCountListArchivoByCodeExpedienteWithLimit");
+		query.setString("codeExpediente", "%" + reportFilterDTO.getTextFilter() + "%");
+		Long count = (Long) query.uniqueResult(); 
+		return count;
 	}
 	
 }

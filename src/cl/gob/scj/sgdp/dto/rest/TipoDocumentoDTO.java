@@ -5,6 +5,9 @@ public class TipoDocumentoDTO extends RespuestaDTO {
 	private Long pkTipoDoc;
 	private String nombreTipoDoc;
 	private String nombreCompletoTipoDoc;
+
+	private Integer idTipoDocDigital;
+
 	
 	public Long getPkTipoDoc() {
 		return pkTipoDoc;
@@ -23,14 +26,25 @@ public class TipoDocumentoDTO extends RespuestaDTO {
 	}
 	public void setNombreCompletoTipoDoc(String nombreCompletoTipoDoc) {
 		this.nombreCompletoTipoDoc = nombreCompletoTipoDoc;
+	}	
+	
+	
+	
+	public Integer getIdTipoDocDigital() {
+		return idTipoDocDigital;
+	}
+	public void setIdTipoDocDigital(Integer idTipoDocDigital) {
+		this.idTipoDocDigital = idTipoDocDigital;
 	}
 	@Override
 	public String toString() {
-		return "TipoDocumentoDTO [pkTipoDoc=" + pkTipoDoc + ", nombreTipoDoc=" + nombreTipoDoc 
-				+ ", nombreCompletoTipoDoc=" + nombreCompletoTipoDoc
-				+ ", estado=" + super.getEstado()
-				+ ", glosa=" + super.getGlosa() 
-				+ "]";
+
+		return "TipoDocumentoDTO [pkTipoDoc=" + pkTipoDoc + ", nombreTipoDoc=" + nombreTipoDoc
+				+ ", nombreCompletoTipoDoc=" + nombreCompletoTipoDoc + ", idTipoDocDigital=" + idTipoDocDigital + "]";
+
 	}
+	
+	
+	
 	
 }

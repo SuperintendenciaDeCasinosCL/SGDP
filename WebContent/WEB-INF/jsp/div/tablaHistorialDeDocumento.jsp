@@ -1,4 +1,5 @@
 <%@ page import= "cl.gob.scj.sgdp.config.Constantes" %>
+<%@ page import= "cl.gob.scj.sgdp.tipos.ModuloType" %>
 
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -8,10 +9,6 @@
 <c:set var="FORMATO_FECHA_FORM_HH_MM" value="<%=Constantes.FORMATO_FECHA_FORM_HH_MM%>" />
 <c:url value="/verificarSession" var="sessionURL" />
 <c:url value="/" var="raizURL" />
-
-<%--<legend>Documentos de ${nombreExpediente} <span class="glyphicon glyphicon-info-sign cursorPuntero info-sgdp-historial hide"  
- 	                	data-toggle="tooltip" data-placement="top" title="Ver Historial del SubProceso"
- 	                	 onclick="dibujarHistorialDeInstanciaDeProceso(${idInstanciaDeTarea})"></span></legend> --%>
 
 <div class="table-responsive col-sm-12">
 				  		
@@ -53,44 +50,19 @@
 		                	'${archivoInstDeTareaDTO.nombreArchivo}',
 		                	'${archivoInstDeTareaDTO.mimeType}',
 			                '${idInstanciaDeTarea}');" >&nbsp;
-						<span class="glyphicon glyphicon-eye-open"></span></a>	
+						<span class="glyphicon glyphicon-eye-open"></span></a>
 						<button type="button" title="Descarga documento"
 							class="btn btn-primary btn-xs"
-							onclick='descargaArchivo("<c:url value='getArchivoPorId/${archivoInstDeTareaDTO.idArchivoCms}'/>")'
+							onclick='descargaArchivo("<c:url value='getArchivoPorId/${archivoInstDeTareaDTO.idArchivoCms}'/>", 
+								"<%=ModuloType.HISTORIAL_DE_DOCUMENTOS.getNombreModulo()%>")'
 							data-iddocumento="${archivoInstDeTareaDTO.idArchivoCms}">
 							<span class="fa fa-download font-icon-2 "></span>
-						</button>	
+						</button>
+						
 			    	</td>
 			    </tr>
 	    	
 	    	</c:forEach>
-	    
-	    <%-- 
-	    	<c:forEach var="listaHistoricoDocumento" items="${listaHistoricoDocumento}">
-	    	
-	    		<tr>
-			    	<td>
-			    		<fmt:formatDate value="${listaHistoricoDocumento.fecha}" pattern="dd/MM/yyyy HH:mm"/> 
-			    	</td>
-			    	<td>${listaHistoricoDocumento.nombreTarea}</td>			    	
-			    	<td>${listaHistoricoDocumento.idUsuarioQueAsigna}</td>
-			    	<td>${listaHistoricoDocumento.comentario}</td>
-			    	<td>${listaHistoricoDocumento.nombreDeTipoDeDocumento}</td>			    	
-			    	<td>
-		    			<a href="#" class="btn btn-primary " id="${listaHistoricoDocumento.idArchivo}"
-		                	onclick="cargaDetalleDeDocumento('${listaHistoricoDocumento.idArchivo}', 
-		                	${listaHistoricoDocumento.esVisable}, 
-		                	${listaHistoricoDocumento.aplicaFEA}, 
-		                	${listaHistoricoDocumento.aplicaFirmaApplet},
-		                	'${listaHistoricoDocumento.idExpediente}',								                	
-		                	'${listaHistoricoDocumento.nombre}',
-		                	'${listaHistoricoDocumento.mimeType}');" >
-						<span class="glyphicon glyphicon-eye-open "></span></a>		
-			    	</td>
-			    </tr>
-	    	
-	    	</c:forEach>
-	       --%>
 	       
 	    </tbody>
 	</table>
@@ -101,7 +73,6 @@
 <script>
 
 var formatTablaHistorialDelDocumento = function () {
-	
 	var tablaHistorialDelDocumento = $('#tablaHistorialDelDocumento${numeroTabla}')
 	.DataTable(
 			{
@@ -111,18 +82,11 @@ var formatTablaHistorialDelDocumento = function () {
 					exportOptions : {
 						columns : ':visible'
 					}
-				}/*, 'colvis'*/ ],
-				//bLengthChange: false,
-				//"sDom": 'l<"toolbarTablaHistorialDelDocumento">frtip'
+				} ],
 				"language" : languajeDataTableDocumentos,
 				"pageLength": 7,
-				"order": [[ 0, "desc" ]]//,
-				//"dom": '<"toolbarTablaHistorialDelDocumento">frtip'
-				//"dom": '<"bottom"ip>rt<"top"fl><"clear">'
-				
+				"order": [[ 0, "desc" ]]
 			});
-
-	//$("div.toolbarTablaHistorialDelDocumento").html('<b>Historial de Documentos</b>');
 	
 	tablaHistorialDelDocumento.buttons().container().appendTo(
 	'#tablaHistorialDelDocumento_wrapper .row:eq(0)');
@@ -141,7 +105,7 @@ function dibujarHistorialDeInstanciaDeProceso(idInstanciaDeTarea){
 				if(haySession){
 					window.open(urlDibujaHistorialInstanciaDeProceso, "Proceso", 'width=1080, height=600');
 				}else{
-					bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acción y hemos caducado tu sesión por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+					bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
 												, function(){
 															window.open('${raizURL}', '_blank');
 												}
@@ -151,11 +115,3 @@ function dibujarHistorialDeInstanciaDeProceso(idInstanciaDeTarea){
 }
 
 </script>
-
-
-
-	<!-- Modal para probar funcionalidad-->
-	
-	<!-- Modal Detalle Documento
-	
-	<c:import url="/WEB-INF/jsp/modals/detalleDeDocumento.jsp"></c:import>-->

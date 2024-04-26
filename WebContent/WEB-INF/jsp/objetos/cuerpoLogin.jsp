@@ -21,7 +21,7 @@
 						</select>						
 					</div>
 					<div class="form-group">
-						<input class="form-control" placeholder='<spring:message code="login.form.clave.placeholder"/>'
+						<input class="form-control claveInput" placeholder='<spring:message code="login.form.clave.placeholder"/>'
 							name="clave"
 							type="password" value="" />
 					</div>					

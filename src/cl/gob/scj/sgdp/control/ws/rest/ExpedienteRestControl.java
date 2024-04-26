@@ -550,7 +550,7 @@ public class ExpedienteRestControl {
 	
 	@RequestMapping(value = "getDocOficialesDeExpediente/{idExpediente}/{idUsuario}", method = RequestMethod.GET, produces = "application/json")
 	public @ResponseBody DocOficialesDeExpResponse getDocOficialesDeExpediente(@PathVariable("idExpediente") String idExpediente
-			, @PathVariable("idUsuario") String idUsuario) {		
+			,@PathVariable("idUsuario") String idUsuario) {		
 		DocOficialesDeExpResponse docOficialesDeExpResponse;
 		try {
 			docOficialesDeExpResponse = expedienteRestService.getDocOficialesDeExpediente(idExpediente, idUsuario);

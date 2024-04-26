@@ -2,6 +2,7 @@ package cl.gob.scj.sgdp.control;
 
 import java.io.IOException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,7 +40,6 @@ import cl.gob.scj.sgdp.dto.AutorDTO;
 import cl.gob.scj.sgdp.dto.ExpedienteDTO;
 import cl.gob.scj.sgdp.dto.FiltroExpedienteDTO;
 import cl.gob.scj.sgdp.dto.InstanciaDeTareaDTO;
-import cl.gob.scj.sgdp.dto.KeyParametroPorContextoDTO;
 import cl.gob.scj.sgdp.dto.RespuestaMailDTO;
 import cl.gob.scj.sgdp.dto.SubirArhivoDTO;
 import cl.gob.scj.sgdp.dto.SuggestionsDTO;
@@ -48,6 +48,7 @@ import cl.gob.scj.sgdp.dto.UsuarioRolDTO;
 import cl.gob.scj.sgdp.exception.SgdpException;
 import cl.gob.scj.sgdp.exception.SgdpExceptionValidaTareaEnBE;
 import cl.gob.scj.sgdp.service.BandejaDeEntradaService;
+import cl.gob.scj.sgdp.service.ComplejidadService;
 import cl.gob.scj.sgdp.service.CrearExpedienteService;
 import cl.gob.scj.sgdp.service.ParametroService;
 import cl.gob.scj.sgdp.service.ProcesoService;
@@ -55,7 +56,6 @@ import cl.gob.scj.sgdp.service.SubirArchivoService;
 import cl.gob.scj.sgdp.service.TipoDeDocumentoService;
 import cl.gob.scj.sgdp.service.UsuarioRolService;
 import cl.gob.scj.sgdp.tipos.EstadoDeTareaType;
-import cl.gob.scj.sgdp.tipos.PermisoType;
 import cl.gob.scj.sgdp.util.SingleObjectFactory;
 
 @Controller
@@ -75,8 +75,6 @@ public class BandejaDeEntradaControl {
 	private List<TipoDeDocumentoDTO> tiposDeDocumentosDTO;	
 	
 	private EstadoDeTareaType estadoDeTareaAsignadaType = EstadoDeTareaType.ASIGNADA;
-		
-	private PermisoType permisoMuestraTareasEnEjecucionType = PermisoType.PUEDE_VER_TAREAS_EN_EJECUCION;
 	
 	@Autowired
 	private CrearExpedienteService crearExpedienteService;
@@ -92,6 +90,9 @@ public class BandejaDeEntradaControl {
 	
 	@Autowired
 	private ProcesoService procesoService;
+	
+	@Autowired
+	private ComplejidadService complejidadService;
 	
 	@RequestMapping("/bandejaDeEntrada")	
 	public String cargaBandejaDeEntrada(Model model, HttpServletRequest request) {
@@ -155,40 +156,14 @@ public class BandejaDeEntradaControl {
 			for (AutorDTO autorDTO: autoresDTO) {
 				log.debug("autor cargaBandejaDeEntrada: " + autorDTO.toString());
 			}
-				
-			String permisoTareasEnEjecucion = usuario.getPermisos().get(permisoMuestraTareasEnEjecucionType.getNombrePermiso());
-			log.debug("permisoTareasEnEjecucion: " + permisoTareasEnEjecucion);
-			log.debug("permisoMuestraTareasEnEjecucionType.getNombrePermiso(): " + permisoMuestraTareasEnEjecucionType.getNombrePermiso());
-			/*if (permisoTareasEnEjecucion!=null && permisoTareasEnEjecucion.equals(permisoMuestraTareasEnEjecucionType.getNombrePermiso())) {
-				log.debug("Buscando parametroPorContextoDTO...");
-				log.debug(keyParametroPorContextoDTOMuestraTareasEnEjecucion.toString());
-				ParametroPorContextoDTO parametroPorContextoDTO = parametroPorContextoService.getParamPorContexto(keyParametroPorContextoDTOMuestraTareasEnEjecucion);
-				log.debug(parametroPorContextoDTO);
-				if (parametroPorContextoDTO!=null && parametroPorContextoDTO.getValorParametroChar().equals(Constantes.MUESTRA_TODAS_LAS_TAREAS_EN_EJECUCION)) {
-					log.debug("Inicio buscando todas las instanciasDeTareasDTOEnEjecucion");
-					instanciasDeTareasDTOEnEjecucion = bandejaDeEntradaService.getTodasInstanciasDeTareasEnEjecucion(instanciasDeTareasDTOEnEjecucion);
-					log.debug("Fin buscando todas las instanciasDeTareasDTOEnEjecucion");
-				} else if (parametroPorContextoDTO!=null && parametroPorContextoDTO.getValorParametroChar().equals(Constantes.MUESTRA_LAS_TAREAS_DE_LA_UNIDAD)) {
-					log.debug("Inicio buscando instanciasDeTareasDTOEnEjecucion por unidad");
-					instanciasDeTareasDTOEnEjecucion = bandejaDeEntradaService.getTodasInstanciasDeTareasEnEjecucionPorIdUnidad(usuario.getUnidadDTO().getIdUnidad(), instanciasDeTareasDTOEnEjecucion);
-					log.debug("Fin buscando instanciasDeTareasDTOEnEjecucion por unidad");
-				}
-			}*/
 			
 			model.addAttribute("instanciasDeTareasDTO", instanciasDeTareasDTO);
 			model.addAttribute("autoresDTO", autoresDTO);
 			model.addAttribute("permisos", usuario.getPermisos());	
 			model.addAttribute("expedienteDTO", expedienteDTO);
 			model.addAttribute("tiposDeDocumentosDTO", tiposDeDocumentosDTO);		
-			//model.addAttribute("instanciasDeTareasDTOEnEjecucion", instanciasDeTareasDTOEnEjecucion);
 			model.addAttribute("urlFuncPhp", parametroService.getParametroPorID(Constantes.ID_PARAM_URL_FUNC_PHP).getValorParametroChar());
-			
-            // Se genera una lista de los documentos de la primera tarea, para que oficina de parte pueda subir documentos en 
-			// cualquier parte del proceso
-			
-			
-			/*List<TipoDeDocumentoDTO> listaTipoDocumentoPrimeraTarea = tipoDeDocumentoService.getTipoDeDocumentoPrimeraTareaDocAdiccionales();
-			model.addAttribute("listaTipoDocumentoPrimeraTarea", new Gson().toJson(listaTipoDocumentoPrimeraTarea));*/
+			model.addAttribute("todasLasComplejidades", complejidadService.getComplejidades());
 			
 			request.getSession().setAttribute("cantidadDeTareas", instanciasDeTareasDTO!=null ? instanciasDeTareasDTO.size(): 0);		
 			
@@ -331,6 +306,7 @@ public class BandejaDeEntradaControl {
 					 // Datos Documento
 					 subirArhivoDTO.setArchivo(archivo);
 					 subirArhivoDTO.setNombreDeArchivo(anadirAntecedenteDTO.getNombreDocumento());
+					 subirArhivoDTO.setNombreArchivoFileUpload(URLEncoder.encode(anadirAntecedenteDTO.getNombreDocumento(), "UTF-8"));
 					 boolean b = listaSubirArhivoDTO.add(subirArhivoDTO);
 					 log.debug("b: " + b);
 					log.info("Entro");

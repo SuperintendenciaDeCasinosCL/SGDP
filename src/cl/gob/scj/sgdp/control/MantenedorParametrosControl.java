@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import cl.gob.scj.sgdp.auth.user.Usuario;
-import cl.gob.scj.sgdp.dto.ListaDeDistribucionDTO;
 import cl.gob.scj.sgdp.dto.ParametroDTO;
 import cl.gob.scj.sgdp.service.ParametroService;
 import cl.gob.scj.sgdp.tipos.PermisoType;

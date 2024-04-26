@@ -2,6 +2,7 @@ package cl.gob.scj.sgdp.dao;
 
 import java.util.List;
 
+import cl.gob.scj.sgdp.dto.ReportFilterDTO;
 import cl.gob.scj.sgdp.model.HistoricoFirma;
 
 public interface HistoricoFirmaDao {	
@@ -21,5 +22,9 @@ public interface HistoricoFirmaDao {
 	HistoricoFirma getHistoricoFirmaPorIdDocumentoFirmado(Long idDocumentoFirmado);
 	
 	List<HistoricoFirma> getHistoricoFirmaPorIdTipoDocumentoIdInstanciaDeTareaIdUsuario(Long idTipoDeDocumento, Long idInstanciaDeTarea, String idUsuario);
+	
+	List<HistoricoFirma> getListArchivoByCodeExpedienteWithLimit(ReportFilterDTO reportFilterDTO);
+	
+	Long getCountListArchivoByCodeExpedienteWithLimit(ReportFilterDTO reportFilterDTO);
 	
 }

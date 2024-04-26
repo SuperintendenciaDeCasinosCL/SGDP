@@ -83,6 +83,11 @@ public class InstanciaDeTareaDTO extends RespuestaDTO  implements Serializable{
 	private boolean esRdsSnc;
 	private boolean procesoTieneRdsSnc;
 	private InstanciaDeProcesoDTO instanciaDeProcesoDTO;
+	private String nombreEtapa;
+	private int diasHabilesMaxDuracionSubproceso;
+	public boolean adviertePlazoProceso;
+    public boolean fueraDePlazoProceso;
+    private  List<UnidadOperativaDTO> listaUnidadesOperativas;
 	
 	public InstanciaDeTareaDTO() {
 		idUsuariosAsignados = new ArrayList<String>();
@@ -91,6 +96,20 @@ public class InstanciaDeTareaDTO extends RespuestaDTO  implements Serializable{
 		instanciaDeProcesoDTO = new InstanciaDeProcesoDTO();
 	}
 	
+	
+	
+	public List<UnidadOperativaDTO> getListaUnidadesOperativas() {
+		return listaUnidadesOperativas;
+	}
+
+
+
+	public void setListaUnidadesOperativas(List<UnidadOperativaDTO> listaUnidadesOperativas) {
+		this.listaUnidadesOperativas = listaUnidadesOperativas;
+	}
+
+
+
 	public long getIdInstanciaDeTarea() {
 		return idInstanciaDeTarea;
 	}
@@ -558,6 +577,38 @@ public class InstanciaDeTareaDTO extends RespuestaDTO  implements Serializable{
 
 	public void setInstanciaDeProcesoDTO(InstanciaDeProcesoDTO instanciaDeProcesoDTO) {
 		this.instanciaDeProcesoDTO = instanciaDeProcesoDTO;
+	}	
+
+	public String getNombreEtapa() {
+		return nombreEtapa;
+	}
+
+	public void setNombreEtapa(String nombreEtapa) {
+		this.nombreEtapa = nombreEtapa;
+	}
+
+	public int getDiasHabilesMaxDuracionSubproceso() {
+		return diasHabilesMaxDuracionSubproceso;
+	}
+
+	public void setDiasHabilesMaxDuracionSubproceso(int diasHabilesMaxDuracionSubproceso) {
+		this.diasHabilesMaxDuracionSubproceso = diasHabilesMaxDuracionSubproceso;
+	}
+
+	public boolean isAdviertePlazoProceso() {
+		return adviertePlazoProceso;
+	}
+
+	public void setAdviertePlazoProceso(boolean adviertePlazoProceso) {
+		this.adviertePlazoProceso = adviertePlazoProceso;
+	}
+
+	public boolean isFueraDePlazoProceso() {
+		return fueraDePlazoProceso;
+	}
+
+	public void setFueraDePlazoProceso(boolean fueraDePlazoProceso) {
+		this.fueraDePlazoProceso = fueraDePlazoProceso;
 	}
 
 	public void cargaInstanciaDeTareaDTO(InstanciaDeTarea instanciaDeTarea) {
@@ -598,6 +649,9 @@ public class InstanciaDeTareaDTO extends RespuestaDTO  implements Serializable{
 		this.setEsperaRespuesta(instanciaDeTarea.getTarea().getEsperarResp());
 		this.setIdTarea(instanciaDeTarea.getTarea().getIdTarea());
 		this.distribuye = instanciaDeTarea.getTarea().getDistribuye() == null ? false : instanciaDeTarea.getTarea().getDistribuye().booleanValue();
+		this.setNombreEtapa(instanciaDeTarea.getTarea().getEtapa().getNombreEtapa());
+		this.setDiasHabilesMaxDuracion(instanciaDeTarea.getTarea().getDiasHabilesMaxDuracion());
+		this.setDiasHabilesMaxDuracionSubproceso(instanciaDeTarea.getInstanciaDeProceso().getProceso().getDiasHabilesMaxDuracion());
 		
 		List<ParametroRelacionTarea> parametrosRelacionTarea = instanciaDeTarea.getTarea().getParametroRelacionTareas();
 		
@@ -654,7 +708,50 @@ public class InstanciaDeTareaDTO extends RespuestaDTO  implements Serializable{
 		setUsuariosAsignadosString(sb.toString());
 	}
 	
-	public void cargaAdvertenciaDePlazo(int porcentajeAdvertenciaTarea, int diasHabilesMaxDuracion) throws IOException {
+	public void cargaAdvertenciaPlazoProceso(int porcentajeAdvertenciaProceso) throws IOException {
+		
+		log.debug("cargaAdvertenciaPlazoProceso inicio");
+		log.debug("porcentajeAdvertenciaProceso: " + porcentajeAdvertenciaProceso);
+		log.debug("diasHabilesMaxDuracionSubproceso: " + diasHabilesMaxDuracionSubproceso);
+		
+		int diasEntreFechas = 0;
+		
+		if (fechaVencimientoInstanciaDeProceso!=null) {
+			diasEntreFechas = (int)FechaUtil.diasEntreFechas(fechaVencimientoInstanciaDeProceso, new Date());	
+		}
+		
+		if (diasEntreFechas<0) {
+			fueraDePlazoProceso = true;	
+			adviertePlazoProceso = false;
+			log.debug("diasEntreFechas<0");
+			return;
+		} else if (diasEntreFechas==0) {
+			fueraDePlazoProceso = false;	
+			adviertePlazoProceso = true;
+			log.debug("diasEntreFechas=0");
+			return;
+		}
+		
+		log.debug("porcentajeAdvertenciaProceso: " + porcentajeAdvertenciaProceso);
+		log.debug("diasHabilesMaxDuracionSubproceso: " + diasHabilesMaxDuracionSubproceso);
+		
+		int diasLimiteAdvertencia = (int)((porcentajeAdvertenciaProceso * diasHabilesMaxDuracionSubproceso) / 100.0f);
+		log.debug("diasLimiteAdvertencia: " + diasLimiteAdvertencia);
+		log.debug("diasEntreFechas: " + diasEntreFechas);
+		
+		if (diasLimiteAdvertencia==0) {
+			log.debug("diasLimiteAdvertencia==0");
+			diasLimiteAdvertencia = 1;
+		}	
+		
+		if (diasEntreFechas<=diasLimiteAdvertencia) {
+			log.debug("diasEntreFechas<=diasLimiteAdvertencia");			
+			adviertePlazoProceso = true;
+		}
+		
+	}
+	
+	public void cargaAdvertenciaDePlazo(int porcentajeAdvertenciaTarea) throws IOException {
 		
 		log.debug("cargaAdvertenciaDePlazo inicio");
 		log.debug("porcentajeAdvertenciaTarea: " + porcentajeAdvertenciaTarea);
@@ -662,10 +759,10 @@ public class InstanciaDeTareaDTO extends RespuestaDTO  implements Serializable{
 		
 		int diasEntreFechas = 0;
 		
-		if (fechaVencimientoUsuario!=null && !fechaVencimientoUsuario.equals("")) {
+		if (fechaVencimientoUsuario!=null && !fechaVencimientoUsuario.toString().equals("")) {
 			log.debug("fechaVencimientoUsuario!=null");
 			diasEntreFechas = (int)FechaUtil.diasEntreFechas(fechaVencimientoUsuario, new Date());			
-		} else if (fechaVencimientoInstanciaDeTarea!=null && !fechaVencimientoInstanciaDeTarea.equals("")) {
+		} else if (fechaVencimientoInstanciaDeTarea!=null && !fechaVencimientoInstanciaDeTarea.toString().equals("")) {
 			log.debug("fechaVencimientoInstanciaDeTarea!=null");
 			diasEntreFechas = (int)FechaUtil.diasEntreFechas(fechaVencimientoInstanciaDeTarea, new Date());			
 		}
@@ -761,7 +858,8 @@ public class InstanciaDeTareaDTO extends RespuestaDTO  implements Serializable{
 				+ ", distribuye=" + distribuye
 				+ ", idUltimaInstanciaDeTareaAnterior=" + idUltimaInstanciaDeTareaAnterior
 				+ ", nombreTareaUltimaInstanciaDeTareaAnterior=" + nombreTareaUltimaInstanciaDeTareaAnterior
-				+ ", usuarioAnterior=" + usuarioAnterior				
+				+ ", usuarioAnterior=" + usuarioAnterior
+				+ ", nombreEtapa=" + nombreEtapa				
 				+ "]";
 	}	
 	

@@ -4,7 +4,7 @@ import java.util.List;
 
 import cl.gob.scj.sgdp.model.Autor;
 
-public interface AutorDao {
+public interface AutorDao extends GenericDao<Autor> {
 	
 	public List<Autor> getTodosLosAutores();
 	

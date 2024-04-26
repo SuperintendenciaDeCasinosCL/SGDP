@@ -159,10 +159,12 @@ var inicializaFileUploadDocumentoAdicionalModal = function(){
         url: urlSubirArchivo,
         autoUpload: false,
         add: function (e, data) {    
-            $( "#nombreArchivoSpanDocumentoAdicionalModal" ).empty();       
+            $( "#nombreArchivoSpanDocumentoAdicionalModal" ).empty(); 
+            var nombreArchivoFileUpload;
         	$.each(data.files, function (index, file) {
                 $('#nombreArchivoSpanDocumentoAdicionalModal').text(file.name);
                 tamanoDeArchivo = file.size;
+                nombreArchivoFileUpload = file.name;
                 console.log("tamanoDeArchivo: " + tamanoDeArchivo);               
             });        	
         	$("#botonSubirDocumentoAdicionalModal").off('click').on('click', function () {
@@ -181,7 +183,8 @@ var inicializaFileUploadDocumentoAdicionalModal = function(){
             			"comentario" : $("#observacionDocumentoAdicionalModal").val(),
             			"tipoDeDocumento" : encodeURIComponent($('#idTipoDeDocumentoAdicionalModal :selected').text()),
             			"esRequerido" : false,
-            			"validaInstanciaDeTareaEnBE": true       			
+            			"validaInstanciaDeTareaEnBE": true,
+            			"nombreArchivoFileUpload": encodeURIComponent(nombreArchivoFileUpload)
             			}; 
         		var validaForm = $("#formSubirDocumentoAdicionalModal").validationEngine('validate'); 
         		console.log("validaForm: " + validaForm);  			
@@ -272,6 +275,18 @@ var inicializaFileUploadDocumentoAdicionalModal = function(){
          	    });
          		var urlGetDetalleDeTarea = $("#urlGetDetalleDeTarea").val()+"?idInstanciaDeTarea="+$("#botonSubirDocumentoAdicionalModal").attr("data-idinstanciadetarea")+"&muestraSoloDocumentosDeSalida="+true;
 				console.log("urlGetDetalleDeTarea: " + urlGetDetalleDeTarea);
+				
+				//MIG
+				var subirArchivoDist = $("#subirArchivoDist").val();
+				console.log("subirArchivoDist: "+subirArchivoDist);
+				if(subirArchivoDist == 'distribucion'){
+					console.log("Recargar tabla");
+					$('#tablaHistorialDelDocumentoEnDistribucion').DataTable().destroy();
+					formatTablaHistorialDelDocumentoEnDistribucion();
+					$("#documentos").load("${pageContext.request.contextPath}"+"/getDocumentoDistribucion" + "/" + $("#botonSubirDocumentoAdicionalModal").attr("data-idexpediente") + "/"+ $("#botonSubirDocumentoAdicionalModal").attr("data-idinstanciadetarea") + "/" + $("#botonSubirDocumentoAdicionalModal").attr("data-nombreexpediente"));
+					
+				}
+				
 				$('#divDetalleDeTarea').each(function(){        	 
 		   			$(this).fadeOut("slow").load(urlGetDetalleDeTarea, function() {	        		      	
 		        		if ($("#divTabsDetalleDeTarea").length>0) {

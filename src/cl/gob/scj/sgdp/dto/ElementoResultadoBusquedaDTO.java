@@ -33,6 +33,9 @@ public class ElementoResultadoBusquedaDTO implements Serializable {
 	private List<String> usuariosQueHanModificado;
 	private List<String> usuariosQueHanParticipado;
 	
+	private String complejidad;
+	private String justificacionComplejidad;
+	
 	// Se agregan los parametros de la instancia de proceso para poder retornarlos en la busqueda
 	
 	private Date fechaInicioInstanciaDeProceso;
@@ -203,6 +206,20 @@ public class ElementoResultadoBusquedaDTO implements Serializable {
 	public void setNombreEstadoDeProceso(String nombreEstadoDeProceso) {
 		this.nombreEstadoDeProceso = nombreEstadoDeProceso;
 	}
+	
+	
+	public String getComplejidad() {
+		return complejidad;
+	}
+	public void setComplejidad(String complejidad) {
+		this.complejidad = complejidad;
+	}
+	public String getJustificacionComplejidad() {
+		return justificacionComplejidad;
+	}
+	public void setJustificacionComplejidad(String justificacionComplejidad) {
+		this.justificacionComplejidad = justificacionComplejidad;
+	}
 	@Override
 	public String toString() {
 		return "ElementoResultadoBusquedaDTO [tipoObjeto=" + tipoObjeto + ", nombreDeObjeto=" + nombreDeObjeto
@@ -216,7 +233,9 @@ public class ElementoResultadoBusquedaDTO implements Serializable {
 				+ linkDescargaNavegador + ", esConfidencial=" + esConfidencial + ", usuariosQueHanModificado="
 				+ usuariosQueHanModificado + ", usuariosQueHanParticipado=" + usuariosQueHanParticipado
 				+ ", fechaInicioInstanciaDeProceso=" + fechaInicioInstanciaDeProceso + ", fechaFinInstanciaDeProceso="
-				+ fechaFinInstanciaDeProceso + ", nombreEstadoDeProceso=" + nombreEstadoDeProceso + "]";
+				+ fechaFinInstanciaDeProceso + ", nombreEstadoDeProceso=" + nombreEstadoDeProceso 
+				+ ", complejidad=" + complejidad 
+				+ "]";
 	}
 	
 	

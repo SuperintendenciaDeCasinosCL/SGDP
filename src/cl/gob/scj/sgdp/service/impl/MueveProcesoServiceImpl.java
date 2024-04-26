@@ -10,9 +10,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
+import cl.gob.scj.sgdp.service.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -38,12 +40,9 @@ import cl.gob.scj.sgdp.dao.HistoricoArchivosInstDeTareaDao;
 import cl.gob.scj.sgdp.dao.HistoricoDeInstDeTareaDao;
 import cl.gob.scj.sgdp.dao.HistoricoFechaVencimientoInstanciaProcesoDao;
 import cl.gob.scj.sgdp.dao.HistoricoUsuariosAsignadosATareaDao;
-import cl.gob.scj.sgdp.dao.HistoricoValorParametroDeTareaDao;
 import cl.gob.scj.sgdp.dao.InstanciaDeProcesoDao;
 import cl.gob.scj.sgdp.dao.InstanciaDeTareaDao;
-import cl.gob.scj.sgdp.dao.ParametroDeTareaDao;
 import cl.gob.scj.sgdp.dao.UsuarioAsignadoDao;
-import cl.gob.scj.sgdp.dao.ValorParametroDeTareaDao;
 import cl.gob.scj.sgdp.dto.AnulacionDTO;
 import cl.gob.scj.sgdp.dto.ArchivoInfoDTO;
 import cl.gob.scj.sgdp.dto.ArchivosInstDeTareaDTO;
@@ -51,6 +50,10 @@ import cl.gob.scj.sgdp.dto.AsignacionTareaDTO;
 import cl.gob.scj.sgdp.dto.CierraInstanciaDeTareaDTO;
 import cl.gob.scj.sgdp.dto.ContinuarProcesoDTO;
 import cl.gob.scj.sgdp.dto.DetalleDeArchivoDTO;
+import cl.gob.scj.sgdp.dto.DocumentoAnexoDTO;
+import cl.gob.scj.sgdp.dto.DocumentoIngresoRequestDTO;
+import cl.gob.scj.sgdp.dto.DocumentoIngresoResponseDTO;
+import cl.gob.scj.sgdp.dto.EntidadDTO;
 import cl.gob.scj.sgdp.dto.FinalizaProcesoDTO;
 import cl.gob.scj.sgdp.dto.HistoricoFirmaDTO;
 import cl.gob.scj.sgdp.dto.InstanciaDeProcesoDTO;
@@ -60,6 +63,7 @@ import cl.gob.scj.sgdp.dto.ParametroFormularioDTO;
 import cl.gob.scj.sgdp.dto.ReabreInstanciaDeSubProcesoDTO;
 import cl.gob.scj.sgdp.dto.RetrocedeProcesoDTO;
 import cl.gob.scj.sgdp.dto.rest.MensajeJson;
+import cl.gob.scj.sgdp.dto.rest.TipoDocumentoDTO;
 import cl.gob.scj.sgdp.exception.SgdpException;
 import cl.gob.scj.sgdp.model.ArchivosInstDeTarea;
 import cl.gob.scj.sgdp.model.DocumentoDeSalidaDeTarea;
@@ -70,38 +74,31 @@ import cl.gob.scj.sgdp.model.HistoricoDeInstDeTarea;
 import cl.gob.scj.sgdp.model.HistoricoFechaVencimientoInstanciaProceso;
 import cl.gob.scj.sgdp.model.HistoricoUsuariosAsignadosATarea;
 import cl.gob.scj.sgdp.model.HistoricoUsuariosAsignadosATareaPK;
-import cl.gob.scj.sgdp.model.HistoricoValorParametroDeTarea;
 import cl.gob.scj.sgdp.model.InstanciaDeProceso;
 import cl.gob.scj.sgdp.model.InstanciaDeTarea;
-import cl.gob.scj.sgdp.model.ParametroDeTarea;
 import cl.gob.scj.sgdp.model.Tarea;
 import cl.gob.scj.sgdp.model.UsuarioAsignado;
 import cl.gob.scj.sgdp.model.UsuarioAsignadoPK;
 import cl.gob.scj.sgdp.model.UsuarioNotificacionTarea;
-import cl.gob.scj.sgdp.model.ValorParametroDeTarea;
-import cl.gob.scj.sgdp.service.EmailService;
-import cl.gob.scj.sgdp.service.GestorDeDocumentosService;
-import cl.gob.scj.sgdp.service.GestorMetadataService;
-import cl.gob.scj.sgdp.service.HistoricoFirmaService;
-import cl.gob.scj.sgdp.service.InstanciaDeProcesoService;
-import cl.gob.scj.sgdp.service.InstanciaDeTareaService;
-import cl.gob.scj.sgdp.service.MueveProcesoService;
-import cl.gob.scj.sgdp.service.ObtenerArchivosExpedienteService;
-import cl.gob.scj.sgdp.service.ObtenerDetalleDeArchivoService;
-import cl.gob.scj.sgdp.service.ParametroDeTareaService;
-import cl.gob.scj.sgdp.service.ParametroService;
-import cl.gob.scj.sgdp.service.UsuarioResponsabilidadService;
+import cl.gob.scj.sgdp.tipos.AccionType;
 import cl.gob.scj.sgdp.tipos.AccionesHistInstDeTareaType;
 import cl.gob.scj.sgdp.tipos.BifurcacionType;
+import cl.gob.scj.sgdp.tipos.DistribucionType;
 import cl.gob.scj.sgdp.tipos.EstadoDeProcesoType;
 import cl.gob.scj.sgdp.tipos.EstadoDeTareaType;
 import cl.gob.scj.sgdp.tipos.MensajeExceptionType;
+import cl.gob.scj.sgdp.tipos.ModuloType;
 import cl.gob.scj.sgdp.tipos.NotificacionType;
 import cl.gob.scj.sgdp.tipos.ReseteoType;
 import cl.gob.scj.sgdp.util.FechaUtil;
 import cl.gob.scj.sgdp.util.FileUtil;
 import cl.gob.scj.sgdp.util.SingleObjectFactory;
 import cl.gob.scj.sgdp.util.StringUtilSGDP;
+import cl.gob.scj.sgdp.ws.alfresco.rest.client.GestorDeDocumentosCMSService;
+import cl.gob.scj.sgdp.ws.alfresco.rest.client.ObtenerDetalleDeArchivoCMSService;
+import cl.gob.scj.sgdp.ws.alfresco.rest.response.DetalleDeArchivoResponse;
+import cl.gob.scj.sgdp.ws.rest.client.NumeracionClientRestService;
+
 
 @Service
 @Transactional(rollbackFor = Throwable.class)
@@ -111,6 +108,21 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 	
 	@Resource(name = "configProps")
 	private Properties configProps;
+	
+	@Autowired
+	private UnidadOperativaService unidadOperativaService;
+	
+	@Autowired
+	private NumeracionClientRestService numeracionClientRestService;
+	
+	@Autowired 
+	private GestorDeDocumentosCMSService gestorDeDocumentosCMSService;
+	
+	@Autowired
+	private ObtenerDetalleDeArchivoCMSService obtenerDetalleDeArchivoCMSService;
+	
+	@Autowired
+	private ApiDocDigitalService apiDocDigitalService;
 	
 	@Autowired
 	private InstanciaDeTareaDao instanciaDeTareaDao;
@@ -181,6 +193,9 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 	@Autowired
 	private ParametroDeTareaService parametroDeTareaService;
 	
+	@Autowired
+	private LogAccionesUsuarioService logAccionesUsuarioService;
+
 	EstadoDeProcesoType estadoDeProcesoType = EstadoDeProcesoType.NUEVO;
 	
 	EstadoDeTareaType estadoDeTareaAsignadaType = EstadoDeTareaType.ASIGNADA;
@@ -203,6 +218,8 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 	AccionesHistInstDeTareaType accionDevuelveHistInstDeTareaType = AccionesHistInstDeTareaType.DEVUELVE;
 	AccionesHistInstDeTareaType accionAnulaHistInstDeTareaType = AccionesHistInstDeTareaType.ANULA;
 	
+	private static final String NOMBRE_TAREA_ADJUNTAR_DOC_DESPACHO = "Adjuntar documento de despacho";
+	
 	@Override
 	public List<InstanciaDeTareaDTO> getInstanciasDeTareasQueContinuanDeInstanciaDeTarea(Usuario usuario, long idInstanciaDeTarea, boolean vigente
 			, List<InstanciaDeTareaDTO> instanciasDeTareasDTOContinuanProceso) {
@@ -219,7 +236,9 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 	
 	@Override
 	public List<InstanciaDeTareaDTO> getInstanciasDeTareasQueContinuanDeInstanciaDeTarea(Usuario usuario, InstanciaDeTareaDTO instanciaDeTareaDTO, 
-			List<InstanciaDeTareaDTO> instanciasDeTareasDTOContinuanProceso) {		
+			List<InstanciaDeTareaDTO> instanciasDeTareasDTOContinuanProceso) {	
+		
+		
 		if (instanciaDeTareaDTO.getTipoDeBifurcacion()!=null && instanciaDeTareaDTO.getTipoDeBifurcacion().equals(bifurcacionANDType.getNombreTipoDeBifurcacion())) {
 			log.info("Tarea de tipo AND");	
 			List<InstanciaDeTarea> instanciasDeTareasQueContinuanDeInstanciaDeTarea = instanciaDeTareaDao.getInstanciasDeTareasQueContinuanDeInstanciaDeTarea(instanciaDeTareaDTO.getIdInstanciaDeTarea());			
@@ -230,6 +249,7 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 					instanciaDeTareaDTOQueContinua.cargaInstanciaDeTareaDTO(instanciaDeTarea);
 					usuarioResponsabilidadService.cargaUsuariosRolesPosiblesPorIdInstanciaDeTarea(instanciaDeTarea.getIdInstanciaDeTarea(), instanciaDeTareaDTOQueContinua.getPosiblesIdUsuarios());
 					usuarioResponsabilidadService.cargaUsuariosFueraOficinaRolesPosiblesPorIdInstanciaDeTarea(instanciaDeTarea.getIdInstanciaDeTarea(), instanciaDeTareaDTOQueContinua.getPosiblesIdUsuariosFueraDeOficina());
+					instanciaDeTareaDTOQueContinua.setListaUnidadesOperativas(unidadOperativaService.getTodasUidadesOperativas());
 					instanciasDeTareasDTOContinuanProceso.add(instanciaDeTareaDTOQueContinua);	
 				} else if (instanciaDeTarea.getEstadoDeTarea().getCodigoEstadoDeTarea()==EstadoDeTareaType.FINALIZADA.getCodigoEstadoDeTarea()) {
 					//Si esta finalizada y no tiene movimientos de origen y destino
@@ -241,6 +261,7 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 						instanciaDeTareaDTOQueContinua.cargaInstanciaDeTareaDTO(instanciaDeTarea);
 						usuarioResponsabilidadService.cargaUsuariosRolesPosiblesPorIdInstanciaDeTarea(instanciaDeTarea.getIdInstanciaDeTarea(), instanciaDeTareaDTOQueContinua.getPosiblesIdUsuarios());
 						usuarioResponsabilidadService.cargaUsuariosFueraOficinaRolesPosiblesPorIdInstanciaDeTarea(instanciaDeTarea.getIdInstanciaDeTarea(), instanciaDeTareaDTOQueContinua.getPosiblesIdUsuariosFueraDeOficina());
+						instanciaDeTareaDTOQueContinua.setListaUnidadesOperativas(unidadOperativaService.getTodasUidadesOperativas());
 						instanciasDeTareasDTOContinuanProceso.add(instanciaDeTareaDTOQueContinua);	
 					}
 				}
@@ -254,6 +275,7 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 						instanciaDeTareaDTOQueContinua.cargaInstanciaDeTareaDTO(instanciaDeTarea);
 						usuarioResponsabilidadService.cargaUsuariosRolesPosiblesPorIdInstanciaDeTarea(instanciaDeTarea.getIdInstanciaDeTarea(), instanciaDeTareaDTOQueContinua.getPosiblesIdUsuarios());
 						usuarioResponsabilidadService.cargaUsuariosFueraOficinaRolesPosiblesPorIdInstanciaDeTarea(instanciaDeTarea.getIdInstanciaDeTarea(), instanciaDeTareaDTOQueContinua.getPosiblesIdUsuariosFueraDeOficina());
+						instanciaDeTareaDTOQueContinua.setListaUnidadesOperativas(unidadOperativaService.getTodasUidadesOperativas());
 						instanciasDeTareasDTOContinuanProceso.add(instanciaDeTareaDTOQueContinua);	
 					}
 				}
@@ -271,6 +293,7 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 				instanciaDeTareaDTOQueContinua.cargaInstanciaDeTareaDTO(instanciaDeTarea);
 				usuarioResponsabilidadService.cargaUsuariosRolesPosiblesPorIdInstanciaDeTarea(instanciaDeTarea.getIdInstanciaDeTarea(), instanciaDeTareaDTOQueContinua.getPosiblesIdUsuarios());
 				usuarioResponsabilidadService.cargaUsuariosFueraOficinaRolesPosiblesPorIdInstanciaDeTarea(instanciaDeTarea.getIdInstanciaDeTarea(), instanciaDeTareaDTOQueContinua.getPosiblesIdUsuariosFueraDeOficina());
+				instanciaDeTareaDTOQueContinua.setListaUnidadesOperativas(unidadOperativaService.getTodasUidadesOperativas());
 				instanciasDeTareasDTOContinuanProceso.add(instanciaDeTareaDTOQueContinua);
 			}			
 		}		
@@ -564,6 +587,8 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 		log.debug("avanzaProceso... inicio");
 		boolean validaTareaEstaBE = true;		
 		List<ParametroFormularioDTO> listParametroFormularioDTO;
+		boolean esTareaDistribuyeODespacho = false;		
+		List<String> nombreArchivosADistribuir = new ArrayList<String>();
 		if (continuarProcesoDTO.getAsignacionesTareasJSON()!=null && !continuarProcesoDTO.getAsignacionesTareasJSON().isEmpty()) {
 			log.debug("continuarProcesoDTO.getAsignacionesTareasJSON(): " + continuarProcesoDTO.getAsignacionesTareasJSON());
 			ObjectMapper mapper = SingleObjectFactory.getMapper();
@@ -571,6 +596,9 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 			InstanciaDeTarea instanciaDeTareaDeOrigen = instanciaDeTareaDao.getInstanciaDeTareaPorIdInstanciaDeTarea(continuarProcesoDTO.getIdInstanciaDeTareaOrigen());
 			Tarea tareaDeOrigen = instanciaDeTareaDeOrigen.getTarea();
 			Boolean tieneRdsSnc = instanciaDeTareaDeOrigen.getInstanciaDeProceso().getProceso().getTieneRdsSnc();
+			if ( tareaDeOrigen.getDistribuye()!=null && ( (tareaDeOrigen.getDistribuye().booleanValue()) || (tareaDeOrigen.getNombreTarea().replaceAll(" ", "").toUpperCase().equals(NOMBRE_TAREA_ADJUNTAR_DOC_DESPACHO.replaceAll(" ", "").toUpperCase())) ) ) {
+				esTareaDistribuyeODespacho = true;
+			} 
 			if ((continuarProcesoDTO.getIdUsuarioMueve()!=null && !continuarProcesoDTO.getIdUsuarioMueve().isEmpty()) || continuarProcesoDTO.getReasigna()==true) {
 				validaTareaEstaBE = false;
 			}
@@ -610,11 +638,12 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 			log.info("Verificamos si es una tarea que llama a un ws");
 			log.info(tareaDeOrigen.toString());
 			//Verificamos si es una tarea que llama a un ws
-			if (tareaDeOrigen.getUrlWS()!=null && continuarProcesoDTO.getReasigna()!=true && continuarProcesoDTO.getReabre()!=true) {
+			if (tareaDeOrigen.getUrlWS()!=null && !tareaDeOrigen.getUrlWS().isEmpty() && continuarProcesoDTO.getReasigna()!=true && continuarProcesoDTO.getReabre()!=true) {
 				IntegracionSatelitesDTO integracionSatelitesDTO = new IntegracionSatelitesDTO();
 				integracionSatelitesDTO.setIdExpediente(continuarProcesoDTO.getIdExpedienteContinuarProceso());
 				integracionSatelitesDTO.setNombreExpediente(instanciaDeTareaDeOrigen.getInstanciaDeProceso().getNombreExpediente());
 				integracionSatelitesDTO.setUrlWS(tareaDeOrigen.getUrlWS());				
+				integracionSatelitesDTO.setFechaDespacho(getFechaDespachoIntegracion(instanciaDeTareaDeOrigen.getInstanciaDeProceso().getIdInstanciaDeProceso(), esTareaDistribuyeODespacho));
 				invocaWS(integracionSatelitesDTO, continuarProcesoDTO.getIdInstanciaDeTareaOrigen(), usuario);				
 			}
 			//Verificamos si es una tarea de reseteo y si tiene alguna instancia de tarea anterior enviada
@@ -663,19 +692,91 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 			//Verificamos si es una tarea de Distribucion
 			if (tareaDeOrigen.getDistribuye()!=null && tareaDeOrigen.getDistribuye().booleanValue() == true && continuarProcesoDTO.getReasigna()!=true && continuarProcesoDTO.getReabre()!=true) {
 				try { 
-					List<String> correosDeDistribucion = mapper.readValue(continuarProcesoDTO.getCorreosDeDistribucionJSON(), new TypeReference<List<String>>(){});
-					List<String> idArchivosADistribuir = mapper.readValue(continuarProcesoDTO.getIdArchivosADistribuirJSON(), new TypeReference<List<String>>(){});
-					emailService.enviarCorreosConAdjuntosAListaDeDistribucion(correosDeDistribucion, idArchivosADistribuir, 
-							continuarProcesoDTO.getIdExpedienteContinuarProceso(), 
-							instanciaDeTareaDeOrigen.getInstanciaDeProceso().getNombreExpediente(),
-							instanciaDeTareaDeOrigen.getIdInstanciaDeTarea(),
-							usuario,
-							continuarProcesoDTO.getAsuntoCorreoDistribucion());
+					Set<String> idArchivosADistribuir = mapper.readValue(continuarProcesoDTO.getIdArchivosADistribuirJSON(), new TypeReference<Set<String>>(){});
+					//MIG
+					log.info("Distri Api Doc: " + continuarProcesoDTO.getCorreosHiden());
+					if (continuarProcesoDTO.getCorreosHiden()!= null && continuarProcesoDTO.getCorreosHiden().equalsIgnoreCase(DistribucionType.DIST_API_DOC.getNombreDistribucion())) {
+						log.info("Distri Api Doc: "+continuarProcesoDTO.toString());						
+						DocumentoIngresoRequestDTO ingresarDocDTO = new DocumentoIngresoRequestDTO();	
+						List<DocumentoAnexoDTO> listaAnexos = new ArrayList<>();						
+						continuarProcesoDTO.setDireccionesDeCorreoParaDistribuir(continuarProcesoDTO.getDireccionesDeCorreosApiDoc());
+						//for(int i = 0; i < idArchivosADistribuir.size(); i++) {
+						for(String idArchivo : idArchivosADistribuir) {
+							//log.info("Distri idArchivo: "+ idArchivosADistribuir.get(i));
+							log.info("Distri idArchivo: "+ idArchivo);
+							log.info("Distri idArchivo: "+ usuario);
+							byte[] archivoByte =  gestorDeDocumentosCMSService.getContenidoArchivo(idArchivo, usuario);
+							DetalleDeArchivoResponse obtenerDetalleDeArchivo = obtenerDetalleDeArchivoCMSService.obtenerDetalleDeArchivo(usuario, idArchivo);							
+							nombreArchivosADistribuir.add(obtenerDetalleDeArchivo.getDetalleDeArchivoDTO().getNombre());
+							if ( obtenerDetalleDeArchivo.getDetalleDeArchivoDTO().getTipoDeDocumento().equalsIgnoreCase("Antecedente")) {
+								DocumentoAnexoDTO documentosAnexosDTO = new DocumentoAnexoDTO();
+								documentosAnexosDTO.setContenido(FileUtil.encodeByteArrayToBase64(archivoByte, "UTF-8"));
+								documentosAnexosDTO.setNombre_archivo(obtenerDetalleDeArchivo.getDetalleDeArchivoDTO().getNombre()); 
+								documentosAnexosDTO.setTipo("ANEXO");
+								listaAnexos.add(documentosAnexosDTO);
+							} else {
+								ingresarDocDTO.setDescripcion(obtenerDetalleDeArchivo.getDetalleDeArchivoDTO().getNombre());
+								ingresarDocDTO.setDocumento(FileUtil.encodeByteArrayToBase64(archivoByte, "UTF-8"));
+								ingresarDocDTO.setFolio(obtenerDetalleDeArchivo.getDetalleDeArchivoDTO().getNumeroDocumento());
+								ingresarDocDTO.setNombre(obtenerDetalleDeArchivo.getDetalleDeArchivoDTO().getNombre());
+								List<HistoricoArchivosInstDeTarea>listaHistoricoArchivosInstDeTarea = historicoArchivosInstDeTareaDao.getHistoricoDeArchivosPorIdArchivoCMS(idArchivo);
+								log.info("tipoDoc: " + listaHistoricoArchivosInstDeTarea);
+								TipoDocumentoDTO tipoDocumentoDTO = numeracionClientRestService.getTipoDocumentoPorCodTipoDoc(listaHistoricoArchivosInstDeTarea.get(0).getTipoDeDocumento().getCodTipoDocumento());								
+								ingresarDocDTO.setTipo_id(tipoDocumentoDTO.getIdTipoDocDigital().toString());
+							}
+						}
+						ingresarDocDTO.setDocumentos_anexos(listaAnexos.toArray(new DocumentoAnexoDTO[listaAnexos.size()]));						
+						ingresarDocDTO.setEs_reservado("false");
+						EntidadDTO entidad = apiDocDigitalService.getEntidadToken();
+						ingresarDocDTO.setId_entidad_creadora(entidad.getIdEntidad());	
+						ingresarDocDTO.setListado_correos_copia(null);						
+						//ingresarDocDTO.setListado_id_entidades_destinatarias(null);
+						String[] idDestinatariosa = mapper.readValue(continuarProcesoDTO.getCorreosApiDocJSON(), new TypeReference<String[]>(){});						
+						log.info("idDestinatarios: " +idDestinatariosa.toString())	;					
+						ingresarDocDTO.setListado_id_usuarios_destinatarios(idDestinatariosa);						
+						ingresarDocDTO.setMateria(instanciaDeTareaDeOrigen.getInstanciaDeProceso().getAsunto());						
+						ingresarDocDTO.setRun_usuario_creador(usuario.getRut());
+						ingresarDocDTO.setListado_id_entidades_destinatarias(new String[]{continuarProcesoDTO.getIdEntidadDestinataria()});
+						ingresarDocDTO.setEs_reservado(Boolean.toString(continuarProcesoDTO.isCondifencialDocdigital()));
+						DocumentoIngresoResponseDTO documentoIngresoResponseDTO = apiDocDigitalService.ingresarDocumentoApiDocDig(ingresarDocDTO);
+						log.info("Status Ingreso Api Doc: " + documentoIngresoResponseDTO.toString());
+						if ( !( documentoIngresoResponseDTO.getStatus().equals(configProps.getProperty("http-200-status"))
+							|| documentoIngresoResponseDTO.getStatus().equals(configProps.getProperty("http-201-status"))) ) {
+							throw new SgdpException(documentoIngresoResponseDTO.getMessage());
+						}
+					} else if(continuarProcesoDTO.getCorreosHiden()!= null && continuarProcesoDTO.getCorreosHiden().equalsIgnoreCase(DistribucionType.DIST_CORREO.getNombreDistribucion())) {
+						List<String> correosDeDistribucion = mapper.readValue(continuarProcesoDTO.getCorreosDeDistribucionJSON(), new TypeReference<List<String>>(){});
+						continuarProcesoDTO.setDireccionesDeCorreoParaDistribuir(StringUtils.join(correosDeDistribucion, configProps.getProperty("sgdp.separador.log-distribuicion")));
+						emailService.enviarCorreosConAdjuntosAListaDeDistribucion(correosDeDistribucion, idArchivosADistribuir, 
+								continuarProcesoDTO.getIdExpedienteContinuarProceso(), 
+								instanciaDeTareaDeOrigen.getInstanciaDeProceso().getNombreExpediente(),
+								instanciaDeTareaDeOrigen.getIdInstanciaDeTarea(),
+								usuario,
+								continuarProcesoDTO.getAsuntoCorreoDistribucion(),
+								nombreArchivosADistribuir);						
+					} else if(continuarProcesoDTO.getRuts()!= null && continuarProcesoDTO.getCorreosHiden().equalsIgnoreCase(DistribucionType.DIST_API_OFICINA_VIRTUAL.getNombreDistribucion())) {
+						/*DistribucionOficinaVirtualDTO distribucionOficinaVirtualDTO = new DistribucionOficinaVirtualDTO();
+						distribucionOficinaVirtualDTO.setIdUsuario(usuario.getIdUsuario());
+						distribucionOficinaVirtualDTO.setFechaEnvio(new Date());
+						distribucionOficinaVirtualDTO.setRuts(continuarProcesoDTO.getRuts());
+						distribucionOficinaVirtualDTO.setDocs(idArchivosADistribuir);
+						distribucionOficinaVirtualDTO.setIdInstanciaDeTarea(continuarProcesoDTO.getIdInstanciaDeTareaOrigen());
+						distribucionOficinaVirtualService.send(distribucionOficinaVirtualDTO);*/
+					}
+					continuarProcesoDTO.setNombreArchivosADistribuir(StringUtils.join(nombreArchivosADistribuir, configProps.getProperty("sgdp.separador.log-distribuicion")));
+					logAccionesUsuarioService.guardaLogAccionesUsuario(usuario, continuarProcesoDTO, 
+							AccionType.DISTRIBUYE_DOCUMENTOS.getNombreAccion(),
+							ModuloType.DISTRIBUCION_DE_DOCUMENTOS.getNombreModulo());
+				} catch(SgdpException e) {
+					throw e;
 				} catch (Exception e) {
 					StringWriter sw = new StringWriter();
 					e.printStackTrace(new PrintWriter(sw));
 					String exceptionAsString = sw.toString();
-					log.error(exceptionAsString);				
+					log.error(exceptionAsString);		
+					if (e instanceof SgdpException) {
+						throw (SgdpException)e;
+					}
 					throw new SgdpException(configProps.getProperty("errorAlAvanzarProceso"));
 				}				
 			}
@@ -707,6 +808,25 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 		}	
 		log.debug("avanzaProceso... fin");
 		return configProps.getProperty("respuestaOK");
+	}
+	
+	private Date getFechaDespachoIntegracion(long idProceso, boolean tareaActualEsTareaDespachoODistribucion) {
+		InstanciaDeTarea instanciaDeTareaDespacho = instanciaDeTareaDao.getInstanciaDeTareaPorIdInstanciaDeProcesoNombreTarea(idProceso, NOMBRE_TAREA_ADJUNTAR_DOC_DESPACHO);
+		InstanciaDeTarea instanciaDeTareaDistribuye = instanciaDeTareaDao.getInstanciaDeTareaDistribuyePorIdInstanciaDeProceso(idProceso);
+		if (instanciaDeTareaDespacho!=null && instanciaDeTareaDistribuye!=null) {			
+			if(instanciaDeTareaDespacho.getFechaFinalizacion().after(instanciaDeTareaDistribuye.getFechaFinalizacion())){
+	            return instanciaDeTareaDistribuye.getFechaFinalizacion();
+	        } else {
+	        	return instanciaDeTareaDespacho.getFechaFinalizacion();
+	        }			
+		} else if (instanciaDeTareaDespacho!=null) {
+			return instanciaDeTareaDespacho.getFechaFinalizacion();			
+		} else if (instanciaDeTareaDistribuye!=null) {
+			return instanciaDeTareaDistribuye.getFechaFinalizacion();
+		} else if (tareaActualEsTareaDespachoODistribucion) {
+			return new Date();
+		}
+		return null;
 	}
 		
 	@SuppressWarnings("unchecked")
@@ -982,10 +1102,18 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 	@Override
 	public void finaliza(Usuario usuario, FinalizaProcesoDTO finalizaProcesoDTO) throws SgdpException {		
 		
+		List<String> nombreArchivosADistribuir = new ArrayList<String>();
+		
 		InstanciaDeTarea instanciaDeTarea = instanciaDeTareaDao.getInstanciaDeTareaPorIdInstanciaDeTarea(finalizaProcesoDTO.getIdInstanciaDeTarea());
 		InstanciaDeProceso instanciaDeProceso = instanciaDeTarea.getInstanciaDeProceso();
 		EstadoDeProceso estadoDeProcesoFinalizado = estadoDeProcesoDao.getEstadoDeProcesoPorCodigo(estadoDeProcesoFinalizadoType.getCodigoEstadoDeProceso());
 		Tarea tareaDeOrigen = instanciaDeTarea.getTarea();
+		
+		boolean esTareaDistribuyeODespacho = false;		
+		
+		if ( tareaDeOrigen.getDistribuye()!=null && ( (tareaDeOrigen.getDistribuye().booleanValue()) || (tareaDeOrigen.getNombreTarea().replaceAll(" ", "").toUpperCase().equals(NOMBRE_TAREA_ADJUNTAR_DOC_DESPACHO.replaceAll(" ", "").toUpperCase())) ) ) {
+			esTareaDistribuyeODespacho = true;
+		} 
 		
 		Boolean tieneRdsSnc = instanciaDeTarea.getInstanciaDeProceso().getProceso().getTieneRdsSnc();
 		
@@ -1054,22 +1182,90 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 		}
 		//Verificamos si es una tarea de Distribucion
 		if (instanciaDeTarea.getTarea().getDistribuye()!=null && instanciaDeTarea.getTarea().getDistribuye().booleanValue() == true && finalizaProcesoDTO.getCierra()==false) {
-			try { 
-				List<String> correosDeDistribucion = mapper.readValue(finalizaProcesoDTO.getCorreosDeDistribucionJSON(), new TypeReference<List<String>>(){});
-				List<String> idArchivosADistribuir = mapper.readValue(finalizaProcesoDTO.getIdArchivosADistribuirJSON(), new TypeReference<List<String>>(){});
-				emailService.enviarCorreosConAdjuntosAListaDeDistribucion(correosDeDistribucion, idArchivosADistribuir, 
-						instanciaDeProceso.getIdExpediente(), 
-						instanciaDeTarea.getInstanciaDeProceso().getNombreExpediente(),
-						instanciaDeTarea.getIdInstanciaDeTarea(),
-						usuario,
-						finalizaProcesoDTO.getAsuntoCorreoDistribucion());
+			try {
+				//MIG
+				log.info("Distribuyendo para: " + finalizaProcesoDTO.getCorreosHiden());
+				Set<String> idArchivosADistribuir = mapper.readValue(finalizaProcesoDTO.getIdArchivosADistribuirJSON(), new TypeReference<Set<String>>(){});
+				if(finalizaProcesoDTO.getCorreosHiden()!= null && finalizaProcesoDTO.getCorreosHiden().equalsIgnoreCase(DistribucionType.DIST_API_DOC.getNombreDistribucion())) {
+					log.info("Distri Api Doc Finaliza: "+finalizaProcesoDTO.toString());						
+					DocumentoIngresoRequestDTO ingresarDocDTO = new DocumentoIngresoRequestDTO();	
+					List<DocumentoAnexoDTO> listaAnexos = new ArrayList<>();						
+					finalizaProcesoDTO.setDireccionesDeCorreoParaDistribuir(finalizaProcesoDTO.getDireccionesDeCorreosApiDoc());		
+					for(String idArchivo : idArchivosADistribuir) {
+						log.info("Distri idArchivo Finaliza: "+ idArchivo);
+						log.info("Distri idArchivo Finaliza: "+ usuario);
+						byte[] archivoByte =  gestorDeDocumentosCMSService.getContenidoArchivo(idArchivo, usuario);
+						DetalleDeArchivoResponse obtenerDetalleDeArchivo = obtenerDetalleDeArchivoCMSService.obtenerDetalleDeArchivo(usuario, idArchivo);	
+						nombreArchivosADistribuir.add(obtenerDetalleDeArchivo.getDetalleDeArchivoDTO().getNombre());
+						if ( obtenerDetalleDeArchivo.getDetalleDeArchivoDTO().getTipoDeDocumento().equalsIgnoreCase("Antecedente")) {
+							DocumentoAnexoDTO documentosAnexosDTO = new DocumentoAnexoDTO();
+							documentosAnexosDTO.setContenido(FileUtil.encodeByteArrayToBase64(archivoByte, "UTF-8"));
+							documentosAnexosDTO.setNombre_archivo(obtenerDetalleDeArchivo.getDetalleDeArchivoDTO().getNombre()); 
+							documentosAnexosDTO.setTipo("ANEXO");
+							listaAnexos.add(documentosAnexosDTO);
+						} else {
+							ingresarDocDTO.setDescripcion(obtenerDetalleDeArchivo.getDetalleDeArchivoDTO().getNombre());
+							ingresarDocDTO.setDocumento(FileUtil.encodeByteArrayToBase64(archivoByte, "UTF-8"));
+							ingresarDocDTO.setFolio(obtenerDetalleDeArchivo.getDetalleDeArchivoDTO().getNumeroDocumento());
+							ingresarDocDTO.setNombre(obtenerDetalleDeArchivo.getDetalleDeArchivoDTO().getNombre());
+							List<HistoricoArchivosInstDeTarea>listaHistoricoArchivosInstDeTarea = historicoArchivosInstDeTareaDao.getHistoricoDeArchivosPorIdArchivoCMS(idArchivo);
+							log.info("tipoDoc: " + listaHistoricoArchivosInstDeTarea);
+							TipoDocumentoDTO tipoDocumentoDTO = numeracionClientRestService.getTipoDocumentoPorCodTipoDoc(listaHistoricoArchivosInstDeTarea.get(0).getTipoDeDocumento().getCodTipoDocumento());								
+							ingresarDocDTO.setTipo_id(tipoDocumentoDTO.getIdTipoDocDigital().toString());
+						}
+					}
+					ingresarDocDTO.setDocumentos_anexos(listaAnexos.toArray(new DocumentoAnexoDTO[listaAnexos.size()]));						
+					ingresarDocDTO.setEs_reservado("false");
+					EntidadDTO entidad = apiDocDigitalService.getEntidadToken();
+					ingresarDocDTO.setId_entidad_creadora(entidad.getIdEntidad());	
+					ingresarDocDTO.setListado_correos_copia(null);
+					ingresarDocDTO.setListado_id_entidades_destinatarias(new String[]{finalizaProcesoDTO.getIdEntidadDestinataria()});
+					ingresarDocDTO.setEs_reservado(Boolean.toString(finalizaProcesoDTO.isCondifencialDocdigital()));
+					String[] idDestinatariosa = mapper.readValue(finalizaProcesoDTO.getCorreosApiDocJSON(), new TypeReference<String[]>(){});						
+					log.info("idDestinatarios: " +idDestinatariosa.toString())	;					
+					ingresarDocDTO.setListado_id_usuarios_destinatarios(idDestinatariosa);						
+					ingresarDocDTO.setMateria(instanciaDeTarea.getInstanciaDeProceso().getAsunto());						
+					ingresarDocDTO.setRun_usuario_creador(usuario.getRut());
+					DocumentoIngresoResponseDTO documentoIngresoResponseDTO = apiDocDigitalService.ingresarDocumentoApiDocDig(ingresarDocDTO);
+					log.info("Status Ingresi Api Doc: " + documentoIngresoResponseDTO.toString());
+					if ( !(documentoIngresoResponseDTO.getStatus().equals(configProps.getProperty("http-200-status"))
+						|| documentoIngresoResponseDTO.getStatus().equals(configProps.getProperty("http-201-status")) )) {
+						throw new SgdpException(documentoIngresoResponseDTO.getMessage());
+					}
+				} else if(finalizaProcesoDTO.getCorreosHiden()!= null && finalizaProcesoDTO.getCorreosHiden().equalsIgnoreCase(DistribucionType.DIST_CORREO.getNombreDistribucion())) {
+					List<String> correosDeDistribucion = mapper.readValue(finalizaProcesoDTO.getCorreosDeDistribucionJSON(), new TypeReference<List<String>>(){});
+					finalizaProcesoDTO.setDireccionesDeCorreoParaDistribuir(StringUtils.join(correosDeDistribucion, configProps.getProperty("sgdp.separador.log-distribuicion")));
+					emailService.enviarCorreosConAdjuntosAListaDeDistribucion(correosDeDistribucion, idArchivosADistribuir, 
+							instanciaDeProceso.getIdExpediente(), 
+							instanciaDeTarea.getInstanciaDeProceso().getNombreExpediente(),
+							instanciaDeTarea.getIdInstanciaDeTarea(),
+							usuario,
+							finalizaProcesoDTO.getAsuntoCorreoDistribucion(),
+							nombreArchivosADistribuir);
+				} else if(finalizaProcesoDTO.getRuts()!= null && finalizaProcesoDTO.getCorreosHiden().equalsIgnoreCase(DistribucionType.DIST_API_OFICINA_VIRTUAL.getNombreDistribucion())) {
+					/*DistribucionOficinaVirtualDTO distribucionOficinaVirtualDTO = new DistribucionOficinaVirtualDTO();
+					distribucionOficinaVirtualDTO.setIdUsuario(usuario.getIdUsuario());
+					distribucionOficinaVirtualDTO.setFechaEnvio(new Date());
+					distribucionOficinaVirtualDTO.setRuts(finalizaProcesoDTO.getRuts());
+					distribucionOficinaVirtualDTO.setDocs(idArchivosADistribuir);
+					distribucionOficinaVirtualDTO.setIdInstanciaDeTarea(finalizaProcesoDTO.getIdInstanciaDeTarea());
+					distribucionOficinaVirtualService.send(distribucionOficinaVirtualDTO);*/
+				}
+				log.debug("setNombreArchivosADistribuir");
+				log.debug(nombreArchivosADistribuir);
+				finalizaProcesoDTO.setNombreArchivosADistribuir(StringUtils.join(nombreArchivosADistribuir, configProps.getProperty("sgdp.separador.log-distribuicion")));
+				logAccionesUsuarioService.guardaLogAccionesUsuario(usuario, finalizaProcesoDTO, 
+				AccionType.DISTRIBUYE_DOCUMENTOS.getNombreAccion(),
+				ModuloType.DISTRIBUCION_DE_DOCUMENTOS.getNombreModulo());
+			} catch(SgdpException e) {
+				throw e;
 			} catch (Exception e) {
 				StringWriter sw = new StringWriter();
 				e.printStackTrace(new PrintWriter(sw));
 				String exceptionAsString = sw.toString();
 				log.error(exceptionAsString);				
 				throw new SgdpException(configProps.getProperty("errorAlAvanzarProceso"));
-			}				
+			}			
 		}
 		//Verificamos si es una tarea de notificacion para notificar y enviar correo
 		List<UsuarioNotificacionTarea> usuariosNotificacionTarea = instanciaDeTarea.getTarea().getUsuarioNotificacionTarea();
@@ -1093,11 +1289,12 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 		log.info("Verificamos si es una tarea que llama a un ws");
 		log.info(tareaDeOrigen.toString());
 		//Verificamos si es una tarea que llama a un ws
-		if (tareaDeOrigen.getUrlWS()!=null && finalizaProcesoDTO.getCierra()==false) {
+		if (tareaDeOrigen.getUrlWS()!=null && !tareaDeOrigen.getUrlWS().isEmpty() && finalizaProcesoDTO.getCierra()==false) {
 			IntegracionSatelitesDTO integracionSatelitesDTO  = new IntegracionSatelitesDTO();
 			integracionSatelitesDTO.setIdExpediente(instanciaDeProceso.getIdExpediente());
 			integracionSatelitesDTO.setNombreExpediente(instanciaDeProceso.getNombreExpediente());
-			integracionSatelitesDTO.setUrlWS(tareaDeOrigen.getUrlWS());			
+			integracionSatelitesDTO.setUrlWS(tareaDeOrigen.getUrlWS());
+			integracionSatelitesDTO.setFechaDespacho(getFechaDespachoIntegracion(instanciaDeProceso.getIdInstanciaDeProceso(), esTareaDistribuyeODespacho));
 			invocaWS(integracionSatelitesDTO, finalizaProcesoDTO.getIdInstanciaDeTarea(), usuario) ;	
 		}		
 	}
@@ -1248,7 +1445,11 @@ public class MueveProcesoServiceImpl implements MueveProcesoService {
 			}
 			IntegracionClient integracionClient = new IntegracionClient();
 			log.info("Ejecutando servicio satelite");
-			log.info(integracionSatelitesDTO.toString());
+			log.info("integracionSatelitesDTO.getNombreExpediente(): " + integracionSatelitesDTO.getNombreExpediente());
+			log.info("integracionSatelitesDTO.getIdExpediente(): " + integracionSatelitesDTO.getIdExpediente());
+			log.info("integracionSatelitesDTO.getFechaFirmaDocumentoOficial(): " + integracionSatelitesDTO.getFechaFirmaDocumentoOficial());
+			log.info("integracionSatelitesDTO.getFechaDespacho(): " + integracionSatelitesDTO.getFechaDespacho());
+			log.info("integracionSatelitesDTO.getNumeroDocumento(): " + integracionSatelitesDTO.getNumeroDocumento());
 			RespuestaIntegracionDTO respuestaIntegracionDTO = integracionClient.ejecuta(integracionSatelitesDTO);
 			if (respuestaIntegracionDTO==null) {
 			    throw new SgdpException("Sin respueta del sistema satelite", Level.ERROR, false);

@@ -67,6 +67,30 @@ public class HistoricoArchivosInstDeTareaDaoImpl implements
         query.setResultTransformer(Transformers.aliasToBean(ArchivosInstDeTareaDTO.class));
 		return query.list();
 	}
+
+	@Override
+	public HistoricoArchivosInstDeTarea getPorIdArchivoCMS(String idArchivoCms) {
+		HistoricoArchivosInstDeTarea hat = null;
+		Query query = getSession().getNamedQuery("HistoricoArchivosInstDeTarea.findByIdCMS");		
+		query.setString("idArchivoCms", idArchivoCms);
+        query.setResultTransformer(Transformers.aliasToBean(ArchivosInstDeTareaDTO.class));
+        try {
+        	hat = (HistoricoArchivosInstDeTarea) query.uniqueResult();
+        } catch(Exception e) {
+        	e.printStackTrace();
+        	return null;
+        }
+        
+        return hat;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<HistoricoArchivosInstDeTarea> getHistoricoDeArchivosPorIdArchivoCMS(String idArchivoCms) {
+	Query query = getSession().getNamedQuery("HistoricoArchivosInstDeTarea.getHistoricoDeArchivosPorIdArchivoCMS");
+	query.setString("idArchivoCms", idArchivoCms);
+	return query.list();
+	}
 	
 	/*@SuppressWarnings("unchecked")
 	@Override

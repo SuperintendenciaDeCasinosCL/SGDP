@@ -1,4 +1,5 @@
 <%@ page import= "cl.gob.scj.sgdp.tipos.PermisoType" %> 
+<%@ page import= "cl.gob.scj.sgdp.tipos.ModuloType" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
@@ -119,16 +120,24 @@
 															data-asignarNumeroDocumento="${instanciaDeTareaDTO.asignaNumDoc}"
 															 >
 												          <span class="glyphicon glyphicon-upload font-icon-2"></span>
-												    </a>			
+												    </a>
+												    
+												    <a href="#" class="btn btn-warning btn-sm" id="btnConfidencialidad" 
+														    data-toggle="tooltip" title="Modificar confidencialidad del documento"
+															 >
+												          <span class="glyphicon glyphicon-lock font-icon-2"></span>
+												    </a>				
 													
 												</td>
 												<td>
 													<c:choose>
 														<c:when test="${!empty archivoInfoDTO.nombre and archivoInfoDTO.subidoALaTareaPorElUsuario eq true}">
 															<a href='#'
-															onclick='descargaArchivo("<c:url value='getArchivoPorId/${archivoInfoDTO.idArchivo}'/>")'>
+															onclick='descargaArchivo("<c:url value='getArchivoPorId/${archivoInfoDTO.idArchivo}'/>"
+															, "<%=ModuloType.DOCUMENTO_REQUERIDO_FORMUlARIO.getNombreModulo()%>")'>
 																${archivoInfoDTO.nombre}
 															</a>
+
 														</c:when>
 														<c:otherwise>
 															<div class="alert alert-info">
@@ -158,6 +167,7 @@
 													<c:if test = "${archivoInfoDTO.esEditable eq true}">
 												
 														<a href="#" class="btn btn-primary btn-sm boton-editar-documento" id="botonEditarDocumentoEnEjecucionTarea" title="Editar documento"
+																        data-idarchivo="${archivoInfoDTO.idArchivo}"
 																        data-codigomimetype="${archivoInfoDTO.codigoMimeType}"
 										                                data-linksharpoint="${archivoInfoDTO.linkSharpoint}">
 										                              <span class="glyphicon glyphicon-edit font-icon-2"></span>
@@ -258,6 +268,7 @@
 		
 					var inicializaLinkSubirDocumentoRequerido = function(){
 						$('.link-subir-documento-requerido').click(function() {
+
 							var botonSubirDocumentoRequerido = $(this);
 							$.get("${sessionURL}", function(haySession){
 						    	if (haySession) {		    	
@@ -358,7 +369,7 @@
 						    		$("#nombreArchivoSpanDocumentoRequeridoModal" ).empty();       
 						        	$('#nombreArchivoSpanDocumentoRequeridoModal').text("Seleccionar archivo");
 		
-						        	// LLena la modificación tipo documento nuevo
+						        	// LLena la modificacion tipo documento nuevo
 						        	$('#idTipoDeDocumentoRequeridoModal').val(idTipoDeDocumento).change();
 						        	$('#idTipoDeDocumentoRequeridoModal').prop('disabled', 'disabled');
 						        	
@@ -417,9 +428,39 @@
 						    	  			
 						    	  		}  		
 						    	  	});	
+						    	  	
+						    	  	$.ajax({
+						    	  	    url: '/sgdp/plantilla/' + idTipoDeDocumento,
+						    	  	    type: 'GET',
+						    	  	    async: true,
+						    	  	    cache: false,
+						    	  	    contentType: false,
+						    	  	    processData: false,
+						    	  	    success: function (returnData) {
+						    	  	    	console.log("SUCCESS -- getPlantilla: ", returnData);	    	
+						    	  	    },
+						    	  	    error : function(e) {
+						    	  			console.log("ERROR: getPlantilla ", e);
+						    	  			$.notify({
+						             			message: 'Error al obtener documentos requeridos: ' + returnData.responseJSON.resultadoRetrocedeProceso
+						             		},{
+						             			type: 'danger'
+						             		});			
+						    	  		},
+						    	  		done : function(e) {
+						    	  			//console.log("DONE");
+						    	  		},
+						    	  		complete : function(returnData) {
+						    	  			console.log("COMPLETE -- getPlantilla: ", returnData );
+						    	  			if (returnData !== null && returnData.nombre) {
+						    	  				$('#seleccioneDocumentoRequeridoModal').append($('<option>').text('PLANTILLA | returnData.nombre | returnData.codigo').attr('value', 'plantilla'));  
+						    	  				$("#subirDocumentoRequeridoModal").modal({backdrop: "static"});
+						    	  			}
+						    	  		}  		
+						    	  	});	 
 						       	} else {
 						             bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acción y hemos caducado tu sesión por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
-						             	, function(){ window.open('${raizURL}', '_blank');}
+						             	, function(){ window.open('${raizURL}', '_self');}
 						             );
 						       }
 							});
@@ -501,7 +542,7 @@
 						    		$('.select2-subir-adjunto-modal-multiple').val('').change();
 						       	} else {
 						             bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acción y hemos caducado tu sesión por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
-						             	, function(){ window.open('${raizURL}', '_blank');}
+						             	, function(){ window.open('${raizURL}', '_self');}
 						             );
 						       	}
 							});

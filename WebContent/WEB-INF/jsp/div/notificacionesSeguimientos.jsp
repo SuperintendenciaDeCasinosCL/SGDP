@@ -1,5 +1,6 @@
 <%@ page import= "cl.gob.scj.sgdp.tipos.PermisoType" %> 
-<%@ page import= "cl.gob.scj.sgdp.config.Constantes" %> 
+<%@ page import= "cl.gob.scj.sgdp.config.Constantes" %>
+<%@ page import= "cl.gob.scj.sgdp.tipos.ModuloType" %>
 
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -353,7 +354,8 @@
 														,"${instanciaDeTareaDTO.idInstanciaDeTarea}"
 														,"true"
 														,"${instanciaDeTareaDTO.idExpediente}"
-														,"${instanciaDeTareaDTO.urlControl}");
+														,"${instanciaDeTareaDTO.urlControl}"
+														,"${instanciaDeTareaDTO.idEstadoTarea}");
 											 */
 											 $("#divTabsDetalleDeTarea").addClass('hide');					
 												notificacionSeguimiento();
@@ -367,7 +369,7 @@
 	          } else {
 	                bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acción y hemos caducado tu sesión por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
 	                              , function(){
-	                                    window.open('${raizURL}', '_blank');
+	                                    window.open('${raizURL}', '_self');
 	                              }
 	                 );
 	          }
@@ -547,6 +549,8 @@ function formatTablaTodosDocumentosFinales() {
 	    	
 	var tablaTodosDocumentos = $('#tablaTodosDocumentos').DataTable();	
 	
+	var modulo  = '<%=ModuloType.NOTIFICACION_SEGUIMIENTO.getNombreModulo()%>';
+	
 	tablaTodosDocumentos.destroy();
    	
        var tablaTodosDocumentos =  $('#tablaTodosDocumentos').DataTable({
@@ -557,7 +561,7 @@ function formatTablaTodosDocumentosFinales() {
                          title: 'Nombre',
                          data:'nombre',
 		                 render: function ( data, type, row ) {
-		                	 return  '<a href="#" onclick="descargaArchivoNotSeg(\''+row.idArchivo+'\')" >' +row.nombre + '</a>' ;
+		                	 return  '<a href="#" onclick="descargaArchivoNotSeg(\''+row.idArchivo+'\', \''+modulo+'\')" >' +row.nombre + '</a>' ;
 		                     //return  "<a href='"+ row.linkDescargaNavegador+"?ticket="+alticket+"' target='_blank'>" +row.nombre + "</a>" ;
 		                 }
                     },
@@ -716,26 +720,27 @@ function formatTablaTodosDocumentosFinales() {
     	
     }
 
-    function descargaArchivoNotSeg(idArchivo) {
-    	var contextPath = "${pageContext.request.contextPath}";
-    	var urlDescarga = contextPath + "/getArchivoPorId/" + idArchivo;
- 		console.log("urlDescarga: " + urlDescarga);
- 		var urlSessionValida = $("#urlSessionValida").val();
- 		var raizURL = $("#raizURL").val();
- 		console.log("urlSessionValida: " + urlSessionValida);
- 		$.get(urlSessionValida, function(haySession) {
- 		      console.log("haySession: " + haySession);
- 		      if(haySession) {
- 		    	  window.location.href = urlDescarga;
- 		      }	else {
- 		            bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acci&oacute;n y hemos caducado tu sesi&oacute;n por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
- 		                          , function(){
- 		                                window.open(raizURL, '_blank');
- 		                          }
- 		             );
- 		      }
- 		});  
- 	}
+       function descargaArchivoNotSeg(idArchivo, modulo) {
+       	var contextPath = "${pageContext.request.contextPath}";
+       	var urlDescarga = contextPath + "/getArchivoPorId/" + idArchivo + "/" + "DESCARGA" + "/" + modulo;
+    		console.log("urlDescarga: " + urlDescarga);
+    		var urlSessionValida = $("#urlSessionValida").val();
+    		var raizURL = $("#raizURL").val();
+    		console.log("urlSessionValida: " + urlSessionValida);
+    		$.get(urlSessionValida, function(haySession) {
+    		      console.log("haySession: " + haySession);
+    		     if(haySession) {
+    		    	window.location.href = urlDescarga;
+    		     }	else {
+    		            bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acci&oacute;n y hemos caducado tu sesi&oacute;n por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+    		                          , function(){
+    		                                window.open(raizURL, '_blank');
+    		                          }
+    		             );
+    		     }
+    		});  
+    	}
+
 
 </script>
 		

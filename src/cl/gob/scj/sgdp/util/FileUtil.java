@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
@@ -117,5 +118,24 @@ public class FileUtil {
 				
 		return bFile;
 	}
+	
+	// Leer todo el contenido de un InputStream en un byte array
+    public static byte[] readFully(InputStream inputStream) throws IOException {
+    	ByteArrayOutputStream outputStream = null;
+    	try {
+    		outputStream = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+            return outputStream.toByteArray();
+    	} finally {
+    		if (outputStream!=null) {
+    			outputStream.close();
+    		}
+    	}
+    }
+
 	
 }

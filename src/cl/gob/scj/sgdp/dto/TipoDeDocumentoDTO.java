@@ -4,15 +4,21 @@ import java.io.Serializable;
 
 public class TipoDeDocumentoDTO implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private long idTipoDeDocumento;
 	private String nombreDeTipoDeDocumento;
+	private String codigoTipoDocumonto;
 	private boolean conformaExpediente;
 	private boolean aplicaVisacion;
 	private boolean aplicaFEA;
 	private boolean esDocumentoConductor;
+	private boolean numeracionAuto;
+	private String nombreEnDiagrama;
 	
 	public TipoDeDocumentoDTO() {
-		super();
 	}
 
 	public TipoDeDocumentoDTO(long idTipoDeDocumento,
@@ -75,6 +81,30 @@ public class TipoDeDocumentoDTO implements Serializable {
 		return "TipoDeDocumentoDTO [idTipoDeDocumento=" + idTipoDeDocumento + ", nombreDeTipoDeDocumento="
 				+ nombreDeTipoDeDocumento + ", conformaExpediente=" + conformaExpediente + ", aplicaVisacion="
 				+ aplicaVisacion + ", aplicaFEA=" + aplicaFEA + ", esDocumentoConductor=" + esDocumentoConductor + "]";
+	}
+
+	public String getCodigoTipoDocumonto() {
+		return codigoTipoDocumonto;
+	}
+
+	public void setCodigoTipoDocumonto(String codigoTipoDocumonto) {
+		this.codigoTipoDocumonto = codigoTipoDocumonto;
+	}
+
+	public String getNombreEnDiagrama() {
+		return nombreEnDiagrama;
+	}
+
+	public void setNombreEnDiagrama(String nombreEnDiagrama) {
+		this.nombreEnDiagrama = nombreEnDiagrama;
+	}
+
+	public boolean isNumeracionAuto() {
+		return numeracionAuto;
+	}
+
+	public void setNumeracionAuto(boolean numeracionAuto) {
+		this.numeracionAuto = numeracionAuto;
 	}
 	
 }

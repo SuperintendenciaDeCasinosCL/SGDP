@@ -13,7 +13,6 @@ import java.util.List;
  */
 @Entity
 @Table(name="\"SGDP_ACCIONES_HIST_INST_DE_TAREAS\"")
-//@Table(name="\"SGDP_HISTORICO_ACCIONES_INST_DE_TAREAS\"")
 @NamedQuery(name="AccionesHistInstDeTarea.findAll", query="SELECT a FROM AccionesHistInstDeTarea a")
 public class AccionesHistInstDeTarea implements Serializable {
 	private static final long serialVersionUID = 1L;

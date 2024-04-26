@@ -29,4 +29,13 @@ public class ResponsabilidadTareaDaoImpl implements ResponsabilidadTareaDao {
 		return query.list();
 	}
 
+	@Override
+	public List<ResponsabilidadTarea> getResponsabilidadesTareasPorIdProceso(long idProceso) {
+		Query query = getSession().getNamedQuery("ResponsabilidadTarea.findAllByProcessID");	
+		query.setLong("processid", idProceso);
+		return query.list();
+	}
+	
+	
+
 }

@@ -1,5 +1,6 @@
 package cl.gob.scj.sgdp.util;
 
+import java.text.Normalizer;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -45,6 +46,24 @@ public class StringUtilSGDP {
 		} else {
 			return false;
 		}
+	}
+	
+	public static String limpiaStringAComparar(String texto) {
+		String cadenaNormalize = Normalizer.normalize(texto, Normalizer.Form.NFD);   
+		String cadenaSinAcentos = cadenaNormalize.replaceAll("[^\\p{ASCII}]", "");
+		String textoLimpio = cadenaSinAcentos.replaceAll("\\s+","");
+		return textoLimpio.toUpperCase();
+	}
+	
+	public static boolean valorContienAlgunElementoEnListaDeString(String valor, List<String> listaDeString) {		
+		for (String s : listaDeString) {
+			log.debug("valor: " + valor);
+			log.debug("s: " + s);
+			if (valor.contains(s)) {
+				return true;
+			}
+		}		
+		return false;
 	}
 
 }

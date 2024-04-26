@@ -6,6 +6,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 		
+<input type="hidden" id="urlGetEntidades" value="<c:url value='/getEntidades' />" />		
 <input type="hidden" id="urlGetDetalleDeTarea" value="<c:url value='/getDetalleDeTarea' />" />
 <input type="hidden" id="urlCrearExpediente" value="<c:url value='/crearExpediente' />" />
 <input type="hidden" id="urlGetProcesosPorIdMacroProceso" value="<c:url value='/getProcesosPorIdMacroProceso' />" />
@@ -39,6 +40,7 @@
 <input type="hidden" id="urlGetDetalleDeArchivoDTOPorIdExpedienteIdUsuarioIdTipoDeDocumento" value="<c:url value='/getDetalleDeArchivoDTOPorIdExpedienteIdUsuarioIdTipoDeDocumento' />" />
 <input type="hidden" id="urlMarcarArchivoComoSubido" value="<c:url value='/marcarArchivoComoSubido' />" />
 <input type="hidden" id="urlGetHistoricoDeInstDeTareaPorIdExpedienteBusqueda" value="<c:url value='/getHistoricoDeInstDeTareaPorIdExpedienteBusqueda' />" />
+<input type="hidden" id="urlBitacoraSubTareas" value="<c:url value='/bitacoraSubTareas/jsp/' />" />
 <input type="hidden" id="urlGetTipoDeDocumentoDTOPorIdProceso" value="<c:url value='/getTipoDeDocumentoDTOPorIdProceso' />" />
 <input type="hidden" id="urlGetTiposDeDocumentosDTO" value="<c:url value='/getTiposDeDocumentosDTO' />" />
 <input type='hidden' id="urlSessionValida" value="<c:url value='/verificarSession' />" />
@@ -52,18 +54,30 @@
 <input type='hidden' id="urlCargaListaDeDistribucion" value="<c:url value='/cargaListaDeDistribucion' />" />
 <input type='hidden' id="urlGetTiposDeDocumentosDTOPorNombreExpediente" value="<c:url value='/getTiposDeDocumentosDTOPorNombreExpediente' />" />
 <input type='hidden' id="urlGetHistorialDeCondicionesDeSatisfaccionPorIdExpediente" value="<c:url value='/getHistorialDeCondicionesDeSatisfaccionPorIdExpediente' />" />
+<input type='hidden' id="urlComplejidadExpediente" value="<c:url value='/complejidad/' />" />
 <input type='hidden' id="urlGetCondicionesDeSatisfaccionPorIdInstanciaDeTarea" value="<c:url value='/getCondicionesDeSatisfaccionPorIdInstanciaDeTarea' />" />
 <input type='hidden' id="urlGetCondDeSatisParaMostrarPorIdInstanciaDeTarea" value="<c:url value='/getCondDeSatisParaMostrarPorIdInstanciaDeTarea' />" />
+<input type='hidden' id="urlLogDocumento" value="<c:url value='/logDocumento' />" />
+<input type='hidden' id="urllogDocumentoSolicitudCreacionExpediente" value="<c:url value='/logDocumentoSolicitudCreacionExpediente' />" />
+<input type='hidden' id="urlInstanciaDeProceso" value="<c:url value='/instanciaDeProceso' />" />
+<input type='hidden' id="urlCargaListaDistribucionMasiva" value="<c:url value='/cargaListaDistribucionMasiva' />" />
+<input type='hidden' id="urlGetAllTipoDeDestinatario" value="<c:url value='/getAllTipoDeDestinatario' />" />
 
 <select id="correosDeDistribucionHiden" class="hide">
 
 </select>
+
+<input type='hidden' id="correosHiden" >
+<input type='hidden' id="subirArchivoDist" >
+
 
 <div id="idsArchivosADistribuir" class="hide">
 
 </div>
 
 <input type='hidden' id="validoFormDistribucion" >
+
+<input type='hidden' id="validoFormDistribucionApi" >
 
 <!-- Data table -->
 
@@ -250,6 +264,13 @@
 			src='<c:url value="/js/buscador.js" />'>
 		</script>
 
+<script type="text/javascript"
+			src='<c:url value="/js/sgdp.js" />'>
+		</script>
+
+<script type="text/javascript"
+			src='<c:url value="/js/bitacora.js" />'>
+		</script>
 
 <c:url value="/verificarSession" var="sessionURL" />
 <c:url value="/" var="raizURL" />
@@ -279,7 +300,6 @@
 
 <link href='<c:url value="/css/duration-picker/duration-picker.min.css"/>' rel="stylesheet">
 <script src='<c:url value="/js/plugins/duration-picker/duration-picker.min.js"/>'></script>
-
 
 <script>	
      $(function(){
@@ -332,19 +352,21 @@
  
  <!-- Vinculaciones de expedientes-->
 
-<c:import url="/WEB-INF/jsp/modals/vinculacionExpediente.jsp"></c:import>	
+<c:import url="/WEB-INF/jsp/modals/vinculacionExpediente.jsp"></c:import>
+
+<!-- Modal de complejidad de expediente-->
+
+<c:import url="/WEB-INF/jsp/modals/complejidad.jsp"></c:import>
 
 <!-- Condiciones de Satisfaccion-->
 
 <c:import url="/WEB-INF/jsp/modals/historialDeCondDeSatisfaccion.jsp"></c:import>
 
-<!-- Edicion Registro Lista de Distribucion-->
-
-<c:import url="/WEB-INF/jsp/modals/editaRegistroListaDeDistribucion.jsp"></c:import>
-
-<!-- Creacion Registro Lista de Distribucion-->
+<!-- Lista de Distribucion-->
 
 <c:import url="/WEB-INF/jsp/modals/creaRegistroListaDeDistribucion.jsp"></c:import>		
+<c:import url="/WEB-INF/jsp/modals/cargaListaDistribucionMasiva.jsp"></c:import>
+<c:import url="/WEB-INF/jsp/modals/editaRegistroListaDeDistribucion.jsp"></c:import>
 
 <!-- Creacion Registro Parametros-->
 
@@ -362,8 +384,43 @@
 
 <c:import url="/WEB-INF/jsp/modals/solicitudesDeCreacionDeExpedientesFinalizadas.jsp"></c:import>	
 
+<!-- Obtener archivos cracion expediente-->
+
+<c:import url="/WEB-INF/jsp/modals/archivosSolicitudCrearExp.jsp"></c:import>
+
 <!-- Condiciones de satisfaccion-->
 
 <c:import url="/WEB-INF/jsp/modals/condDeSatisfaccion.jsp"></c:import>	
 
 <c:import url="/WEB-INF/jsp/modals/condDeSatisfaccionParaMostrar.jsp"></c:import>
+
+<!-- Creacion Registro Usuario-->
+
+<c:import url="/WEB-INF/jsp/modals/creaUsuario.jsp"></c:import>
+
+<c:import url="/WEB-INF/jsp/modals/editaUsuario.jsp"></c:import>
+
+<!-- Creacion Registro Rol-->
+<c:import url="/WEB-INF/jsp/modals/crearRol.jsp"></c:import>
+
+<c:import url="/WEB-INF/jsp/modals/editaRol.jsp"></c:import>
+
+<!-- Creacion Registro Unidad-->
+<c:import url="/WEB-INF/jsp/modals/creaUnidad.jsp"></c:import>
+
+<c:import url="/WEB-INF/jsp/modals/editaUnidad.jsp"></c:import>
+
+<!-- Creacion Registro Unidad Operativa-->
+<c:import url="/WEB-INF/jsp/modals/creaUnidadOperativa.jsp"></c:import>
+<c:import url="/WEB-INF/jsp/modals/editaUnidadOperativa.jsp"></c:import>
+
+<!-- Creacion Registro Tipo de Subtarea de bitacora-->
+<c:import url="/WEB-INF/jsp/modals/creaTipoSubtareaBitacora.jsp"></c:import>
+<c:import url="/WEB-INF/jsp/modals/editaTipoSubtareaBitacora.jsp"></c:import>
+
+<!-- import Modal Registro Autor-->
+
+<c:import url="/WEB-INF/jsp/modals/crearAutor.jsp"></c:import>
+<c:import url="/WEB-INF/jsp/modals/editarAutor.jsp"></c:import>
+
+<c:import url="/WEB-INF/jsp/modals/archivosDocDigital.jsp"></c:import>

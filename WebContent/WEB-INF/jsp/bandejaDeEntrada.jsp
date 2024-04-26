@@ -315,7 +315,9 @@
 														
 														<legend>Historial de documentos</legend>
 														<div class="col-sm-12" id="divTablaHistorialDeDocumentosForm">					
-														</div>														
+														</div>	
+														
+										
 														
 													</div>
 												
@@ -339,7 +341,8 @@
 							   			<ul class="nav nav-tabs">
 											<li id="liTabDivDetalleDeTarea" class="active"><a data-toggle="tab" href="#tabDivDetalleDeTarea">Tarea</a></li>
 											<li id="liTabHistorialDeTareas"><a data-toggle="tab" href="#tabDivHistorialDeTareas">Historial de tareas</a></li>
-											<li id="liTabHistorialDeDocumentos"><a data-toggle="tab" href="#tabDivHistorialDeDocumentos">Historial de documentos</a></li>																								
+											<li id="liTabHistorialDeDocumentos"><a data-toggle="tab" href="#tabDivHistorialDeDocumentos">Historial de documentos</a></li>															
+											<li id="liBitacoraDeSubTareas"><a data-toggle="tab" href="#tabDivBitacoraSubTareas">Bit&aacute;cora de subtareas</a></li>																																	
 										</ul>
 							   		
 							   		</div>
@@ -359,6 +362,11 @@
 										
 										<div id="tabDivHistorialDeDocumentos" class="tab-pane fade">																						
 											<div class="col-sm-12 panel-body" id="divTablaHistorialDeDocumentos">
+											</div>											
+										</div>
+										
+										<div id="tabDivBitacoraSubTareas" class="tab-pane fade">																						
+											<div class="col-sm-12 panel-body" id="divBitacoraSubTareas">
 											</div>											
 										</div>
 
@@ -588,15 +596,20 @@
 		</div>
 		
 		<!-- Modal Continuar Proceso  -->				
-		<c:import url="/WEB-INF/jsp/modals/continuarProceso.jsp"></c:import>	
+		<c:import url="/WEB-INF/jsp/modals/continuarProceso.jsp"></c:import>
+			
 		<!-- Modal Subir Documento-->
 		
 		<c:import url="/WEB-INF/jsp/modals/subirDocumento.jsp"></c:import>
+		
+		<!-- Modal Asignar confidencialidad-->
+		
+		<c:import url="/WEB-INF/jsp/modals/Confidencialidad.jsp"></c:import>
+		
 		<!-- Modal Subir Adjunto  -->
 		
-		<c:import url="/WEB-INF/jsp/modals/subirAdjunto.jsp"></c:import>
-		<!-- Modal Subir Documento Requerido  -->					
-			
+		<c:import url="/WEB-INF/jsp/modals/subirAdjunto.jsp"></c:import>		
+	
 		<!-- Firma Avanzada-->
 		<c:import url="/WEB-INF/jsp/modals/firmaAvanzada.jsp"></c:import>
 		
@@ -612,6 +625,7 @@
 		<!-- Correo de Distribucion-->
 		<c:import url="/WEB-INF/jsp/modals/correoDeDistribucion.jsp"></c:import>
 		
+		<c:import url="/WEB-INF/jsp/modals/detalleBitacoraAcciones.jsp"></c:import>
 		
 	</body>
 </html>

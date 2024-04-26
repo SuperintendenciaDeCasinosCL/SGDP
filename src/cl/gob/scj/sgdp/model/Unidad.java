@@ -17,7 +17,16 @@ import java.util.List;
  */
 @Entity
 @Table(name="\"SGDP_UNIDADES\"")
-@NamedQuery(name="Unidad.findAll", query="SELECT u FROM Unidad u")
+
+@NamedQueries({
+	@NamedQuery(name="Unidad.findAll", query="SELECT u FROM Unidad u"),
+	
+	
+	@NamedQuery(name="Unidad.getUnidadesPorIdUnidadOperativa", 
+	query="SELECT u FROM Unidad u, UnidadOperativa uniope "
+	+ "where u.unidadOperativa.idUnidadOperativa = uniope.idUnidadOperativa "
+	+ "and uniope.idUnidadOperativa = :idUnidadOperativa")
+})
 public class Unidad implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -34,6 +43,12 @@ public class Unidad implements Serializable {
 	@Column(name="\"A_NOMBRE_COMPLETO_UNIDAD\"")
 	private String nombreCompletoUnidad;
 
+	
+	//bi-directional many-to-one association to UnidadOperativa
+	@ManyToOne
+	@JoinColumn(name="\"ID_UNIDAD_OPERATIVA\"")
+	private UnidadOperativa unidadOperativa;
+	
 	//bi-directional many-to-one association to Proceso
 	@JsonIgnore
 	@OneToMany(mappedBy="unidad", cascade={CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch=FetchType.LAZY)
@@ -141,6 +156,21 @@ public class Unidad implements Serializable {
 
 		return instanciaDeProceso;
 	}
+
+	public UnidadOperativa getUnidadOperativa() {
+		return unidadOperativa;
+	}
+
+	public void setUnidadOperativa(UnidadOperativa unidadOperativa) {
+		this.unidadOperativa = unidadOperativa;
+	}
+
+	@Override
+	public String toString() {
+		return "Unidad [idUnidad=" + idUnidad + ", codigoUnidad=" + codigoUnidad + ", nombreCompletoUnidad="
+				+ nombreCompletoUnidad + ", unidadOperativa=" + unidadOperativa.toString() + "]";
+	}
+	
 	
 	
 

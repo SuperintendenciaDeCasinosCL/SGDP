@@ -52,4 +52,15 @@ public class SolicitudCreacionExpDaoImpl extends GenericDaoImpl<SolicitudCreacio
 		return total.intValue();
 	}
 	
+	@Override
+	public List<SolicitudCreacionExp> getSolicitudesCreaExpSolicitadasPorOAsignadasAMultiOficina(SolicitudCreacionExpDTO solicitudCreacionExpDTO, String idUsuario) {
+		Query query = getSession().getNamedQuery("SolicitudCreacionExp.getSolicitudesCreaExpSolicitadasPorOAsignadasAMultiOficina");
+		query.setString("idUsuarioSolicitante", solicitudCreacionExpDTO.getIdUsuarioSolicitante());
+		query.setString("idUsuarioCreadorExpediente", solicitudCreacionExpDTO.getIdUsuarioCreadorExpediente());
+		query.setLong("idEstadoSolicitudCreacionExp", solicitudCreacionExpDTO.getIdEstadoSolicitudCreacionExp());
+		query.setString("idUsuario", idUsuario);
+		List<SolicitudCreacionExp> resultado = (List<SolicitudCreacionExp>)query.list();
+		return resultado;
+	}
+	
 }

@@ -21,6 +21,40 @@ import cl.gob.scj.sgdp.config.Constantes;
 @NamedQueries({
 	@NamedQuery(name="UsuarioResponsabilidad.findAll", query="SELECT R FROM UsuarioResponsabilidad R"),
 	
+	//MIG
+	@NamedQuery(name="UsuarioResponsabilidad.getUsuariosResponsabilidadesPorIdInstanciaDeTareaUnidadOp", 
+	query="SELECT distinct ur FROM UsuarioResponsabilidad ur, Responsabilidad r, ResponsabilidadTarea rt, InstanciaDeTarea it, UsuarioRol u, "
+			+ "UnidadOperativa uniope, Unidad uni "
+			+ "where ur.responsabilidad.idResponsabilidad = r.idResponsabilidad "
+			+ "and r.idResponsabilidad = rt.id.responsabilidad.idResponsabilidad "		
+			+ "and rt.id.tarea.idTarea = it.tarea.idTarea "
+			+ "and ur.idUsuario = u.idUsuario "
+			+ "and it.idInstanciaDeTarea = :idInstanciaDeTarea "
+			+ "and u.activo = true "
+			+ "and u.fueraDeOficina = false "
+			+ "and strpos(( SELECT p.valorParametroChar FROM Parametro p WHERE p.idParametro = 73 ), ur.idUsuario ) = 0 "
+			+ "and u.unidad.idUnidad = uni.idUnidad "
+			+ "and uni.unidadOperativa.idUnidadOperativa = uniope.idUnidadOperativa "
+			+ "and uniope.idUnidadOperativa = :idUnidadOperativa"
+			),
+	
+	
+	@NamedQuery(name="UsuarioResponsabilidad.getUsuariosFueraOficinaRespPorIdInstanciaDeTareaOp", 
+	query="SELECT distinct ur FROM UsuarioResponsabilidad ur, Responsabilidad r, ResponsabilidadTarea rt, InstanciaDeTarea it, UsuarioRol u, "
+			+ "UnidadOperativa uniope, Unidad uni "
+			+ "where ur.responsabilidad.idResponsabilidad = r.idResponsabilidad "
+			+ "and r.idResponsabilidad = rt.id.responsabilidad.idResponsabilidad "		
+			+ "and rt.id.tarea.idTarea = it.tarea.idTarea "
+			+ "and ur.idUsuario = u.idUsuario "
+			+ "and it.idInstanciaDeTarea = :idInstanciaDeTarea "
+			+ "and u.activo = true "
+			+ "and u.fueraDeOficina = true "
+			+ "and strpos(( SELECT p.valorParametroChar FROM Parametro p WHERE p.idParametro = 73 ), ur.idUsuario ) = 0"
+			+ "and u.unidad.idUnidad = uni.idUnidad "
+			+ "and uni.unidadOperativa.idUnidadOperativa = uniope.idUnidadOperativa "
+			+ "and uniope.idUnidadOperativa = :idUnidadOperativa"
+			),
+	
 	@NamedQuery(name="UsuarioResponsabilidad.getUsuariosResponsabilidadesPorIdInstanciaDeTarea", 
 	query="SELECT distinct ur FROM UsuarioResponsabilidad ur, Responsabilidad r, ResponsabilidadTarea rt, InstanciaDeTarea it, UsuarioRol u "
 			+ "where ur.responsabilidad.idResponsabilidad = r.idResponsabilidad "
@@ -103,7 +137,11 @@ import cl.gob.scj.sgdp.config.Constantes;
 			+ "and it.idInstanciaDeTarea = :idInstanciaDeTarea "
 			+ "and u.activo = true "
 			+ "and u.fueraDeOficina = true "
-			+ "and strpos(( SELECT p.valorParametroChar FROM Parametro p WHERE p.idParametro = 73 ), ur.idUsuario ) = 0")
+			+ "and strpos(( SELECT p.valorParametroChar FROM Parametro p WHERE p.idParametro = 73 ), ur.idUsuario ) = 0"),
+	
+	@NamedQuery(name="UsuarioResponsabilidad.eliminarPorIdResponsabilidad", 
+	query="DELETE FROM UsuarioResponsabilidad WHERE responsabilidad.idResponsabilidad = :idResponsabilidad")
+	
 })
 public class UsuarioResponsabilidad implements Serializable  {
 

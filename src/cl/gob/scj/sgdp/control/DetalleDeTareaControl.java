@@ -11,6 +11,7 @@ import java.util.Properties;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import cl.gob.scj.sgdp.service.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,6 +28,7 @@ import cl.gob.scj.sgdp.dto.ArchivoInfoDTO;
 import cl.gob.scj.sgdp.dto.ArchivosInstDeTareaDTO;
 import cl.gob.scj.sgdp.dto.AutorDTO;
 import cl.gob.scj.sgdp.dto.DetalleDeArchivoDTO;
+import cl.gob.scj.sgdp.dto.EntidadDTO;
 import cl.gob.scj.sgdp.dto.HistoricoDeInstDeTareaDTO;
 import cl.gob.scj.sgdp.dto.InstanciaDeProcesoDTO;
 import cl.gob.scj.sgdp.dto.InstanciaDeTareaDTO;
@@ -34,19 +36,9 @@ import cl.gob.scj.sgdp.dto.ListaDeDistribucionDTO;
 import cl.gob.scj.sgdp.dto.MensajeVistaDTO;
 import cl.gob.scj.sgdp.dto.ParametroDeTareaDTO;
 import cl.gob.scj.sgdp.dto.TipoDeDocumentoDTO;
+import cl.gob.scj.sgdp.dto.UsuarioEntidadDTO;
 import cl.gob.scj.sgdp.dto.rest.MensajeJson;
 import cl.gob.scj.sgdp.exception.SgdpException;
-import cl.gob.scj.sgdp.service.BandejaDeEntradaService;
-import cl.gob.scj.sgdp.service.GestorDeTagsService;
-import cl.gob.scj.sgdp.service.HistoricoDeInstDeTareaService;
-import cl.gob.scj.sgdp.service.InstanciaDeProcesoService;
-import cl.gob.scj.sgdp.service.InstanciaDeTareaService;
-import cl.gob.scj.sgdp.service.ListaDeDistribucionService;
-import cl.gob.scj.sgdp.service.MueveProcesoService;
-import cl.gob.scj.sgdp.service.ObtenerArchivosExpedienteService;
-import cl.gob.scj.sgdp.service.ParametroDeTareaService;
-import cl.gob.scj.sgdp.service.ParametroService;
-import cl.gob.scj.sgdp.service.TipoDeDocumentoService;
 import cl.gob.scj.sgdp.tipos.NotificacionType;
 import cl.gob.scj.sgdp.util.SGDPUtil;
 
@@ -59,7 +51,14 @@ public class DetalleDeTareaControl {
 	private Properties configProps;
 	
 	@Autowired
-	InstanciaDeTareaService instanciaDeTareaService;
+	private UsuarioResponsabilidadService usuarioResponsabilidadService;
+
+	@Autowired
+	private ApiDocDigitalService apiDocDigitalService;
+
+
+	@Autowired
+	private InstanciaDeTareaService instanciaDeTareaService;
 	
 	@Autowired
 	private ObtenerArchivosExpedienteService obtenerArchivosExpedienteService;
@@ -90,7 +89,10 @@ public class DetalleDeTareaControl {
 	
 	@Autowired
 	private ParametroDeTareaService parametroDeTareaService;
-	
+
+	@Autowired
+	private ConfidencialidadDocumentoService confidencialidadDocumentoService;	
+
 	@RequestMapping("/getDetalleDeTarea")
 	public String getDetalleDeTarea(Model model, HttpServletRequest request) {
 		
@@ -131,6 +133,7 @@ public class DetalleDeTareaControl {
 				return "errorTareaNoEstaEnBE";
 			}
 			
+			//MIG
 			instanciasDeTareasDTOContinuanProceso = mueveProcesoService.getInstanciasDeTareasQueContinuanDeInstanciaDeTarea(usuario, 
 					instanciaDeTareaDTO, instanciasDeTareasDTOContinuanProceso);
 			
@@ -203,6 +206,9 @@ public class DetalleDeTareaControl {
 				idArchivosInstTareasAnteriores.append(da.getIdArchivo());
 				if (it.hasNext()) {
 					idArchivosInstTareasAnteriores.append(";");
+				}
+				if (!confidencialidadDocumentoService.puedeVerPorRol(da.getIdArchivo(), usuario) ||  !confidencialidadDocumentoService.puedeVerPorUsuario(da.getIdArchivo(), usuario)) {
+					it.remove();
 				}
 			}
 			
@@ -502,9 +508,14 @@ public class DetalleDeTareaControl {
 		try {
 			todosLosDocSubidos = instanciaDeTareaService.getTodosLosDocSubidosPorIdInstTarea(idInstanciaDeTarea);			
 			obtenerArchivosExpedienteService.filtraPorNumeroDeDocumento(usuario, todosLosDocSubidos);
+			
+			
+			todosLosDocSubidos = instanciaDeTareaService.archivosInstanciaTarea(idInstanciaDeTarea, todosLosDocSubidos);
+			log.info("Archivos tarea: " + todosLosDocSubidos );
+			
 			Map<String, ArchivosInstDeTareaDTO> mapDeArchivosInstDeTareaDTOPorIdCms = SGDPUtil.generaMapDeArchivosInstDeTareaDTOPorIdCms(todosLosDocSubidos);
 			todosLosDocSubidos = new ArrayList<ArchivosInstDeTareaDTO>(mapDeArchivosInstDeTareaDTOPorIdCms.values());
-			listaDistribucion = listaDeDistribucionService.getListaDeDistribucion();
+			listaDistribucion = listaDeDistribucionService.getListaDeDistribucion(true);
 			instanciaDeProcesoService.cargaInstanciaDeProcesoDTOPorIdExpediente(idExpediente, instanciaDeProcesoDTO);	
 			log.debug(listaDistribucion.toString());
 			model.addAttribute("nombreExpediente", nombreExpediente);
@@ -512,7 +523,8 @@ public class DetalleDeTareaControl {
 			model.addAttribute("idInstanciaDeTarea", idInstanciaDeTarea);
 			model.addAttribute("listaDistribucion", listaDistribucion);			
 			model.addAttribute("urlFuncPhp", parametroService.getParametroPorID(Constantes.ID_PARAM_URL_FUNC_PHP).getValorParametroChar());
-			model.addAttribute("instanciaDeProcesoDTO", instanciaDeProcesoDTO);	
+			model.addAttribute("instanciaDeProcesoDTO", instanciaDeProcesoDTO);
+			//model.addAttribute("todosLostiposDeDestinatarios", tipoDeDestinatarioService.getAllTipoDeDestinatario());
 		} catch (Exception e) {
 			StringWriter sw = new StringWriter();
 			e.printStackTrace(new PrintWriter(sw));
@@ -523,5 +535,164 @@ public class DetalleDeTareaControl {
 		return "div/detalleDeExpedienteEnDistribucion";
 		
 	}
+	
+	
+	//MIG
+	@RequestMapping("/getEntidades")
+	public String getEntidades(Model model, HttpServletRequest request) {
+		
+		log.debug("Inicio getEntidades");
+		String vista = "div/entidadesDocDig";		 
+		try {
+			List<EntidadDTO> listaEntidades = apiDocDigitalService.getEntidades();
+			if (listaEntidades==null || listaEntidades.isEmpty()) {
+				log.debug("Devolviendo vista 403");
+				vista = "error403";
+			} else {
+				log.debug("Lista Entidades: " + listaEntidades.toString());
+				model.addAttribute("listaEntidades", listaEntidades);
+			}
+		} catch (Exception e) {
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			String exceptionAsString = sw.toString();
+			log.error(exceptionAsString);
+		}		
+		
+		return vista;
+	}
+	
+	@RequestMapping("/getUsuariosEntidades/{idEntidad}")
+	public String getUsuariosEntidades(@PathVariable("idEntidad") Integer idEntidad, Model model, HttpServletRequest request) {
+		
+		log.debug("Inicio getEntidades");
+		String vista = "div/usuariosDocDig";
+		 try {
+			 List<UsuarioEntidadDTO> listaUsuariosEntidad = apiDocDigitalService.getUsuarioEntidad(idEntidad);
+			 if (listaUsuariosEntidad==null || listaUsuariosEntidad.isEmpty()) {
+					log.debug("Devolviendo vista 403");
+					vista = "error403";
+				} else {
+					log.debug("Lista Entidades: " + listaUsuariosEntidad.toString());
+					model.addAttribute("listaUsuariosEntidad", listaUsuariosEntidad);
+				}
+		 }catch (Exception e) {
+				StringWriter sw = new StringWriter();
+				e.printStackTrace(new PrintWriter(sw));
+				String exceptionAsString = sw.toString();
+				log.error(exceptionAsString);
+		}	
+		
+		
+		return vista;
+	}
 
+	
+	@RequestMapping("/getDocumentoDistribucion/{idExpediente}/{idInstanciaDeTarea}/{nombreExpediente}")
+	public String getActualizarTablaDocumeto(
+								@PathVariable("idExpediente") String idExpediente,
+								@PathVariable("idInstanciaDeTarea") Integer idInstanciaDeTarea,
+								@PathVariable("nombreExpediente") String nombreExpediente,
+								Model model, 
+								HttpServletRequest request) {
+		
+		log.debug("Inicio getDetalleDeExpedienteEnDistribucion");
+		log.debug("idExpediente : " + idExpediente);
+		log.debug("idInstanciaDeTarea : " + idInstanciaDeTarea);		
+		
+		List<ListaDeDistribucionDTO> listaDistribucion;
+		List<ArchivosInstDeTareaDTO> todosLosDocSubidos;
+		
+		InstanciaDeProcesoDTO instanciaDeProcesoDTO = new InstanciaDeProcesoDTO();
+		
+		Usuario usuario = (Usuario)request.getSession().getAttribute("usuario");
+		
+		try {
+			todosLosDocSubidos = instanciaDeTareaService.getTodosLosDocSubidosPorIdInstTarea(idInstanciaDeTarea);			
+			obtenerArchivosExpedienteService.filtraPorNumeroDeDocumento(usuario, todosLosDocSubidos);
+			
+			
+			todosLosDocSubidos = instanciaDeTareaService.archivosInstanciaTarea(idInstanciaDeTarea, todosLosDocSubidos);
+			log.info("Archivos tarea: " + todosLosDocSubidos );
+			
+			Map<String, ArchivosInstDeTareaDTO> mapDeArchivosInstDeTareaDTOPorIdCms = SGDPUtil.generaMapDeArchivosInstDeTareaDTOPorIdCms(todosLosDocSubidos);
+			todosLosDocSubidos = new ArrayList<ArchivosInstDeTareaDTO>(mapDeArchivosInstDeTareaDTOPorIdCms.values());
+			listaDistribucion = listaDeDistribucionService.getListaDeDistribucion(true);
+			instanciaDeProcesoService.cargaInstanciaDeProcesoDTOPorIdExpediente(idExpediente, instanciaDeProcesoDTO);	
+			log.debug(listaDistribucion.toString());
+			model.addAttribute("nombreExpediente", nombreExpediente);
+			model.addAttribute("todosLosDocSubidos", todosLosDocSubidos);
+			model.addAttribute("idInstanciaDeTarea", idInstanciaDeTarea);
+			model.addAttribute("listaDistribucion", listaDistribucion);			
+			model.addAttribute("urlFuncPhp", parametroService.getParametroPorID(Constantes.ID_PARAM_URL_FUNC_PHP).getValorParametroChar());
+			model.addAttribute("instanciaDeProcesoDTO", instanciaDeProcesoDTO);
+			//model.addAttribute("todosLostiposDeDestinatarios", tipoDeDestinatarioService.getAllTipoDeDestinatario());
+		} catch (Exception e) {
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			String exceptionAsString = sw.toString();
+			log.error(exceptionAsString);
+		}	
+		
+		return "div/documentoDistribucion";
+		
+	}
+	
+	
+	@RequestMapping("/getListaDistribucionCorreo")
+	public String getListaDistribucionCorreo(
+								Model model, 
+								HttpServletRequest request) {
+		
+		log.debug("Inicio getListaDistribucionCorreo");
+				
+		
+		List<ListaDeDistribucionDTO> listaDistribucion;
+		
+		
+		InstanciaDeProcesoDTO instanciaDeProcesoDTO = new InstanciaDeProcesoDTO();
+		
+		Usuario usuario = (Usuario)request.getSession().getAttribute("usuario");
+		
+		try {
+			
+			
+			listaDistribucion = listaDeDistribucionService.getListaDeDistribucion(true);			
+			log.debug(listaDistribucion.toString());			
+			model.addAttribute("listaDistribucion", listaDistribucion);			
+			
+		} catch (Exception e) {
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			String exceptionAsString = sw.toString();
+			log.error(exceptionAsString);
+		}	
+		
+		return "div/listaDistribucionCorreo";
+		
+	}
+	
+	
+	
+	//MIG
+	@RequestMapping("/getUsuariosPorUnidadOperativa/{idUnidadOperativa}/{instanciaTarea}")
+	public String getUsuariosPorUnidadOperativa(@PathVariable("idUnidadOperativa") Integer idUnidadOperativa, @PathVariable("instanciaTarea") Integer instanciaTarea,  Model model, HttpServletRequest request) {
+		
+		log.debug("Inicio idUnidadOperativa: "+idUnidadOperativa);
+		log.debug("Inicio instanciaTarea: "+instanciaTarea);
+		String vista = "div/usuariosEnviarTarea";
+		 try {
+			  List<String> listaPosiblesUsuariosUnidad = usuarioResponsabilidadService.obtenerPosiblesUsuarios(idUnidadOperativa, instanciaTarea );
+			  List<String> listaPosiblesUsuariosUnidadFueraOf = usuarioResponsabilidadService.obtenerPosiblesUsuariosFueraOf(idUnidadOperativa, instanciaTarea );
+			  model.addAttribute("listaPosiblesUsuariosUnidad", listaPosiblesUsuariosUnidad);
+			  model.addAttribute("listaPosiblesUsuariosUnidadFueraOf", listaPosiblesUsuariosUnidadFueraOf);
+			  model.addAttribute("instanciaTarea", instanciaTarea);
+		 }catch (Exception e) {
+				StringWriter sw = new StringWriter();
+				e.printStackTrace(new PrintWriter(sw));
+				String exceptionAsString = sw.toString();
+				log.error(exceptionAsString);
+		}
+		return vista;	
+	}
 }

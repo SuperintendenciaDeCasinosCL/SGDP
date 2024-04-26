@@ -135,6 +135,7 @@ public class CrearExpedienteControl {
 		 subirArhivoDTO.setIdInstanciaDeTareaSubirArchivo(listaSubirArhivoDTO.get(0).getIdInstanciaDeTareaSubirArchivo());
 		 subirArhivoDTO.setCartaRelacionada(listaSubirArhivoDTO.get(0).getCartaRelacionada());
 		 subirArhivoDTO.setTipoDeDocumento(listaSubirArhivoDTO.get(0).getTipoDeDocumento());
+		 subirArhivoDTO.setNombreArchivoFileUpload(listaSubirArhivoDTO.get(0).getNombreArchivoFileUpload());
 		 
 		try {
 			// subirArhivoDTO.setCssStatus(configProps.getProperty("cssError"));

@@ -1,5 +1,6 @@
 package cl.gob.scj.sgdp.ws.alfresco.rest.client.impl;
 
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Date;
 
@@ -63,8 +64,16 @@ public class SubirArchivoCMSServiceImpl implements SubirArchivoCMSService {
 		serviceRestURLSubirArchivo.append("?alf_ticket=");
 		
 		LinkedMultiValueMap<String, Object> mvm = new LinkedMultiValueMap<String, Object>();
+		
 		mvm.add("idExpediente", idExpediente.toString());
-		mvm.add("nombreDeArchivo", subirArhivoDTO.getArchivo().getOriginalFilename());
+		
+		if (subirArhivoDTO.getNombreArchivoFileUpload()!=null &&
+				!subirArhivoDTO.getNombreArchivoFileUpload().isEmpty()) {
+			mvm.add("nombreDeArchivo", subirArhivoDTO.getNombreArchivoFileUpload());
+		} else {
+			mvm.add("nombreDeArchivo", subirArhivoDTO.getArchivo().getOriginalFilename());
+		}
+		
 		mvm.add("cdr", subirArhivoDTO.getCdr());
 		mvm.add("numeroDeDocumento", subirArhivoDTO.getNumeroDocumento());
 		

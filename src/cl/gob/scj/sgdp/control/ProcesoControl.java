@@ -1,5 +1,6 @@
 package cl.gob.scj.sgdp.control;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -21,12 +22,15 @@ import cl.gob.scj.sgdp.config.Constantes;
 import cl.gob.scj.sgdp.dto.ArchivosInstDeTareaDTO;
 import cl.gob.scj.sgdp.dto.EtapaDeInstanciaDeProcesoDTO;
 import cl.gob.scj.sgdp.dto.HistorialProcesoDTO;
+import cl.gob.scj.sgdp.dto.ProcesoDTO;
 import cl.gob.scj.sgdp.dto.ProcesoFormCreaExpDTO;
 import cl.gob.scj.sgdp.service.ArchivosInstDeTareaService;
+import cl.gob.scj.sgdp.service.BitacoraSubTareaService;
 import cl.gob.scj.sgdp.service.InstanciaDeProcesoService;
 import cl.gob.scj.sgdp.service.InstanciaDeTareaService;
 import cl.gob.scj.sgdp.service.ParametroService;
 import cl.gob.scj.sgdp.service.ProcesoFormCreaExpService;
+import cl.gob.scj.sgdp.service.ProcesoService;
 
 @Controller
 public class ProcesoControl {
@@ -47,6 +51,12 @@ public class ProcesoControl {
 	
 	@Autowired
 	private ProcesoFormCreaExpService procesoService;
+	
+	@Autowired
+	private ProcesoService procesoServiceNormal;
+	
+	@Autowired
+	private BitacoraSubTareaService bitacoraSubTareaService;
 	
 	@Resource(name = "configProps")
 	private Properties configProps;
@@ -127,6 +137,12 @@ public class ProcesoControl {
 	public @ResponseBody List<ProcesoFormCreaExpDTO> getTiposDeDocumentosDTOPorNombreExpediente(HttpServletRequest request, HttpServletResponse response) {
 		log.debug("Inicio getTiposDeDocumentosDTOPorNombreExpediente");
 		return procesoService.getTodosProcesoFormCreaExp();
+	}
+	
+	@RequestMapping(value="/procesos/vigente", method=RequestMethod.GET)
+	public @ResponseBody List<ProcesoDTO> getTodosLosProcesosVigentes() {
+		log.debug("Inicio get getTodosLosProcesosVigentes");
+		return procesoServiceNormal.getBuscarTodosProcesosPorVigencia(true);
 	}
 	
 }

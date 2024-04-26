@@ -16,12 +16,14 @@
 		        	<th>Expediente</th>
 		        	<th>Subproceso</th>
 		        	<th>Tarea</th>
+		        	<th>Etapa</th>
 		            <th>Asunto</th>			
-					<th>Plazo</th>
+					<th>Plazo tarea</th>
 					<th>De</th>
 					<th>Estado</th>
+					<th>Plazo expediente</th>	
 					<th>Autor</th>
-					<th>Observaci&oacute;n</th>
+					<th>Observaci&oacute;n</th>					
 		    	</tr>
 			</thead>
 			
@@ -36,7 +38,7 @@
 								<c:when test="${instanciaDeTareaDTO.procesoTieneRdsSnc eq true}">
 								
 									<td class="view-message subproceso-rds-snc">								
-										<a class="btn btn-link btn-wrap-break" id="${instanciaDeTareaDTO.idInstanciaDeTarea}LinkProceso" onclick='cargaDetalleDeTarea("${instanciaDeTareaDTO.nombreExpediente}","${instanciaDeTareaDTO.idInstanciaDeTarea}", "true", "${instanciaDeTareaDTO.idExpediente}", "${instanciaDeTareaDTO.urlControl}")'><spring:message code="bandejaDeEntrada.tabla.tareas.esRDSNC"/>&nbsp;${instanciaDeTareaDTO.nombreDeProceso}</a>
+										<a class="btn btn-link btn-wrap-break" id="${instanciaDeTareaDTO.idInstanciaDeTarea}LinkProceso" onclick='cargaDetalleDeTarea("${instanciaDeTareaDTO.nombreExpediente}","${instanciaDeTareaDTO.idInstanciaDeTarea}", "true", "${instanciaDeTareaDTO.idExpediente}", "${instanciaDeTareaDTO.urlControl}", "${instanciaDeTareaDTO.idEstadoTarea}")'><spring:message code="bandejaDeEntrada.tabla.tareas.esRDSNC"/>&nbsp;${instanciaDeTareaDTO.nombreDeProceso}</a>
 									</td>
 								
 								</c:when>
@@ -44,7 +46,7 @@
 								<c:otherwise>
 								
 									<td class="view-message">								
-										<a class="btn btn-link btn-wrap-break" id="${instanciaDeTareaDTO.idInstanciaDeTarea}LinkProceso" onclick='cargaDetalleDeTarea("${instanciaDeTareaDTO.nombreExpediente}","${instanciaDeTareaDTO.idInstanciaDeTarea}", "true", "${instanciaDeTareaDTO.idExpediente}", "${instanciaDeTareaDTO.urlControl}")'>${instanciaDeTareaDTO.nombreDeProceso}</a>
+										<a class="btn btn-link btn-wrap-break" id="${instanciaDeTareaDTO.idInstanciaDeTarea}LinkProceso" onclick='cargaDetalleDeTarea("${instanciaDeTareaDTO.nombreExpediente}","${instanciaDeTareaDTO.idInstanciaDeTarea}", "true", "${instanciaDeTareaDTO.idExpediente}", "${instanciaDeTareaDTO.urlControl}", "${instanciaDeTareaDTO.idEstadoTarea}")'>${instanciaDeTareaDTO.nombreDeProceso}</a>
 									</td>
 								
 								</c:otherwise>
@@ -57,7 +59,7 @@
 														
 							<td class="view-message ${requisitoStyle}">
 								<a type="button" class="btn btn-link btn-wrap-break" id="${instanciaDeTareaDTO.idInstanciaDeTarea}LinkTarea"
-									onclick='cargaDetalleDeTarea("${instanciaDeTareaDTO.nombreExpediente}","${instanciaDeTareaDTO.idInstanciaDeTarea}", "true", "${instanciaDeTareaDTO.idExpediente}", "${instanciaDeTareaDTO.urlControl}")'>
+									onclick='cargaDetalleDeTarea("${instanciaDeTareaDTO.nombreExpediente}","${instanciaDeTareaDTO.idInstanciaDeTarea}", "true", "${instanciaDeTareaDTO.idExpediente}", "${instanciaDeTareaDTO.urlControl}", "${instanciaDeTareaDTO.idEstadoTarea}")'>
 									
 									<c:choose>
 									
@@ -74,7 +76,9 @@
 									</c:choose>
 								
 								</a>
-							</td>
+							</td>							
+							
+							<td class="view-message">${instanciaDeTareaDTO.nombreEtapa}</td>
 							
 							<c:set var="requisitoStyle" value="" />
 							
@@ -138,10 +142,37 @@
 							</c:choose>
 							<td class="view-message">${instanciaDeTareaDTO.idUsuarioQueAsigna}</td>
 							<td class="view-message">${instanciaDeTareaDTO.nombreEstadoHomologadoDeInstProceso}</td>
+		       				<c:choose>
+							    <c:when test="${instanciaDeTareaDTO.adviertePlazoProceso eq true}">
+							       	<td class="view-message btn-warning">
+                                        <span style="display: none;" >
+                                            <fmt:formatDate value="${instanciaDeTareaDTO.fechaVencimientoInstanciaDeProceso}" pattern="yyyy-MM-dd" /> 
+                                        </span>
+                                        <fmt:formatDate pattern="${FORMATO_FECHA}" value="${instanciaDeTareaDTO.fechaVencimientoInstanciaDeProceso}" />						       						       								       		
+							       	</td>
+							    </c:when>
+							    <c:when test="${instanciaDeTareaDTO.fueraDePlazoProceso eq true}">
+							        <td class="view-message btn-danger">
+							        	<span style="display: none;" >
+                                            <fmt:formatDate value="${instanciaDeTareaDTO.fechaVencimientoInstanciaDeProceso}" pattern="yyyy-MM-dd" /> 
+                                        </span>
+                                        <fmt:formatDate pattern="${FORMATO_FECHA}" value="${instanciaDeTareaDTO.fechaVencimientoInstanciaDeProceso}" />	
+							        </td>
+							    </c:when>
+							    <c:otherwise>
+							        <td class="view-message">
+							        	<span style="display: none;" >
+                                            <fmt:formatDate value="${instanciaDeTareaDTO.fechaVencimientoInstanciaDeProceso}" pattern="yyyy-MM-dd" /> 
+                                        </span>
+                                        <fmt:formatDate pattern="${FORMATO_FECHA}" value="${instanciaDeTareaDTO.fechaVencimientoInstanciaDeProceso}" />
+							        </td>
+							    </c:otherwise>
+							</c:choose>	
 							<td class="view-message">${instanciaDeTareaDTO.emisor}</td>
 							<td class="view-message details-control cursorPuntero" data-idinstanciadetarea="${instanciaDeTareaDTO.idInstanciaDeTarea}">
 								<i id="plus${instanciaDeTareaDTO.idInstanciaDeTarea}" class="glyphicon glyphicon-plus"></i>
-							</td>								
+							</td>
+														
 					</tr>
 									
 				</c:forEach>															  
@@ -172,7 +203,7 @@ function formatTablaTareas() {
 				
 				"columnDefs": [
   		             {
-  		                 "targets": [ 7, 8 ],
+  		                 "targets": [ 3, 9, 10],
   		                 "visible": false				                       		                
   		             }
   		         ]

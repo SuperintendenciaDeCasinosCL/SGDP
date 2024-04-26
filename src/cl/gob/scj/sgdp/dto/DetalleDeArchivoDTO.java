@@ -42,6 +42,7 @@ public class DetalleDeArchivoDTO implements Serializable {
 	private String documentoNombreExpediente;
 	private long idCategoriaDocumento;
 	private String categoriaDocumento;
+	private String nombreExpedienteQueLoContiene;
 
 	public String getNombre() {
 		return nombre;
@@ -296,6 +297,14 @@ public class DetalleDeArchivoDTO implements Serializable {
 	public void setDocumentoNombreExpediente(String documentoNombreExpediente) {
 		this.documentoNombreExpediente = documentoNombreExpediente;
 	}
+	public String getNombreExpedienteQueLoContiene() {
+		return nombreExpedienteQueLoContiene;
+	}
+
+	public void setNombreExpedienteQueLoContiene(String nombreExpedienteQueLoContiene) {
+		this.nombreExpedienteQueLoContiene = nombreExpedienteQueLoContiene;
+	}
+
 	@Override
 	public String toString() {
 		return "DetalleDeArchivoDTORest [nombre=" + nombre + ", autor=" + autor + ", cdr=" + cdr + ", numeroDocumento="
@@ -317,7 +326,7 @@ public class DetalleDeArchivoDTO implements Serializable {
 				+ ", documentoNombreExpediente=" + documentoNombreExpediente
 				+ ", idCategoriaDocumento=" + idCategoriaDocumento
 				+ ", categoriaDocumento=" + categoriaDocumento
-				//+ ", actualizaNombre=" + actualizaNombre
+				+ ", nombreExpedienteQueLoContiene=" + nombreExpedienteQueLoContiene
 				+ "]";
 	}
 	

@@ -2,6 +2,8 @@ package cl.gob.scj.sgdp.dao;
 
 import java.util.List;
 
+import org.hibernate.Session;
+
 import cl.gob.scj.sgdp.model.Tarea;
 
 public interface TareaDao {
@@ -17,5 +19,7 @@ public interface TareaDao {
 	List<Tarea> getTareasPorCodigoProceso(String codigoProceso);
 	
 	List<Tarea> getSegundasTareasPorIdProceso(long idProceso);
+	
+	Long guardarTarea(Tarea t, Session session);
 	
 }

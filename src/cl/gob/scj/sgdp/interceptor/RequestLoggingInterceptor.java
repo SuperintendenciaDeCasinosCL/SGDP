@@ -67,11 +67,13 @@ public class RequestLoggingInterceptor implements ClientHttpRequestInterceptor {
         log.info(MessageFormat.format("URI         : {0}", getUri));
         log.info(MessageFormat.format("Method      : {0}", request.getMethod()));
         log.info(MessageFormat.format("Headers     : {0}", request.getHeaders()));
-        if (!request.getURI().toString().contains("/alfresco/s/scj/subirArchivo") &&
-        		!request.getURI().toString().contains("/Convert")) {
-        	log.info(MessageFormat.format("Request body: {0}", new String(body, "UTF-8")));
-        }        
-        log.info("==========================request end==============================================");
+		if (!request.getURI().toString().contains("/alfresco/s/scj/subirArchivo") &&
+				!request.getURI().toString().contains("/Convert") &&
+				!request.getURI().toString().contains("/realms/master/protocol/openid-connect/token") &&
+				!request.getURI().toString().contains("/convertToPDFFromSupported")) {
+			log.info(MessageFormat.format("Request body: {0}", new String(body, "UTF-8")));
+		}
+		log.info("==========================request end==============================================");
     }
 
     private void traceResponse(HttpRequest request, ClientHttpResponse response) throws IOException { 

@@ -8,6 +8,9 @@ public interface UsuarioResponsabilidadDao {
 	
 	List<UsuarioResponsabilidad> getUsuariosResponsabilidadesPorIdInstanciaDeTarea(long idInstanciaDeTarea);
 	
+	List<UsuarioResponsabilidad> getUsuariosResponsabilidadesPorIdInstanciaDeTareaUnidad(long idUnidadOperativa, long idInstanciaDeTarea);
+	List<UsuarioResponsabilidad> getUsuariosResponsabilidadesPorIdInstanciaDeTareaUnidadOfi(long idUnidadOperativa, long idInstanciaDeTarea);
+	
 	UsuarioResponsabilidad getPrimerUsuarioResponsabilidadPorIdInstanciaDeTarea(long idInstanciaDeTarea);
 	
 	UsuarioResponsabilidad getUsuarioResponsabilidadPorIdUsuarioIdTarea(String idUsuario, long idTarea);
@@ -21,5 +24,9 @@ public interface UsuarioResponsabilidadDao {
 	List<UsuarioResponsabilidad> getTodosLosUsuariosResponsabilidadExcluyePorIdTarea(long idTarea);
 	
 	List<UsuarioResponsabilidad> getUsuariosFueraOficinaResponsabilidadesPorIdInstanciaDeTarea(long idInstanciaDeTarea);
+
+	Integer eliminarUsuarioResponsabilidadPorIdresponsabilidad(long idResponsabilidad);
+	
+	void guardar(UsuarioResponsabilidad ur);
 
 }

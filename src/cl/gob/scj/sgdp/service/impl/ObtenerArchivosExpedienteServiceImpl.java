@@ -12,6 +12,7 @@ import java.util.Properties;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.logging.Log;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,9 +26,13 @@ import cl.gob.scj.sgdp.dao.HistoricoFirmaDao;
 import cl.gob.scj.sgdp.dao.TipoDeDocumentoDao;
 import cl.gob.scj.sgdp.dto.ArchivoInfoDTO;
 import cl.gob.scj.sgdp.dto.ArchivosInstDeTareaDTO;
+import cl.gob.scj.sgdp.dto.ConfidencialidadDocumentoDTO;
+import cl.gob.scj.sgdp.dto.ConfidencialidadDocumentoRolDTO;
+import cl.gob.scj.sgdp.dto.ConfidencialidadDocumentoUsuarioDTO;
 import cl.gob.scj.sgdp.dto.DetalleDeArchivoDTO;
 import cl.gob.scj.sgdp.dto.InstanciaDeTareaDTO;
 import cl.gob.scj.sgdp.dto.ParametroDTO;
+import cl.gob.scj.sgdp.dto.RolDTO;
 import cl.gob.scj.sgdp.dto.TipoDeDocumentoDTO;
 import cl.gob.scj.sgdp.exception.SgdpException;
 import cl.gob.scj.sgdp.model.ArchivosInstDeTarea;
@@ -35,6 +40,7 @@ import cl.gob.scj.sgdp.model.HistoricoDeInstDeTarea;
 import cl.gob.scj.sgdp.model.InstanciaDeProceso;
 import cl.gob.scj.sgdp.model.InstanciaDeTarea;
 import cl.gob.scj.sgdp.model.TipoDeDocumento;
+import cl.gob.scj.sgdp.service.ConfidencialidadDocumentoService;
 import cl.gob.scj.sgdp.service.InstanciaDeTareaService;
 import cl.gob.scj.sgdp.service.ObtenerArchivosExpedienteService;
 import cl.gob.scj.sgdp.service.ParametroService;
@@ -82,6 +88,9 @@ public class ObtenerArchivosExpedienteServiceImpl implements
 	
 	@Autowired
 	private HistoricoDeInstDeTareaDao historicoDeInstDeTareaDao;
+	
+	@Autowired
+	private ConfidencialidadDocumentoService confidencialidadDocumentoService;
 		
 	@Override
 	public List<ArchivoInfoDTO> obtenerArchivosExpediente(Usuario usuario, String idExpediente, boolean filtraFirmas, boolean tareaPuedeVisarDocumentos, boolean tareaPuedeAplicarFEA, long idInstanciaDeTarea) throws SgdpException {		
@@ -174,6 +183,7 @@ public class ObtenerArchivosExpedienteServiceImpl implements
 		if (archivosInstDeTareaList!=null && archivosInstDeTareaList.size()>0) {
 			log.debug("archivosInstDeTareaList.size(): " + archivosInstDeTareaList.size());
 			for (ArchivosInstDeTarea archivoInstDeTarea : archivosInstDeTareaList) {
+				
 				log.debug(archivoInstDeTarea.toString());
 				ArchivoInfoDTO archivoInfoDTO = obtenerArchivoDeExpedienteNombreTipoDeDocumentoPorIdArchivoCMS(usuario, 
 						archivosExpedienteDTO,
@@ -200,6 +210,10 @@ public class ObtenerArchivosExpedienteServiceImpl implements
 					log.debug(archivoInfoDTO.toString());
 					log.debug("tiposDeDocumentosDeSalidaPorIdTarea.size(): " + tiposDeDocumentosDeSalidaPorIdTarea.size());		
 					archivosInfoDTODeSalidaPorIdInstanciaDeTarea.add(archivoInfoDTO);
+					//Agregado por Hugo Cifuentes. la idea es agregar al documento quienes, usuariosy roles, tienen permiso para visualizar el documento
+					archivoInfoDTO.setPuedeVerPorUsuario(confidencialidadDocumentoService.puedeVerPorUsuario(archivoInfoDTO.getIdArchivo(), usuario));
+					archivoInfoDTO.setPuedeVerPorRol(confidencialidadDocumentoService.puedeVerPorRol(archivoInfoDTO.getIdArchivo(), usuario));
+					log.debug(archivoInfoDTO.toString());
 					cantidadDeArchivosValidaContinuaProceso ++;
 				}				
 			}
@@ -310,6 +324,7 @@ public class ObtenerArchivosExpedienteServiceImpl implements
 				archivoInfoDTO.setConformaExpediente(archivoInstDeTarea.getTipoDeDocumento().getConformaExpediente());
 				archivoInfoDTO.setEsDocumentoConductor(archivoInstDeTarea.getTipoDeDocumento().getEsDocumentoConductor());
 				archivoInfoDTO.setLabelVersionEnInstanciaDeTarea(archivoInstDeTarea.getVersion());
+
 				return archivoInfoDTO;		
 			}
 		}
@@ -392,23 +407,24 @@ public class ObtenerArchivosExpedienteServiceImpl implements
 			boolean puedeAplicarFEA,
 			TipoDeDocumentoDTO tipoDeDocumentoDTODInstanciaDeTarea
 			) throws Exception {
-		log.debug("Inicio cargaDocBuscandoHaciaAtrasEnHistoricoInsTarea");
+		log.info("Inicio cargaDocBuscandoHaciaAtrasEnHistoricoInsTarea");
 		log.debug(historicoDeInstDeTarea.toString());						
 		for (int i = 0; i < cantidadArchivos; i++) {
+			log.info("Primer for i: " + i);
+			log.info("Inicia consulta getArchivosInstDeTareaPorIdInstTareaIdUsuarioNombreTipoDocFechaSubidoMayorA");
 			List<ArchivosInstDeTarea> archivosInstDeTareaPorIDInstTareaIdUsuarioNombreTipoDoc = 
-					/*archivosInstDeTareaDao.getArchivosInstDeTareaPorIdInstTareaIdUsuarioNombreTipoDoc(historicoDeInstDeTarea.getInstanciaDeTareaDeOrigen().getIdInstanciaDeTarea(),
-							historicoDeInstDeTarea.getIdUsuarioOrigen(), tipoDeDocumentoDTODInstanciaDeTarea.getNombreDeTipoDeDocumento());*/
 					archivosInstDeTareaDao.getArchivosInstDeTareaPorIdInstTareaIdUsuarioNombreTipoDocFechaSubidoMayorA(historicoDeInstDeTarea.getInstanciaDeTareaDeOrigen().getIdInstanciaDeTarea(),
 							historicoDeInstDeTarea.getIdUsuarioOrigen(), tipoDeDocumentoDTODInstanciaDeTarea.getNombreDeTipoDeDocumento(),
 							historicoDeInstDeTarea.getInstanciaDeTareaDeOrigen().getFechaAsignacion());
+			log.info("Fin consulta getArchivosInstDeTareaPorIdInstTareaIdUsuarioNombreTipoDocFechaSubidoMayorA");
 			if (archivosInstDeTareaPorIDInstTareaIdUsuarioNombreTipoDoc!=null && !archivosInstDeTareaPorIDInstTareaIdUsuarioNombreTipoDoc.isEmpty()) {
-				log.debug("archivosInstDeTareaPorIDInstTareaIdUsuarioNombreTipoDoc!=null && !archivosInstDeTareaPorIDInstTareaIdUsuarioNombreTipoDoc.isEmpty()");
+				log.info("archivosInstDeTareaPorIDInstTareaIdUsuarioNombreTipoDoc!=null && !archivosInstDeTareaPorIDInstTareaIdUsuarioNombreTipoDoc.isEmpty()");
 				for (ArchivosInstDeTarea archivosInstDeTarea : archivosInstDeTareaPorIDInstTareaIdUsuarioNombreTipoDoc) {
+					log.info("Segundo for");
 					log.debug(archivosInstDeTarea.toString());
 					DetalleDeArchivoDTO detalleDeArchivoDTO = obtenerDetalleDeArchivoCMSService.obtenerDetalleDeArchivo(usuario, archivosInstDeTarea.getIdArchivoCms()).getDetalleDeArchivoDTO();
 					detalleDeArchivoDTO.setIdArchivo(archivosInstDeTarea.getIdArchivoCms());
 					log.debug(detalleDeArchivoDTO.toString());
-					//ParametroDTO parametroDTOEsMimeTypeConvertibleAPDF = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_CONVERTIBLES_A_PDF, detalleDeArchivoDTO.getMimeType());
 					ParametroDTO parametroDTOEsMimeTypeAplicaVisacion = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_VISABLES, detalleDeArchivoDTO.getMimeType());
 					ParametroDTO parametroDTOEsMimeTypeAplicaFEA = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_APLICA_FEA, detalleDeArchivoDTO.getMimeType());
 					ParametroDTO parametroDTOEsEditable = parametroService.getParametroPorNombreParamYValorParam(Constantes.NOMBRE_PARAM_MIME_TYPES_EDITABLES, detalleDeArchivoDTO.getMimeType());
@@ -418,20 +434,17 @@ public class ObtenerArchivosExpedienteServiceImpl implements
 					}
 					log.debug(tipoDeDocumentoDTODInstanciaDeTarea.toString());
 					log.debug("puedeVisarDocumentos: " + puedeVisarDocumentos);
-					log.debug("puedeAplicarFEA: " + puedeAplicarFEA);
-					/*if (parametroDTOEsMimeTypeConvertibleAPDF!=null) {
-						log.debug("parametroDTOEsMimeTypeConvertibleAPDF: " + parametroDTOEsMimeTypeConvertibleAPDF.toString());
-					}*/
+					log.debug("puedeAplicarFEA: " + puedeAplicarFEA);				
 					if (parametroDTOEsMimeTypeAplicaVisacion!=null) {
 						log.debug("parametroDTOEsMimeTypeAplicaVisacion: " + parametroDTOEsMimeTypeAplicaVisacion.toString());
 					}
 					if (parametroDTOEsMimeTypeAplicaFEA!=null) {
 						log.debug("parametroDTOEsMimeTypeAplicaFEA: " + parametroDTOEsMimeTypeAplicaFEA.toString());
 					}
-					if (/*parametroDTOEsMimeTypeConvertibleAPDF!=null &&*/ parametroDTOEsMimeTypeAplicaVisacion==null && tipoDeDocumentoDTODInstanciaDeTarea.getAplicaVisacion()==true && puedeVisarDocumentos) {
+					if (parametroDTOEsMimeTypeAplicaVisacion==null && tipoDeDocumentoDTODInstanciaDeTarea.getAplicaVisacion()==true && puedeVisarDocumentos) {
 						detalleDeArchivoDTO.setConvertirAPDF(true);
 					}
-					if (/*parametroDTOEsMimeTypeConvertibleAPDF!=null &&*/ parametroDTOEsMimeTypeAplicaFEA==null && tipoDeDocumentoDTODInstanciaDeTarea.getAplicaFEA()==true && puedeAplicarFEA) {
+					if (parametroDTOEsMimeTypeAplicaFEA==null && tipoDeDocumentoDTODInstanciaDeTarea.getAplicaFEA()==true && puedeAplicarFEA) {
 						 detalleDeArchivoDTO.setConvertirAPDF(true);
 					}
 					if (estaArchivoEnListaTodosLosArchivosSubidosRequeridos(detalleDeArchivoDTO.getIdArchivo(), todosLosArchivosSubidosRequeridos)) {
@@ -440,15 +453,18 @@ public class ObtenerArchivosExpedienteServiceImpl implements
 				}
 				return;						
 			} else {				
-				log.debug("archivosInstDeTareaPorIDInstTareaIdUsuarioNombreTipoDoc==null || archivosInstDeTareaPorIDInstTareaIdUsuarioNombreTipoDoc.isEmpty()");
+				log.info("archivosInstDeTareaPorIDInstTareaIdUsuarioNombreTipoDoc==null || archivosInstDeTareaPorIDInstTareaIdUsuarioNombreTipoDoc.isEmpty()");
 				log.debug(historicoDeInstDeTarea.toString());
+				log.info("Inicia consulta getHistoricoDeInstDeTareaPorIdInstanciaDeTareaDeDestinoMaxFechaMovEnviaODevuelveMenFech");
 				historicoDeInstDeTarea = historicoDeInstDeTareaDao.getHistoricoDeInstDeTareaPorIdInstanciaDeTareaDeDestinoMaxFechaMovEnviaODevuelveMenFech(
 						historicoDeInstDeTarea.getInstanciaDeTareaDeOrigen().getIdInstanciaDeTarea(), historicoDeInstDeTarea.getFechaMovimiento());
+				log.info("Fin consulta getHistoricoDeInstDeTareaPorIdInstanciaDeTareaDeDestinoMaxFechaMovEnviaODevuelveMenFech");
 				if (historicoDeInstDeTarea==null) {
 					return;
 				}
 			}
-		}		
+		}
+		log.info("Fin cargaDocBuscandoHaciaAtrasEnHistoricoInsTarea");
 	}
 	
 	@Override

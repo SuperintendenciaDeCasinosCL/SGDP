@@ -2,7 +2,9 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="sf" uri="http://www.springframework.org/tags/form"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
 <%@ page import="cl.gob.scj.sgdp.util.FechaUtil" %>
+<%@ page import= "cl.gob.scj.sgdp.tipos.ModuloType" %>
 
 <input type="hidden" id="idInstanciaDeTareaTablaDetalleDeExpediente" value="${instanciaDeTareaDTO.idInstanciaDeTarea}" />
 
@@ -31,8 +33,9 @@
 	            <tr>	                
 	                <c:choose>
 						<c:when test="${linkDescargaEnNombre eq true}">					
-							 <td class="view-message">							 
-							 	<a href='#' onclick='descargaArchivo("<c:url value='getArchivoPorId/${archivoInfoDTO.idArchivo}'/>")'>
+							 <td class="view-message">
+								<a href='#' onclick='descargaArchivo("<c:url value='getArchivoPorId/${archivoInfoDTO.idArchivo}'/>"
+							 	, "<%=ModuloType.DETALLE_DE_EXPEDIENTE.getNombreModulo()%>")'>)'>
 									${archivoInfoDTO.nombre}
 								</a>							 
 							 </td>
@@ -59,7 +62,9 @@
 							<td class="view-message">							               
 			                	<c:if test = "${archivoInfoDTO.esEditable eq true and permisos[permisoModificaArchivos] eq permisoModificaArchivos}">
 			                					            	
-					            	<a href="#" class="btn btn-info btn-sm" id="botonEditarDocumento" onclick="editarDocumento();" 
+					            	<a href="#" class="btn btn-info btn-sm" id="botonEditarDocumento" 
+					            		onclick='editarDocumento("<%=ModuloType.DETALLE_DE_EXPEDIENTE.getNombreModulo()%>");'
+					            		data-idarchivo="${archivoInfoDTO.idArchivo}"
 				                		data-codigomimetype=${archivoInfoDTO.codigoMimeType}
 				                		data-linksharpoint="${archivoInfoDTO.linkSharpoint}">		
 			                			<span class="glyphicon glyphicon-pencil"></span>

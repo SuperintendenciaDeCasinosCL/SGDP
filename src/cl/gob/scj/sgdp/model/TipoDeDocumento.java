@@ -15,6 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -121,6 +122,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 			+ ")  "
 			),
 	
+	@NamedQuery(name="TipoDeDocumento.getTiposDeDocumentosPorIdProceso",
+	query="SELECT DISTINCT d, s FROM TipoDeDocumento d INNER JOIN d.documentosDeSalidasDeTareas s "		
+			+ "WHERE s.id.tarea.idTarea in ("
+			+ "  	SELECT t.idTarea FROM Tarea t INNER JOIN t.proceso p "
+			+ "		WHERE p.idProceso = :idProceso AND p.vigente = true "
+			+ ")  "
+			),
+	
 	@NamedQuery(name="TipoDeDocumento.getTiposDeDocumentosPorNombreExpediente",
 	query="SELECT DISTINCT d FROM TipoDeDocumento d INNER JOIN d.documentosDeSalidasDeTareas s "		
 			+ "WHERE s.id.tarea.idTarea in ("
@@ -141,7 +150,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 			+ "		WHERE ip.proceso.idProceso = p.idProceso "
 			+ "		AND ip.idExpediente = :idExpediente "
 			+ ")  "
-			)
+			),
+	
+	@NamedQuery(name="TipoDeDocumento.getTiposDeDocumentosPorCodigoPlantilla", 
+	query="SELECT p FROM TipoDeDocumento p WHERE p.plantilla.codigo = :codigoPlantilla and p.plantilla.vigente = :vigente")
+	
 })
 public class TipoDeDocumento implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -202,6 +215,11 @@ public class TipoDeDocumento implements Serializable {
 	
 	@Column(name="\"A_NOM_COMP_CAT_TIPO_DOC\"")
 	private String nombreCompletoCategoriaTipoDocumento;	
+	
+	//bi-directional one-to-one association to InstanciasDeProceso
+	@OneToOne
+	@JoinColumn(name="\"ID_PLANTILLA_DE_DOCUMENTO\"")	
+	private PlantillaDeDocumento plantilla;
 
 	public TipoDeDocumento() {
 	}
@@ -389,6 +407,14 @@ public class TipoDeDocumento implements Serializable {
 
 	public void setNombreCompletoCategoriaTipoDocumento(String nombreCompletoCategoriaTipoDocumento) {
 		this.nombreCompletoCategoriaTipoDocumento = nombreCompletoCategoriaTipoDocumento;
+	}
+
+	public PlantillaDeDocumento getPlantilla() {
+		return plantilla;
+	}
+
+	public void setPlantilla(PlantillaDeDocumento plantilla) {
+		this.plantilla = plantilla;
 	}
 
 	@Override

@@ -9,22 +9,14 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @Component
-//@Scope("request")
-public class FirmaAvanzadaRequest {
-	
+public class FirmaAvanzadaRequest {	
 	private String token;
 	private String api_token_key;
-	private List<FirmaAvanzadaArchivoRequest> files;
-	
+	private List<FirmaAvanzadaArchivoRequest> files;	
 	public FirmaAvanzadaRequest() {
 		super();
 		files = new ArrayList<FirmaAvanzadaArchivoRequest>();
-	}
-	/*@PostConstruct
-	public void init() {
-		files = new ArrayList<FirmaAvanzadaArchivoRequest>();
-	}*/
-	
+	}	
 	public String getToken() {
 		return token;
 	}
@@ -42,6 +34,5 @@ public class FirmaAvanzadaRequest {
 	}
 	public void setFiles(List<FirmaAvanzadaArchivoRequest> files) {
 		this.files = files;
-	}	
-
+	}
 }

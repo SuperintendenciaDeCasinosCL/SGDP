@@ -258,6 +258,9 @@ public class AsignacionNumeroDocServiceImpl implements
 			historicoFirmaDTO.setTipoFirma(firmaTypeWebStart);
 			historicoFirmaDTO.setIdTipoDeDocumento(asignacionesNumerosDocDto.getTipoDeDocumento());
 			historicoFirmaDTO.setIdDocumentoFirmado(asignacionesNumerosDocDto.getIdDocumentoFirmado());
+			
+			historicoFirmaDTO.setUuid(asignacionesNumerosDocDto.getUuid());
+			
 			//gestorDeDocumentosService.registraFirma(asignacionesNumerosDocDto.getIdUsuario(), historicoFirmaDTO);			
 			usuario.setIdUsuario(asignacionesNumerosDocDto.getIdUsuario());
 			usuario.setAlfTicket(asignacionesNumerosDocDto.getAlfTicket());

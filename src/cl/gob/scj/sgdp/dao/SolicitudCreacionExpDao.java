@@ -13,4 +13,6 @@ public interface SolicitudCreacionExpDao extends GenericDao<SolicitudCreacionExp
 	
 	int getTotalSolicitudesCreaExpFinalizadas(SolicitudCreacionExpDTO solicitudCreacionExpDTO);
 	
+	List<SolicitudCreacionExp> getSolicitudesCreaExpSolicitadasPorOAsignadasAMultiOficina(SolicitudCreacionExpDTO solicitudCreacionExpDTO, String idUsuario);
+	
 }

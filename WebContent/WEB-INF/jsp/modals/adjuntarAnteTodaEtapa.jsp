@@ -164,8 +164,7 @@ var inicializaFileUploadAdjuntarAntecedenteEtapaModal = function(){
         		flagRestablecerDocumentoFijo = 0;
         		contador = 0;
         	});
-
-
+           
         	 if (flagRestablecerDocumentoFijo == 0){
         		 formDataAdjuntarAntecedenteEtapa.delete("listaArchivoFile2");
         		 formDataAdjuntarAntecedenteEtapa.delete("anadirAntecedentesTablaString");
@@ -193,6 +192,7 @@ var inicializaFileUploadAdjuntarAntecedenteEtapaModal = function(){
         	var anadirAntecedentesAdicionalesTablas = new Array();   	
 
         	anadirAntecedentesAdicionalesTablas = trasformarTablaEnArreglo();
+        	
        
             $.each(data.files, function (index, file) {
                var seEncuentraDocumento = false;

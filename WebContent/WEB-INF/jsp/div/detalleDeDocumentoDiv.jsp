@@ -1,5 +1,6 @@
 <%@ page import="cl.gob.scj.sgdp.tipos.PermisoType"%>
 <%@ page import="cl.gob.scj.sgdp.config.Constantes"%>
+<%@ page import= "cl.gob.scj.sgdp.tipos.ModuloType" %>
 
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -235,10 +236,12 @@
 			
 					<button type="button"
 						class="btn btn-primary"
-						onclick='descargaArchivo("<c:url value='getArchivoPorId/${detalleDeArchivoDTO.idArchivo}'/>")'
+						onclick='descargaArchivo("<c:url value='getArchivoPorId/${detalleDeArchivoDTO.idArchivo}'/>"
+						, "<%=ModuloType.DETALLE_DE_DOCUMENTO.getNombreModulo()%>" )'
 						data-iddocumento="${detalleDeArchivoDTO.idArchivo}">
 						<span class="fa fa-download font-icon-2 "></span>
 					</button>&nbsp;
+
 			
 					<%--
 				 	<a href='<c:url value="${detalleDeArchivoDTO.linkDescargaNavegador}"/>?ticket=${usuario.alfTicket}' target="_blank" class="btn btn-primary btn-sm">
@@ -249,7 +252,8 @@
 					<c:if test = "${detalleDeArchivoDTO.esEditable eq true}">
 					
 						<a href="#" class="btn btn-primary btn-sm" id="botonEditarDocumento" 
-								onclick="editarDocumento();" 
+								onclick='editarDocumento("<%=ModuloType.DETALLE_DE_DOCUMENTO.getNombreModulo()%>");'
+										data-idarchivo="${detalleDeArchivoDTO.idArchivo}"
 		                                data-codigomimetype="${detalleDeArchivoDTO.codigoMimeType}"
 		                                data-linksharpoint="${detalleDeArchivoDTO.linkSharpoint}">
 		                              <span class="glyphicon glyphicon-edit font-icon-2"></span>
@@ -348,6 +352,7 @@
 								,"${detalleDeArchivoDTO.idArchivo}"
 								,"${versionArchivoDTO.versionLabel}"
 								,"${versionArchivoDTO.versionMimeType}"
+								,"<%=ModuloType.DETALLE_DE_DOCUMENTO.getNombreModulo()%>"
 								)'
 									data-idarchivo='${detalleDeArchivoDTO.idArchivo}'
 									data-versionlabel='${versionArchivoDTO.versionLabel}'
@@ -356,6 +361,7 @@
 									${versionArchivoDTO.versionLabel} por
 									${versionArchivoDTO.creador}
 								</a>
+
 							</li>
 
 						</c:forEach>

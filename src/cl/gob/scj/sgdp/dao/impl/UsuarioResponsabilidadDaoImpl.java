@@ -29,6 +29,28 @@ public class UsuarioResponsabilidadDaoImpl implements UsuarioResponsabilidadDao 
 		return query.list();
 	}
 	
+	//MIG
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<UsuarioResponsabilidad> getUsuariosResponsabilidadesPorIdInstanciaDeTareaUnidad(long idUnidadOperativa,
+			long idInstanciaDeTarea) {
+		Query query = getSession().getNamedQuery("UsuarioResponsabilidad.getUsuariosResponsabilidadesPorIdInstanciaDeTareaUnidadOp");
+		query.setLong("idInstanciaDeTarea", idInstanciaDeTarea);		
+		query.setLong("idUnidadOperativa", idUnidadOperativa);
+		return query.list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<UsuarioResponsabilidad> getUsuariosResponsabilidadesPorIdInstanciaDeTareaUnidadOfi(
+			long idUnidadOperativa, long idInstanciaDeTarea) {
+		Query query = getSession().getNamedQuery("UsuarioResponsabilidad.getUsuariosFueraOficinaRespPorIdInstanciaDeTareaOp");
+		query.setLong("idInstanciaDeTarea", idInstanciaDeTarea);		
+		query.setLong("idUnidadOperativa", idUnidadOperativa);
+		return query.list();
+	}
+	
+	
 	@Override
 	public UsuarioResponsabilidad getPrimerUsuarioResponsabilidadPorIdInstanciaDeTarea(long idInstanciaDeTarea) {
 		Query query = getSession().getNamedQuery("UsuarioResponsabilidad.getPrimerUsuarioResponsabilidadPorIdInstanciaDeTarea");
@@ -86,4 +108,24 @@ public class UsuarioResponsabilidadDaoImpl implements UsuarioResponsabilidadDao 
 		return query.list();
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Integer eliminarUsuarioResponsabilidadPorIdresponsabilidad(long idResponsabilidad) {
+		Query query = getSession().getNamedQuery("UsuarioResponsabilidad.eliminarPorIdResponsabilidad");
+		query.setLong("idResponsabilidad", idResponsabilidad);		
+		return query.executeUpdate();
+	}
+
+	@Override
+	public void guardar(UsuarioResponsabilidad ur) {
+		try {
+			getSession().saveOrUpdate(ur);
+		}catch (Exception e) {
+			System.out.println("ya insertado");
+		}
+	}
+
+	
+
+
 }

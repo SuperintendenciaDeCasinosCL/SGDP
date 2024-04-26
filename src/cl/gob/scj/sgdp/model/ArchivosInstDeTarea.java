@@ -499,6 +499,9 @@ public class ArchivosInstDeTarea {
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="\"D_FECHA_RECEPCION\"")
 	private Date fechaRecepcion;
+	
+	@Column(name="\"B_ANULADO\"")
+	private Boolean anulado;
 
 	public ArchivosInstDeTarea() {
 		super();
@@ -615,6 +618,14 @@ public class ArchivosInstDeTarea {
 	public void setFechaRecepcion(Date fechaRecepcion) {
 		this.fechaRecepcion = fechaRecepcion;
 	}
+	
+	public Boolean getAnulado() {
+		return anulado;
+	}
+
+	public void setAnulado(Boolean anulado) {
+		this.anulado = anulado;
+	}
 
 	@Override
 	public String toString() {
@@ -626,6 +637,7 @@ public class ArchivosInstDeTarea {
 				+ ", estaFirmadoConFEACentralizada=" + estaFirmadoConFEACentralizada 
 				+ ", fechaDocumento=" + fechaDocumento 
 				+ ", fechaRecepcion=" + fechaRecepcion 
+				+ ", anulado=" + anulado 
 				+ "]";
 	}	
 

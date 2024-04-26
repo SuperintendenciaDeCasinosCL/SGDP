@@ -25,6 +25,7 @@ public class HistoricoDeInstDeTareaDTO implements Serializable {
 	private String nombreResponsabilidadDestino;
 	private Short horasOcupadas;
 	private Short minutosOcupados;
+	private Integer cantAccionesEnBitacora = 0;
 	
 	public HistoricoDeInstDeTareaDTO() {
 		super();
@@ -174,6 +175,12 @@ public class HistoricoDeInstDeTareaDTO implements Serializable {
 				+ ", horasOcupadas=" + horasOcupadas
 				+ ", minutosOcupados=" + minutosOcupados
 				+ "]";
+	}
+	public Integer getCantAccionesEnBitacora() {
+		return cantAccionesEnBitacora;
+	}
+	public void setCantAccionesEnBitacora(Integer cantAccionesEnBitacora) {
+		this.cantAccionesEnBitacora = cantAccionesEnBitacora;
 	}	
 	
 }

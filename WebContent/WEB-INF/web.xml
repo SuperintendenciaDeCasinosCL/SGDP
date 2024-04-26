@@ -9,7 +9,7 @@
 		<session-timeout>60</session-timeout>
 	</session-config>
 	-->
- 	<distributable/>
+ 	<!--<distributable/>-->
 	<servlet>
 		<description></description>
 		<display-name>dispatcher</display-name>
@@ -25,17 +25,15 @@
 	</listener>
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
-		<!-- Configuracion para SSO Comentar -->		
+		<!-- Para LDAP -->
 		<param-value>
 		       classpath:cl/gob/scj/sgdp/config/service-context.xml    
 		       classpath:cl/gob/scj/sgdp/config/persistence-context.xml    
 		       classpath:cl/gob/scj/sgdp/config/security-context.xml
 		       classpath:cl/gob/scj/sgdp/config/util-context.xml		       
 		</param-value>
-		<!-- Configuracion para SSO Comentar -->
-		
-		<!-- Configuracion para SSO DesComentar -->
-		<!--<param-value>
+		<!-- Para Keyclock 
+		<param-value>
 		       classpath:cl/gob/scj/sgdp/config/service-context.xml    
 		       classpath:cl/gob/scj/sgdp/config/persistence-context.xml
 		       classpath:cl/gob/scj/sgdp/config/util-context.xml	       
@@ -54,6 +52,20 @@
 			<param-value>true</param-value>
 		</init-param>
 	</filter>
+
+	<filter>
+		<filter-name>basicauth</filter-name>
+		<filter-class>cl.gob.scj.sgdp.filter.BasicAuthFilter</filter-class>
+		<init-param>
+			<param-name>user</param-name>
+			<param-value>automatizacion_sgdp</param-value>
+		</init-param>
+		<init-param>
+			<param-name>password</param-name>
+			<param-value>7'*#kGJd9'k[7BZJ</param-value>
+		</init-param>
+	</filter>
+	
 	<filter-mapping>
 		<filter-name>encodingFilter</filter-name>
 		<url-pattern>/mueveProceso</url-pattern>
@@ -71,7 +83,7 @@
 		<url-pattern>/getSolicitudesCreaExpFinalizadas</url-pattern>
 	</filter-mapping>
 	
-	<!-- Configuracion para SSO Comentar -->
+	<!-- Para LDAP -->
 	<filter-mapping>	
 		<filter-name>encodingFilter</filter-name>
 		<url-pattern>/j_spring_security_check</url-pattern>
@@ -85,6 +97,18 @@
 		<filter-name>springSecurityFilterChain</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
+
+	<filter-mapping>	
+		<filter-name>basicauth</filter-name>
+		<url-pattern>/api-servicios-sgdp/*</url-pattern>
+		<url-pattern>/archivo/*</url-pattern>
+	    <url-pattern>/serviciosDoc/*</url-pattern>
+	    <url-pattern>/servicios/*</url-pattern>
+	    <url-pattern>/mantenimiento/*</url-pattern>
+	    <url-pattern>/vinculacion/*</url-pattern>
+	</filter-mapping>
+	
+	<!--
 	<filter>
         <filter-name>NoCacheFilter</filter-name>
         <filter-class>cl.gob.scj.sgdp.filter.NoCacheFilter</filter-class>         
@@ -92,14 +116,15 @@
     <filter-mapping>
         <filter-name>NoCacheFilter</filter-name>
         <url-pattern>/*</url-pattern>
-    </filter-mapping> 
+    </filter-mapping>
+    -->
+    
 	<listener>
 		<listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
 	</listener>
-	<!-- Configuracion para SSO Comentar -->
 	
-	<!-- Configuracion para SSO DesComentar -->
-	<!-- <security-constraint>
+	<!-- Para Keyclock INICIO
+	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>Todo</web-resource-name>
 			<url-pattern>/*</url-pattern>
@@ -110,13 +135,15 @@
 		<user-data-constraint>
 			<transport-guarantee>NONE</transport-guarantee>
 		</user-data-constraint>
-	</security-constraint>	
+	</security-constraint>
+	
 	<security-constraint>
 	    <web-resource-collection>
 	        <web-resource-name>ValidaSesion</web-resource-name>
 	        <url-pattern>/verificarSession</url-pattern>
 	    </web-resource-collection>
 	</security-constraint>	
+	
 	<security-constraint>
 	    <web-resource-collection>
 	        <web-resource-name>Servicios Web</web-resource-name>
@@ -125,16 +152,21 @@
 	        <url-pattern>/mantenimiento/*</url-pattern>
 	        <url-pattern>/lib2/*</url-pattern>
 	    </web-resource-collection>
-	</security-constraint>	
+	</security-constraint>	 
+
+	 
 	<login-config>
 		<auth-method>KEYCLOAK</auth-method>
 		<realm-name>this is ignored currently</realm-name>
 	</login-config>
+
 	<security-role>
 		<role-name>user</role-name>
-	</security-role> -->
-	<!-- Configuracion para SSO DesComentar-->
-			
+	</security-role>
+	
+	 Para Keyclock FIN--> 
+	
+		
     <error-page>
         <error-code>404</error-code>
         <location>/error404</location>

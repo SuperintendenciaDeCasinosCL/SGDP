@@ -1,5 +1,7 @@
 package cl.gob.scj.sgdp.dto;
 
+import java.util.Objects;
+
 public class SubprocesoIndicadoresSalidaDTO {
 
 	private String nombreSubproceso;
@@ -106,6 +108,34 @@ public class SubprocesoIndicadoresSalidaDTO {
 
 	public void setMarcaDuracion(String marcaDuracion) {
 		this.marcaDuracion = marcaDuracion;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(duracion, duracionProgramadaProceso, estado, fechaFinElementoMedido,
+				fechaInicioElementoMedido, marcaDuracion, marcaFechaHasta, nombreSubproceso, numeroExpediente,
+				tipoDeInicio, tipoFin);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SubprocesoIndicadoresSalidaDTO other = (SubprocesoIndicadoresSalidaDTO) obj;
+		return Objects.equals(duracion, other.duracion)
+				&& Objects.equals(duracionProgramadaProceso, other.duracionProgramadaProceso)
+				&& Objects.equals(estado, other.estado)
+				&& Objects.equals(fechaFinElementoMedido, other.fechaFinElementoMedido)
+				&& Objects.equals(fechaInicioElementoMedido, other.fechaInicioElementoMedido)
+				&& Objects.equals(marcaDuracion, other.marcaDuracion)
+				&& Objects.equals(marcaFechaHasta, other.marcaFechaHasta)
+				&& Objects.equals(nombreSubproceso, other.nombreSubproceso)
+				&& Objects.equals(numeroExpediente, other.numeroExpediente)
+				&& Objects.equals(tipoDeInicio, other.tipoDeInicio) && Objects.equals(tipoFin, other.tipoFin);
 	}
 
 

@@ -61,10 +61,7 @@ function formatTablaDeRDSSNC() {
 				}],
 				"language" : lenguaje_es,
 				"pageLength": 5,
-				"order": [[ 0, "desc" ], [1, "asc"]],
-				"columnDefs": [
-				    { "width": "10%", "targets": 0 }
-				  ]
+				"order": [[ 0, "desc" ], [1, "asc"]]
 			});
 	
 	tablaDeRDSSNC.buttons().container().appendTo(

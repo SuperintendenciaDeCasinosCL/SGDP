@@ -1,5 +1,6 @@
 package cl.gob.scj.sgdp.service.impl;
 
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -13,6 +14,7 @@ import cl.gob.scj.sgdp.auth.user.Usuario;
 import cl.gob.scj.sgdp.dao.ProcesoDao;
 import cl.gob.scj.sgdp.dto.ProcesoDTO;
 import cl.gob.scj.sgdp.model.Proceso;
+
 import cl.gob.scj.sgdp.service.ProcesoService;
 import cl.gob.scj.sgdp.tipos.PermisoType;
 
@@ -24,6 +26,18 @@ public class ProcesoServiceImpl implements ProcesoService {
 	
 	@Autowired
 	private ProcesoDao procesoDao;
+	
+	@Override
+	public List<ProcesoDTO> buscarTodosProcesoVigente(boolean vigente) {
+		List<ProcesoDTO> listaProcesoDto = new ArrayList<ProcesoDTO>();
+		List<Proceso> procesos = procesoDao.buscarTodosProcesoVigente(vigente);
+		for (Proceso proceso : procesos) {
+			ProcesoDTO procesoDTO = new ProcesoDTO(proceso.getIdProceso(), proceso.getDescripcionProceso(), proceso.getNombreProceso(), 
+					proceso.getVigente(), proceso.getDiasHabilesMaxDuracion(),proceso.getMacroProceso().getNombreMacroProceso(), proceso.getCodigoProceso());
+			listaProcesoDto.add(procesoDTO);
+		}
+		return listaProcesoDto;
+	}
 	
 	@Override
 	public List<ProcesoDTO> buscarTodosProcesoVigenteOrderPorCod(boolean vigente) {
@@ -80,7 +94,8 @@ public class ProcesoServiceImpl implements ProcesoService {
 			}	
 			return listaProcesoDto;
 		}			
-	}	
+	}
+
 	
 
 }

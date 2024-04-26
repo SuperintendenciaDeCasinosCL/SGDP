@@ -1,9 +1,11 @@
 <%@ page import= "cl.gob.scj.sgdp.config.Constantes" %> 
 <%@ page import= "cl.gob.scj.sgdp.tipos.BifurcacionType" %> 
+<%@ page import= "cl.gob.scj.sgdp.tipos.ModuloType" %>
+<%@ page import= "cl.gob.scj.sgdp.tipos.PermisoType" %>
 
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="sf" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="sf" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <c:set var="FORMATO_FECHA" value="<%=Constantes.FORMATO_FECHA_FORM%>" />
@@ -16,6 +18,8 @@
 <c:url value="http://${urlFuncPhp}/proceso/bpm/notificar.php?idproc=${instanciaDeProcesoDTO.nombreExpediente}" var="urlNotificarInstanciaDeProceso" />
 
 <c:url value="http://${urlFuncPhp}/proceso/bpm/this_task.php?idTask=${instanciaDeTareaDTO.idDiagrama}&idProc=${instanciaDeTareaDTO.idProceso}&idInsProc=${instanciaDeTareaDTO.idInstanciaDeProceso}" var="urlDiagramaSubProcesoBoton" />
+
+<c:set var="permisoIngresarComplejidad" value="<%=PermisoType.PUEDE_INGRESAR_COMPLEJIDAD.getNombrePermiso()%>"/>
 
 <c:choose>
 	<c:when test = "${instanciaDeTareaDTO.fechaVencimientoUsuario ne null}">
@@ -69,7 +73,7 @@
  		
  		<div class="row espacio-entre-row">
 			<div class="col-sm-12">
-				<font size="2"><strong>Plazo m&aacute;ximo del SubProceso :</strong> ${fechaPlazoInstProcesoFormat}</font>	
+				<font size="2"><strong>Plazo m&aacute;ximo del expediente :</strong> ${fechaPlazoInstProcesoFormat}</font>	
 			</div>	
 		</div>
 			
@@ -77,108 +81,7 @@
 			
 			<div class="col-sm-12">
 				<font size="2"><strong>Tarea:</strong> ${instanciaDeTareaDTO.nombreDeTarea}</font>
-			</div>
-						
-			<script type="text/javascript">
-			function seguir(idInstanciaDeProceso){
-
-				var contextPath = "${pageContext.request.contextPath}"
-				
-
-				 var InstanciaDeProceso = {}
-				 InstanciaDeProceso["idInstanciaDeProceso"] =  idInstanciaDeProceso;
-
-						$.ajax({
-						type : "POST",
-						contentType : "application/json",
-					    url: contextPath + "/" + "guardarSeguimiento",
-						data : JSON.stringify(InstanciaDeProceso),
-						dataType : 'json',
-						timeout : 100000,
-						success : function(data) {
-	                        if (data.mensaje == "ERROR"){
-	                        	$.notify({
-									message: 'Error al seguir'
-								},{
-									type: 'danger'
-								}); 
-		                      }	           							 
-						},
-						error : function(e) {
-							 console.log("ERROR: ", e);
-						},
-						complete: function(e){
-							cargaDetalleDeTarea("${instanciaDeTareaDTO.nombreExpediente}"
-									,"${instanciaDeTareaDTO.idInstanciaDeTarea}"
-									,"true"
-									,"${instanciaDeTareaDTO.idExpediente}"
-									,"${instanciaDeTareaDTO.urlControl}");							
-							
-						},
-		
-					});
-				 
-				}
-
-			
-			function dejarSeguir(idInstanciaDeProceso){
-					bootbox.confirm({
-				     message: "¿Dejar de seguir el proceso?",
-				    buttons: {
-				        confirm: {
-				            label: 'Si',
-				            className: 'btn-success'
-				        },
-				        cancel: {
-				            label: 'No',
-				            className: 'btn-danger'
-				        }
-				    },
-				    callback: function (result) {
-				        if (result){
-
-							var contextPath = "${pageContext.request.contextPath}"
-								
-								 var InstanciaDeProceso = {}
-								 InstanciaDeProceso["idInstanciaDeProceso"] =  idInstanciaDeProceso;
-
-										$.ajax({
-										type : "POST",
-										contentType : "application/json",
-									    url: contextPath + "/" + "dejarDeSeguimiento",
-										data : JSON.stringify(InstanciaDeProceso),
-										dataType : 'json',
-										timeout : 100000,
-										success : function(data) {
-
-					                        if (data.mensaje == "ERROR"){
-					                        	$.notify({
-													message: 'Error al dejar de seguir'
-												},{
-													type: 'danger'
-												}); 
-						                      }	           							 
-										},
-										error : function(e) {
-											 console.log("ERROR: ", e);
-										},
-										complete: function(e){
-											
-											cargaDetalleDeTarea("${instanciaDeTareaDTO.nombreExpediente}"
-													,"${instanciaDeTareaDTO.idInstanciaDeTarea}"
-													,"true"
-													,"${instanciaDeTareaDTO.idExpediente}"
-													,"${instanciaDeTareaDTO.urlControl}");										
-										
-										},
-						
-									});
-				        }
-				    }
-				});			
-				}
-			
-			</script>
+			</div>			
 
 		</div>
 		
@@ -243,6 +146,15 @@
 		
 		<div class="row espacio-entre-row">
 			<div class="col-sm-12">	
+				
+				<div class="card">
+				
+		        <c:if test = "${permisos[permisoIngresarComplejidad] eq permisoIngresarComplejidad}"> 
+                     <button type="button" class="btn btn-default botonVinculaciones" id="botonComplejidad" onclick="cargarModalComplejidad('${instanciaDeProcesoDTO.nombreExpediente}', false)">
+                         Complejidad
+                     </button>						
+                 </c:if>	
+				
 				<button type="button" class="btn btn-default btn-sm botonVinculaciones" id="botonVinculaciones" onclick="vinculaciones('${instanciaDeProcesoDTO.idExpediente}', '${instanciaDeProcesoDTO.nombreExpediente}')">
 		            Vinculaciones
 		      	</button>							
@@ -261,6 +173,8 @@
 				<button type="button" class="btn btn-default btn-sm boton-notificar" id="botonNotificarInstanciaDeProceso">
 				            Notificar
 				</button>
+				</div>
+				
 	 		</div>
  		</div>
    	
@@ -289,16 +203,18 @@
 						    	<tr>
 							    	<td>${detalleDeArchivoDTOAnterior.nombre}</td>
 							    	<td>${detalleDeArchivoDTOAnterior.tipoDeDocumento}</td>
-							    	<td>							    	
-							    		<button type="button" title="Descargar documento"
+							    	<td>
+										<button type="button" title="Descargar documento"
 											class="btn btn-primary btn-sm"
-											onclick='descargaArchivo("<c:url value='getArchivoPorId/${detalleDeArchivoDTOAnterior.idArchivo}'/>")'
+											onclick='descargaArchivo("<c:url value='getArchivoPorId/${detalleDeArchivoDTOAnterior.idArchivo}'/>", 
+											"<%=ModuloType.EJECUCION_DE_TAREA.getNombreModulo()%>")'
 											data-iddocumento="${detalleDeArchivoDTOAnterior.idArchivo}">
 											<span class="fa fa-download font-icon-2 "></span>
 										</button>&nbsp;
 										<c:if test = "${detalleDeArchivoDTOAnterior.esEditable eq true}">
 											<a href="#" class="btn btn-primary btn-sm boton-editar-documento-enviado" id="botonEditarDocumentoEnviadoEnEjecucionTarea" 
 											title="Editar documento"
+												data-idarchivo="${detalleDeArchivoDTOAnterior.idArchivo}"
 												data-codigomimetype="${detalleDeArchivoDTOAnterior.codigoMimeType}"
 						                        data-linksharpoint="${detalleDeArchivoDTOAnterior.linkSharpoint}">
 						                              <span class="glyphicon glyphicon-edit font-icon-2"></span>
@@ -425,7 +341,7 @@
 				<br>
 				
 				<div class="row"> 				
- 					<div class="col-sm-12">
+ 					<div class="col-sm-12" id="tiempoDedicadoDiv">
 						<label class="control-label">Tiempo dedicado:</label>
 						<input type="text" id="tiempoDedicado" name="tiempoDedicado">					
 					</div>
@@ -451,10 +367,10 @@
 						
 							<c:choose>
 								<c:when test="${instanciaDeTareaDTO.tipoDeBifurcacion eq tipoBifurcacionOR or instanciaDeTareaDTO.tipoDeBifurcacion eq tipoBifurcacionAND}">
-											<div class="col-sm-3"><strong>Usuario</strong></div>
+											<div class="col-sm-3"><strong>Unidad Operativa / Usuario</strong></div>
 								</c:when>
 								<c:otherwise>		
-											<div class="col-sm-4"><strong>Usuario</strong></div>			
+											<div class="col-sm-4"><strong>Unidad Operativa / Usuario</strong></div>			
 								</c:otherwise>	
 							</c:choose>	
 					
@@ -523,28 +439,54 @@
 							<c:choose>
 								<c:when test="${instanciaDeTareaDTO.tipoDeBifurcacion eq tipoBifurcacionOR}">
 									<div class="col-sm-3">
-										<select class="form-control usuarios-asignados" name="idUsuario${instanciasDeTareaDTOContinuanProceso.idInstanciaDeTarea}" id="${instanciasDeTareaDTOContinuanProceso.idInstanciaDeTarea}">
-											<option selected="selected" value="">Seleccione Usuario</option>
-											<c:forEach items="${instanciasDeTareaDTOContinuanProceso.posiblesIdUsuarios}" var="posibleUsuario">
-												<option value="${posibleUsuario}">${posibleUsuario}</option>																	
-											</c:forEach>
-											<c:forEach items="${instanciasDeTareaDTOContinuanProceso.posiblesIdUsuariosFueraDeOficina}" var="posibleUsuarioFO">
-												<option value="${posibleUsuarioFO}" disabled>${posibleUsuarioFO} (Fuera de oficina)</option>																	
-											</c:forEach>
-										</select>
+										<div id="divUnidadOperativa">
+											<select class="form-control select2-unidadop-doc validate[required]"
+												name="unidadesOperativaSelect2" id="unidadesOperativaSelect2">
+												<option value="">Seleccione Unidad Operariva</option>
+												<c:forEach items="${instanciasDeTareaDTOContinuanProceso.listaUnidadesOperativas}" var="unidadOp">
+													<option value="${unidadOp.idUnidadOperativa},${instanciasDeTareaDTOContinuanProceso.idInstanciaDeTarea} ">${unidadOp.nombreUnidadOperativa}</option>
+												</c:forEach>
+											</select>
+										</div>
+											<br>
+											<div id="usuariosDiv${instanciasDeTareaDTOContinuanProceso.idInstanciaDeTarea}">
+											<select class="form-control usuarios-asignados" name="idUsuario${instanciasDeTareaDTOContinuanProceso.idInstanciaDeTarea}" id="${instanciasDeTareaDTOContinuanProceso.idInstanciaDeTarea}">
+												<option selected="selected" value="">Seleccione Usuario</option>
+<%-- 												<c:forEach items="${instanciasDeTareaDTOContinuanProceso.posiblesIdUsuarios}" var="posibleUsuario"> --%>
+<%-- 													<option value="${posibleUsuario}">${posibleUsuario}</option>																	 --%>
+<%-- 												</c:forEach> --%>
+<%-- 												<c:forEach items="${instanciasDeTareaDTOContinuanProceso.posiblesIdUsuariosFueraDeOficina}" var="posibleUsuarioFO"> --%>
+<%-- 													<option value="${posibleUsuarioFO}" disabled>${posibleUsuarioFO} (Fuera de oficina)</option>																	 --%>
+<%-- 												</c:forEach> --%>
+											</select>
+											</div>
+											<br><br>
 									</div>
 								</c:when>
 								<c:otherwise>		
 									<div class="col-sm-4">	
-										<select class="form-control usuarios-asignados" name="idUsuario${instanciasDeTareaDTOContinuanProceso.idInstanciaDeTarea}" id="${instanciasDeTareaDTOContinuanProceso.idInstanciaDeTarea}">
-											<option selected="selected" value="">Seleccione Usuario</option>
-											<c:forEach items="${instanciasDeTareaDTOContinuanProceso.posiblesIdUsuarios}" var="posibleUsuario">
-												<option value="${posibleUsuario}">${posibleUsuario}</option>																
-											</c:forEach>
-											<c:forEach items="${instanciasDeTareaDTOContinuanProceso.posiblesIdUsuariosFueraDeOficina}" var="posibleUsuarioFO">
-												<option value="${posibleUsuarioFO}" disabled>${posibleUsuarioFO} (Fuera de oficina)</option>																	
-											</c:forEach>
-										</select>	  									
+									  	<div id="divUnidadOperativa">								
+											<select class="form-control select2-unidadop-doc validate[required]"
+												name="unidadesOperativaSelect2" id="unidadesOperativaSelect2">
+												<option value="">Seleccione Unidad Operariva</option>
+												<c:forEach items="${instanciasDeTareaDTOContinuanProceso.listaUnidadesOperativas}" var="unidadOp">
+													<option value="${unidadOp.idUnidadOperativa},${instanciasDeTareaDTOContinuanProceso.idInstanciaDeTarea}">${unidadOp.nombreUnidadOperativa}</option>
+												</c:forEach>
+											</select>
+										</div>
+											<br>
+											<div id="usuariosDiv${instanciasDeTareaDTOContinuanProceso.idInstanciaDeTarea}">
+											<select class="form-control usuarios-asignados" name="idUsuario${instanciasDeTareaDTOContinuanProceso.idInstanciaDeTarea}" id="${instanciasDeTareaDTOContinuanProceso.idInstanciaDeTarea}">
+												<option selected="selected" value="">Seleccione Usuario</option>
+<%-- 												<c:forEach items="${instanciasDeTareaDTOContinuanProceso.posiblesIdUsuarios}" var="posibleUsuario"> --%>
+<%-- 													<option value="${posibleUsuario}">${posibleUsuario}</option>																 --%>
+<%-- 												</c:forEach> --%>
+<%-- 												<c:forEach items="${instanciasDeTareaDTOContinuanProceso.posiblesIdUsuariosFueraDeOficina}" var="posibleUsuarioFO"> --%>
+<%-- 													<option value="${posibleUsuarioFO}" disabled>${posibleUsuarioFO} (Fuera de oficina)</option>																	 --%>
+<%-- 												</c:forEach> --%>
+											</select>	
+											</div>
+											<br><br>
 									</div>		
 								</c:otherwise>	
 							</c:choose>	
@@ -649,13 +591,13 @@
     		
 	</div>
 
-	<!-- Modal Subir Documento Adicional  -->
- 			
+	<!-- Modal Subir Documento Adicional  --> 			
 	<c:import url="/WEB-INF/jsp/modals/subirDocumentoAdicional.jsp"></c:import>
- 
+	
 	<!-- Modal Subir Documento Requerido  -->					
-	<c:import url="/WEB-INF/jsp/modals/subirDocumentoRequerido.jsp"></c:import>	
-
+	<c:import url="/WEB-INF/jsp/modals/subirDocumentoRequerido.jsp"></c:import>
+ 
+	
 	<c:url value="/verificarSession" var="sessionURL" />
 	<c:url value="/" var="raizURL" />
 	
@@ -674,9 +616,9 @@ var inicializaBotonNotificarInstanciaDeProceso = function (){
               window.open(urlNotificarInstanciaDeProceso, "Notificar", 'width=750, height=720');
               console.log("Fin window.open");
           } else {
-                bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+                bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde su �ltima acci�n y hemos caducado tu sesi�n por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
                               , function(){
-                                    window.open('${raizURL}', '_blank');
+                                    window.open('${raizURL}', '_self');
                               }
                  );
           }
@@ -701,9 +643,9 @@ var inicializaBotonDevolverTarea = function(){
             console.log("haySession: " + haySession);
             if(!haySession) {
             	haySessionB = false;
-                bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+                bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde su �ltima acci�n y hemos caducado tu sesi�n por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
                     , function(){
-                            window.open('${raizURL}', '_blank');                            
+                            window.open('${raizURL}', '_self');                            
                     }
                 );                
             } 
@@ -717,9 +659,22 @@ var inicializaBotonDevolverTarea = function(){
 			var formData = new FormData();
 			var comentario = $("#commentarioEjecucionTarea").val();
 			var idInstanciaDeTareaSeleccionada = $(this).attr("data-idinstanciadetarea");
-			var parametrosMapParaGuardarJSON = JSON.stringify($("#parametrosForm").serializeArray());
-			var horasOcupadas = $("#duration-hours").val();
-			var minutosOcupados = $("#duration-minutes").val();	
+			var parametrosMapParaGuardarJSON = JSON.stringify($("#parametrosForm").serializeArray());			
+			//var horasOcupadas = $("#duration-hours").val();
+			//var minutosOcupados = $("#duration-minutes").val();
+			var tiempoDedicadoDivContainer = $("#tiempoDedicadoDiv");
+			var durationArray = tiempoDedicadoDivContainer.find(".durationpicker-duration");
+			var horasOcupadas;
+			var minutosOcupados;
+			$(durationArray).each(function() {
+				if ($(this).attr('id') == "duration-hours") {
+					horasOcupadas = $(this).val();
+					
+				}
+				if ($(this).attr('id') == "duration-minutes") {
+					minutosOcupados = $(this).val();
+				}
+			});	
 			if (horasOcupadas == "") {
 				horasOcupadas = 0;
 			}
@@ -727,8 +682,11 @@ var inicializaBotonDevolverTarea = function(){
 				minutosOcupados = 0;
 			}
 			if (horasOcupadas <= 0 && minutosOcupados <= 0) {
-				$("#duration-hours").validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');	
-				$("#duration-minutes").validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');
+				//$("#duration-hours").validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');	
+				//$("#duration-minutes").validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');
+				$(durationArray).each(function() {
+					$(this).validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');	
+				});	
 				return;
 			}	
 			formData.append("comentario", comentario);
@@ -738,9 +696,9 @@ var inicializaBotonDevolverTarea = function(){
 			formData.append("minutosOcupados", minutosOcupados);			
 			var mensajeConfirmacionRetrocederTarea = "";		    
 		    if (tareaTieneParametros == 'true') {
-		    	mensajeConfirmacionRetrocederTarea = "¿Desea retroceder la tarea?<br><br><div style='color:red'> Recuerde que esta tarea tiene requisitos de satisfacci&oacute;n y/o salidas no conformes que deben ser verificados</div>";	
+		    	mensajeConfirmacionRetrocederTarea = "�Desea retroceder la tarea?<br><br><div style='color:red'> Recuerde que esta tarea tiene requisitos de satisfacci&oacute;n y/o salidas no conformes que deben ser verificados</div>";	
 		    } else {
-		    	mensajeConfirmacionRetrocederTarea = "¿Desea retroceder la tarea?";		    	
+		    	mensajeConfirmacionRetrocederTarea = "�Desea retroceder la tarea?";		    	
 		    }			
 			bootbox.confirm({
 		    	title: "Retroceder tarea",
@@ -830,9 +788,9 @@ var inicializaBotonEnviarTarea = function(){
             console.log("haySession: " + haySession);
             if(!haySession) {
             	haySessionB = false;
-                bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+                bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde su �ltima acci�n y hemos caducado tu sesi�n por seguridad, por favor presione aceptar y vuelve a hacer login. </p></div>"
                     , function(){
-                            window.open('${raizURL}', '_blank');
+                            window.open('${raizURL}', '_self');
                     }
                 );
             } 
@@ -848,10 +806,21 @@ var inicializaBotonEnviarTarea = function(){
 			}
 		}
 		var distribuye = $(this).attr("data-distribuye");
-		if (distribuye == "true" && $("#validoFormDistribucion").val()!="true") {
-			$("#botonAbrirCorreoDeDistribucionModal").validationEngine('showPrompt', 'Por favor complete los datos de la distribuci&oacute;n', 'error');
-			return;
-		}	
+		if (distribuye == "true") {
+			if ($("#correosHiden").val() == "distCorreo" && $("#validoFormDistribucion").val()!="true") {
+				$("#botonAbrirCorreoDeDistribucionModal").validationEngine('showPrompt', 'Por favor complete los datos de la distribuci&oacute;n', 'error');
+				return;
+			} else if ($("#correosHiden").val() == "apiDoc" && $("#validoFormDistribucionApi").val()!="true") {
+				$("#botonAbrirCorreoDeDistribucionModal").validationEngine('showPrompt', 'Por favor complete los datos de la distribuci&oacute;n', 'error');
+				return;
+			} else if ($("#correosHiden").val() == "apiOficinaVirtual" && $("#validoFormDistribucionOFPAVI").val()!="true") {
+				$("#botonAbrirCorreoDeDistribucionModal").validationEngine('showPrompt', 'Por favor complete los datos de la distribuci&oacute;n', 'error');
+				return;
+			} else if ($("#correosHiden").val() == "") {
+				$("#botonAbrirCorreoDeDistribucionModal").validationEngine('showPrompt', 'Por favor complete los datos de la distribuci&oacute;n', 'error');
+				return;
+			}
+		}
 		var cantidadDeOption = $('#divListaTareaAsignar :radio').length;
 		var noHaSeleccionadoTodosLosUsuarios = false;
 		var formData = new FormData();
@@ -875,9 +844,20 @@ var inicializaBotonEnviarTarea = function(){
 			var avanzaRetrocede= "avanzarProceso";
 			var idExpedienteContinuarProceso = $(this).attr("data-idexpediente");
 			var reasigna = false;				
-			var nombreExpediente = $(this).attr("data-nombreexpediente");			
-			var horasOcupadas = $("#duration-hours").val();
-			var minutosOcupados = $("#duration-minutes").val();
+			var nombreExpediente = $(this).attr("data-nombreexpediente");				
+			var tiempoDedicadoDivContainer = $("#tiempoDedicadoDiv");
+			var durationArray = tiempoDedicadoDivContainer.find(".durationpicker-duration");
+			var horasOcupadas;
+			var minutosOcupados;
+			$(durationArray).each(function() {
+				if ($(this).attr('id') == "duration-hours") {
+					horasOcupadas = $(this).val();
+					
+				}
+				if ($(this).attr('id') == "duration-minutes") {
+					minutosOcupados = $(this).val();
+				}
+			});	
 			if (horasOcupadas == "") {
 				horasOcupadas = 0;
 			}
@@ -885,8 +865,9 @@ var inicializaBotonEnviarTarea = function(){
 				minutosOcupados = 0;
 			}
 			if (horasOcupadas <= 0 && minutosOcupados <= 0) {
-				$("#duration-hours").validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');	
-				$("#duration-minutes").validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');
+				$(durationArray).each(function() {
+					$(this).validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');	
+				});	
 				return;
 			}
 		    $(".asignaciones-tareas").each(function (colIndex, c) {		    	
@@ -899,7 +880,7 @@ var inicializaBotonEnviarTarea = function(){
 			            }); 
 			    	}
 			    }	   
-		    });   	    
+		    }); 
 		    var asignacionesTareasJSON = JSON.stringify(asignacionesTareasArray);
 		    var parametrosMapParaGuardarJSON = JSON.stringify($("#parametrosForm").serializeArray());    
 		    formData.append("comentario", comentario);
@@ -915,30 +896,66 @@ var inicializaBotonEnviarTarea = function(){
 		    var puedeAvanzarProcesoConAdvertenciaFEA = $(this).attr("data-puedeavanzarprocesoconadvertenciafea");	    
 		    var mensajeConfirmacionEnviaTarea = "";		    
 		    if (tareaTieneParametros == 'true') {
-		    	mensajeConfirmacionEnviaTarea = "¿Desea enviar su tarea?<br><br><div style='color:red'> Recuerde que esta tarea tiene requisitos de satisfacci&oacute;n y/o salidas no conformes que deben ser verificados</div>";	
+		    	mensajeConfirmacionEnviaTarea = "�Desea enviar su tarea?<br><br><div style='color:red'> Recuerde que esta tarea tiene requisitos de satisfacci&oacute;n y/o salidas no conformes que deben ser verificados</div>";	
 		    } else {
-		    	mensajeConfirmacionEnviaTarea = "¿Desea enviar su tarea?";		    	
+		    	mensajeConfirmacionEnviaTarea = "�Desea enviar su tarea?";		    	
 		    }
-		    if (distribuye == "true" && $("#validoFormDistribucion").val()=="true") {			   
+		    if (distribuye == "true" && $("#validoFormDistribucion").val()=="true" && $("#correosHiden").val() == "distCorreo" ) {	
 		    	var correosDeDistribucionJSON = JSON.stringify($("#correosDeDistribucion").val());
+		    	console.log("correosDeDistribucionJSON: "+correosDeDistribucionJSON);
 		    	var idArchivosADistribuirArray = [];
 		    	$('input[name="idArchivosADistribuirHiden"]').each(function() {   
 		    	    idArchivosADistribuirArray.push(this.value);
-		    	 });
-		    	var idArchivosADistribuirJSON = JSON.stringify(idArchivosADistribuirArray);	
-		    	formData.append("correosDeDistribucionJSON", correosDeDistribucionJSON);
-		    	formData.append("asuntoCorreoDistribucion", $("#asuntoCorreoDistribucion").val());
-		    	formData.append("idArchivosADistribuirJSON", idArchivosADistribuirJSON);		    	
-		    }	
-		    
+		    	 }); 			    	
+		   		var idArchivosADistribuirJSON = JSON.stringify(idArchivosADistribuirArray);	
+			    formData.append("correosDeDistribucionJSON", correosDeDistribucionJSON);
+			    formData.append("asuntoCorreoDistribucion", $("#asuntoCorreoDistribucion").val());
+			    formData.append("idArchivosADistribuirJSON", idArchivosADistribuirJSON);
+			    formData.append("correosHiden", $("#correosHiden").val());
+		    } else if (distribuye == "true" && $("#validoFormDistribucionApi").val()=="true" && $("#correosHiden").val() == "apiDoc" )  {
+            	var correosApiDocJSON = JSON.stringify($("#usuarioDocDigSelect2").val());
+                console.log("correosApiDocJSON: "+correosApiDocJSON);
+                formData.append("correosApiDocJSON", correosApiDocJSON);                
+                var idArchivosADistribuirArray = [];
+		    	$('input[name="idArchivosADistribuirHiden"]').each(function() {   
+		    	    idArchivosADistribuirArray.push(this.value);
+		    	 });		    	
+                var idArchivosADistribuirJSON = JSON.stringify(idArchivosADistribuirArray);
+                formData.append("idEntidadDestinataria", $('#entidadesDocDigSelect2').val());
+                formData.append("idArchivosADistribuirJSON", idArchivosADistribuirJSON);
+                formData.append("correosHiden", $("#correosHiden").val());
+                formData.append("direccionesDeCorreosApiDoc", $('#usuarioDocDigSelect2 option:selected').toArray().map(item => item.text).join());
+                formData.append("condifencialDocdigital", document.getElementById("condifencialDocdigital").checked ? "true" : "false");
+            } else if (distribuye == "true" && $("#validoFormDistribucionOFPAVI").val()=="true" && $("#correosHiden").val() == "apiOficinaVirtual" )  {
+            	var correosApiDocJSON = JSON.stringify($("#usuarioDocDigSelect2").val());
+                console.log("correosApiDocJSON: "+correosApiDocJSON);
+                formData.append("correosApiDocJSON", correosApiDocJSON);                
+                var idArchivosADistribuirArray = [];
+		    	$('input[name="idArchivosADistribuirHiden"]').each(function() {   
+		    	    idArchivosADistribuirArray.push(this.value);
+		    	 });		    	
+                var idArchivosADistribuirJSON = JSON.stringify(idArchivosADistribuirArray);	                
+                formData.append("idArchivosADistribuirJSON", idArchivosADistribuirJSON);
+                formData.append("correosHiden", $("#correosHiden").val());
+                $("#rutsOFPAVIDist").empty();
+                $("#listaDeRuts li").each(function(i, li) {
+                	 $('#rutsOFPAVIDist').append($('<option>', {
+                         value: $(li).text(),
+                         text: $(li).text()
+                     }));
+                });
+                $('#rutsOFPAVIDist option').each(function () {
+                    $(this).attr('selected', true);
+                });
+                formData.append("ruts", $('#rutsOFPAVIDist').val());
+            }
 		    if (puedeAvanzarProcesoConAdvertenciaVisacion == "true" && tareaTieneParametros == 'true') {
-		    	mensajeConfirmacionEnviaTarea = "Esta es una tarea de visaci&oacuten, pero no ha visado todos los documentos. <br> ¿Desea enviar la tarea de todos modos?<br><br><div style='color:red'> Recuerde que esta tarea tiene requisitos de satisfacci&oacute;n y/o salidas no conformes que deben ser verificados</div>";
+		    	mensajeConfirmacionEnviaTarea = "Esta es una tarea de visaci&oacuten, pero no ha visado todos los documentos. <br> �Desea enviar la tarea de todos modos?<br><br><div style='color:red'> Recuerde que esta tarea tiene requisitos de satisfacci&oacute;n y/o salidas no conformes que deben ser verificados</div>";
 		    	formData.append("avanzaProcesoConAdvertenciaVisacion", true);
 			} else if (puedeAvanzarProcesoConAdvertenciaVisacion == "true") {
-				mensajeConfirmacionEnviaTarea = "Esta es una tarea de visaci&oacuten, pero no ha visado todos los documentos. <br> ¿Desea enviar la tarea de todos modos?";
+				mensajeConfirmacionEnviaTarea = "Esta es una tarea de visaci&oacuten, pero no ha visado todos los documentos. <br> �Desea enviar la tarea de todos modos?";
 		    	formData.append("avanzaProcesoConAdvertenciaVisacion", true);
 			}
-
 		    bootbox.confirm({
 		    	title: "Enviar tarea",
 		        message: mensajeConfirmacionEnviaTarea,
@@ -1039,8 +1056,8 @@ var inicializaBotonAnadirDocumentoOpcional = function() {
 	    		$("#fechaRecepcionDocumentoAdicionalModal").val(moment().format("DD/MM/YYYY"));
 		   		$("#subirDocumentoAdicionalModal").modal({backdrop: "static"});
 	       } else {
-	             bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
-	             	, function(){ window.open('${raizURL}', '_blank');}
+	             bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde su �ltima acci�n y hemos caducado tu sesi�n por seguridad, por favor presiona aceptar y vuelve a hacer login </p></div>"
+	             	, function(){ window.open('${raizURL}', '_self');}
 	             );
 	       }
 		});
@@ -1056,9 +1073,9 @@ var inicializaBotonFinalizaProceso = function(){
             console.log("haySession: " + haySession);
             if(!haySession) {
             	haySessionB = false;
-                bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+                bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde su �ltima acci�n y hemos caducado tu sesi�n por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
                     , function(){
-                            window.open('${raizURL}', '_blank');                            
+                            window.open('${raizURL}', '_self');                            
                     }
                 );                
             } 
@@ -1074,9 +1091,20 @@ var inicializaBotonFinalizaProceso = function(){
 			}
         }
 		var distribuye = $(this).attr("data-distribuye");
-		if (distribuye == "true" && $("#validoFormDistribucion").val()!="true") {
-			$("#botonAbrirCorreoDeDistribucionModal").validationEngine('showPrompt', 'Por favor complete los datos de la distribuci&oacute;n', 'error');
-			return;
+		if (distribuye == "true") {
+			if ($("#correosHiden").val() == "distCorreo" && $("#validoFormDistribucion").val()!="true") {
+				$("#botonAbrirCorreoDeDistribucionModal").validationEngine('showPrompt', 'Por favor complete los datos de la distribuci&oacute;n', 'error');
+				return;
+			} else if ($("#correosHiden").val() == "apiDoc" && $("#validoFormDistribucionApi").val()!="true") {
+				$("#botonAbrirCorreoDeDistribucionModal").validationEngine('showPrompt', 'Por favor complete los datos de la distribuci&oacute;n', 'error');
+				return;
+			} else if ($("#correosHiden").val() == "apiOficinaVirtual" && $("#validoFormDistribucionOFPAVI").val()!="true") {
+				$("#botonAbrirCorreoDeDistribucionModal").validationEngine('showPrompt', 'Por favor complete los datos de la distribuci&oacute;n', 'error');
+				return;
+			} else if ($("#correosHiden").val() == "") {
+				$("#botonAbrirCorreoDeDistribucionModal").validationEngine('showPrompt', 'Por favor complete los datos de la distribuci&oacute;n', 'error');
+				return;
+			} 
 		}
 		if ($("#commentarioEjecucionTarea").val().trim().length == 0) {
 			$("#commentarioEjecucionTarea").validationEngine('showPrompt', 'Por favor ingrese un comentario antes de enviar la tarea', 'error');			
@@ -1085,18 +1113,30 @@ var inicializaBotonFinalizaProceso = function(){
 			var comentario = $("#commentarioEjecucionTarea").val();
 			var parametrosMapParaGuardarJSON = JSON.stringify($("#parametrosForm").serializeArray());	
             var nombreExpediente = $(this).attr("data-nombreexpediente");
-            var idExpediente = $(this).attr("data-idexpediente");
-            var horasOcupadas = $("#duration-hours").val();
-            var minutosOcupados = $("#duration-minutes").val();
-            if (horasOcupadas == "") {
+            var idExpediente = $(this).attr("data-idexpediente");        	
+         	var tiempoDedicadoDivContainer = $("#tiempoDedicadoDiv");
+			var durationArray = tiempoDedicadoDivContainer.find(".durationpicker-duration");
+			var horasOcupadas;
+			var minutosOcupados;
+			$(durationArray).each(function() {
+				if ($(this).attr('id') == "duration-hours") {
+					horasOcupadas = $(this).val();
+					
+				}
+				if ($(this).attr('id') == "duration-minutes") {
+					minutosOcupados = $(this).val();
+				}
+			});	
+			if (horasOcupadas == "") {
 				horasOcupadas = 0;
 			}
 			if (minutosOcupados == "") {
 				minutosOcupados = 0;
 			}
 			if (horasOcupadas <= 0 && minutosOcupados <= 0) {
-				$("#duration-hours").validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');	
-				$("#duration-minutes").validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');
+				$(durationArray).each(function() {
+					$(this).validationEngine('showPrompt', 'Por favor ingrese un valor para horas y/o segundos', 'error');	
+				});	
 				return;
 			}
 			var parametrosMapParaGuardarJSON = JSON.stringify($("#parametrosForm").serializeArray());			
@@ -1107,22 +1147,60 @@ var inicializaBotonFinalizaProceso = function(){
 	        formData.append("horasOcupadas", horasOcupadas);
 	        formData.append("minutosOcupados", minutosOcupados);
 	        var distribuye = $(this).attr("data-distribuye");
-	        if (distribuye == "true" && $("#validoFormDistribucion").val()=="true") {			   
-                var correosDeDistribucionJSON = JSON.stringify($("#correosDeDistribucion").val());
+	        if (distribuye == "true" && $("#validoFormDistribucion").val()=="true" && $("#correosHiden").val() == "distCorreo" ) {	
+		    	var correosDeDistribucionJSON = JSON.stringify($("#correosDeDistribucion").val());
+		    	console.log("correosDeDistribucionJSON: "+correosDeDistribucionJSON);
+		    	var idArchivosADistribuirArray = [];
+		    	$('input[name="idArchivosADistribuirHiden"]').each(function() {   
+		    	    idArchivosADistribuirArray.push(this.value);
+		    	 }); 			    	
+		   		var idArchivosADistribuirJSON = JSON.stringify(idArchivosADistribuirArray);	
+			    formData.append("correosDeDistribucionJSON", correosDeDistribucionJSON);
+			    formData.append("asuntoCorreoDistribucion", $("#asuntoCorreoDistribucion").val());
+			    formData.append("idArchivosADistribuirJSON", idArchivosADistribuirJSON);
+			    formData.append("correosHiden", $("#correosHiden").val());
+		    } else if (distribuye == "true" && $("#validoFormDistribucionApi").val()=="true" && $("#correosHiden").val() == "apiDoc" )  {
+            	var correosApiDocJSON = JSON.stringify($("#usuarioDocDigSelect2").val());
+                console.log("correosApiDocJSON: "+correosApiDocJSON);
+                formData.append("correosApiDocJSON", correosApiDocJSON);                
                 var idArchivosADistribuirArray = [];
-                $('input[name="idArchivosADistribuirHiden"]').each(function() {   
-                    idArchivosADistribuirArray.push(this.value);
-                 });
-                var idArchivosADistribuirJSON = JSON.stringify(idArchivosADistribuirArray);	
-                formData.append("correosDeDistribucionJSON", correosDeDistribucionJSON);
-                formData.append("asuntoCorreoDistribucion", $("#asuntoCorreoDistribucion").val());
-                formData.append("idArchivosADistribuirJSON", idArchivosADistribuirJSON);		    	
+		    	$('input[name="idArchivosADistribuirHiden"]').each(function() {   
+		    	    idArchivosADistribuirArray.push(this.value);
+		    	 });		    	
+                var idArchivosADistribuirJSON = JSON.stringify(idArchivosADistribuirArray);
+                formData.append("idEntidadDestinataria", $('#entidadesDocDigSelect2').val());
+                formData.append("idArchivosADistribuirJSON", idArchivosADistribuirJSON);
+                formData.append("correosHiden", $("#correosHiden").val());
+                formData.append("direccionesDeCorreosApiDoc", $('#usuarioDocDigSelect2 option:selected').toArray().map(item => item.text).join());
+                formData.append("condifencialDocdigital", document.getElementById("condifencialDocdigital").checked ? "true" : "false");
+            } else if (distribuye == "true" && $("#validoFormDistribucionOFPAVI").val()=="true" && $("#correosHiden").val() == "apiOficinaVirtual" )  {
+            	var correosApiDocJSON = JSON.stringify($("#usuarioDocDigSelect2").val());
+                console.log("correosApiDocJSON: "+correosApiDocJSON);
+                formData.append("correosApiDocJSON", correosApiDocJSON);                
+                var idArchivosADistribuirArray = [];
+		    	$('input[name="idArchivosADistribuirHiden"]').each(function() {   
+		    	    idArchivosADistribuirArray.push(this.value);
+		    	 });		    	
+                var idArchivosADistribuirJSON = JSON.stringify(idArchivosADistribuirArray);	                
+                formData.append("idArchivosADistribuirJSON", idArchivosADistribuirJSON);
+                formData.append("correosHiden", $("#correosHiden").val());
+                $("#rutsOFPAVIDist").empty();
+                $("#listaDeRuts li").each(function(i, li) {
+               		$('#rutsOFPAVIDist').append($('<option>', {
+                        value: $(li).text(),
+                        text: $(li).text()
+                    }));
+               	});
+                $('#rutsOFPAVIDist option').each(function () {
+                    $(this).attr('selected', true);
+                });
+               	formData.append("ruts", $('#rutsOFPAVIDist').val());
             }
 	        var mensajeFinalizaTarea = "";		    
 		    if (tareaTieneParametros == 'true') {
-		    	mensajeFinalizaTarea = "¿Desea finalizar la tarea?<br><br><div style='color:red'> Recuerde que esta tarea tiene requisitos de satisfacci&oacute;n y/o salidas no conformes que deben ser verificados</div>";	
+		    	mensajeFinalizaTarea = "�Desea finalizar la tarea?<br><br><div style='color:red'> Recuerde que esta tarea tiene requisitos de satisfacci&oacute;n y/o salidas no conformes que deben ser verificados</div>";	
 		    } else {
-		    	mensajeFinalizaTarea = "¿Desea finalizar la tarea?";		    	
+		    	mensajeFinalizaTarea = "�Desea finalizar la tarea?";		    	
 		    }
 			bootbox.confirm({
 		    	title: "Finalizar Tarea",
@@ -1211,43 +1289,58 @@ var inicializaBotonEditarDocumentoEnviadoEnEjecucionTarea = function(){
 
 		var codigoMimeType = $(this).attr("data-codigomimetype"); 
 		var linkSharpoint = $(this).attr("data-linksharpoint");
-
-		console.log("codigoMimeType: " + codigoMimeType);
-		console.log("linkSharpoint: " + linkSharpoint);
+		var idArchivo = $(this).attr("data-idarchivo");
+		
+		var raizURL = $("#raizURL").val();
+		var urlPuedeVerDocumento = raizURL + "confidencialidadDocumento/puedeVerDocumento/" + idArchivo;
+		
+		var modulo = "<%=ModuloType.EJECUCION_DE_TAREA.getNombreModulo()%>";
 		
 		$.get("${sessionURL}", function(haySession) {
-	    	if (haySession) {  	
-				if(!(window.ActiveXObject)) {			
-					if(codigoMimeType==1) { //word
-						var miwindow = window.open("ms-word:ofe|u|"+linkSharpoint,"_self");
-						miwindow.locate;
-					}
-					else if (codigoMimeType==2) { //excel
-						var miwindow = window.open("ms-excel:ofe|u|"+linkSharpoint,"_self");
-						miwindow.locate;
-					}
-			   } else {
-				   if(codigoMimeType==1) { //word								
-						var wdApp = new ActiveXObject("Word.Application");
-						wdApp.Visible = true;
-						var wdDoc = wdApp.Documents;
-						wdDoc.Open(linkSharpoint);
-					}
-					else if (codigoMimeType==2) { //excel							
-						var wdApp = new ActiveXObject("Excel.Application");
-						wdApp.Visible = true;
-						var wb = wdApp.Workbooks;
-						wb.Open(linkSharpoint);
-					}
-			   }
+	    	if (haySession) { 
+	    		$.get(urlPuedeVerDocumento, function(puedeVerDocumento) {
+	    			  console.log("puedeVerDocumento: " + puedeVerDocumento);
+	    			  if (puedeVerDocumento == true) {
+	    				  if(!(window.ActiveXObject)) {			
+	    						if(codigoMimeType==1) { //word
+	    							var miwindow = window.open("ms-word:ofe|u|"+linkSharpoint,"_self");
+	    							miwindow.locate;
+	    							insertaLogDocumento(idArchivo, "EDITA", modulo);
+	    						}
+	    						else if (codigoMimeType==2) { //excel
+	    							var miwindow = window.open("ms-excel:ofe|u|"+linkSharpoint,"_self");
+	    							miwindow.locate;
+	    							insertaLogDocumento(idArchivo, "EDITA", modulo);
+	    						}
+	    				   } else {
+	    					   if(codigoMimeType==1) { //word								
+	    							var wdApp = new ActiveXObject("Word.Application");
+	    							wdApp.Visible = true;
+	    							var wdDoc = wdApp.Documents;
+	    							wdDoc.Open(linkSharpoint);
+	    							insertaLogDocumento(idArchivo, "EDITA", modulo);
+	    						}
+	    						else if (codigoMimeType==2) { //excel							
+	    							var wdApp = new ActiveXObject("Excel.Application");
+	    							wdApp.Visible = true;
+	    							var wb = wdApp.Workbooks;
+	    							wb.Open(linkSharpoint);
+	    							insertaLogDocumento(idArchivo, "EDITA", modulo);
+	    						}
+	    				   }
+	    			  } else {
+	    				  bootbox.alert("Lo sentimos, no tiene acceso al documento.");
+	    			  }
+	    		  });
 	       } else {
-	             bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
-	             	, function(){ window.open('${raizURL}', '_blank');}
+	             bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde su ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+	             	, function(){ window.open('${raizURL}', '_self');}
 	             );
 	       }
 		});
 	});
 };
+
 
 var inicializaBotonVerDiagramaEnNuevaVentanaET = function (){
   $("#botonVerDiagramaEnNuevaVentanaET").off('click').on('click', function () {
@@ -1260,9 +1353,9 @@ var inicializaBotonVerDiagramaEnNuevaVentanaET = function (){
               window.open(urlDiagramaSubProcesoBoton, "SubProceso", 'width=1700, height=900');
               console.log("Fin window.open");
           } else {
-                bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+                bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde su �ltima acci�n y hemos caducado tu sesi�n por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
                               , function(){
-                                    window.open('${raizURL}', '_blank');
+                                    window.open('${raizURL}', '_self');
                               }
                  );
           }
@@ -1302,14 +1395,14 @@ function abrirCorreoDeDistribucionModal(idExpediente, idInstanciaDeTarea, nombre
         	$("#detalleDeExpedienteEnDistribucionModal").css("position", "relative").prepend($("<div />").addClass("cargando"));
         	$('#detalleDeExpedienteEnDistribucionModal').load(urlGetDetalleDeExpedienteEnDistribucion + "/" + idExpediente + "/" 
         			+ idInstanciaDeTarea + "/" + nombreExpediente, function() {
-        				$('#correosDeDistribucionHiden option').each(function() {      
-        			        $("#correosDeDistribucion option[value='"+$(this).val()+"']").attr("selected", true);			       
-        			    });        				
-        				$(".select2-correos-de-distribucion").select2({
-        				    theme: "bootstrap",
-        		 		    dropdownParent: $("#formCorreoDeDistribucionModal"),
-        		 		    language: "es"
-        		 		});
+//         				$('#correosDeDistribucionHiden option').each(function() {      
+//         			        $("#correosDeDistribucion option[value='"+$(this).val()+"']").attr("selected", true);			       
+//         			    });        				
+//         				$(".select2-correos-de-distribucion").select2({
+//         				    theme: "bootstrap",
+//         		 		    dropdownParent: $("#formCorreoDeDistribucionModal"),
+//         		 		    language: "es"
+//         		 		});
         				$('#idsArchivosADistribuir input').each(function() { 
         				    var inputGuardado = $(this).val();   
         				    $('#checkBoxesADistribuir input').filter(function(){      
@@ -1322,9 +1415,9 @@ function abrirCorreoDeDistribucionModal(idExpediente, idInstanciaDeTarea, nombre
         				$("#detalleDeExpedienteEnDistribucionModal").find(".cargando").remove();        				
         	});	
         } else {
-              bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+              bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde su �ltima acci�n y hemos caducado tu sesi�n por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
                             , function(){
-                                  window.open('${raizURL}', '_blank');
+                                  window.open('${raizURL}', '_self');
                             }
                );
         }
@@ -1360,7 +1453,7 @@ function cargaCondicionesDeSatisfaccion(idInstanciaDeTarea, nombreExpediente, no
 	      }	else {
 	            bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acci&oacute;n y hemos caducado tu sesi&oacute;n por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
 	                          , function(){
-	                                window.open(raizURL, '_blank');
+	                                window.open(raizURL, '_self');
 	                          }
 	             );
 	      }
@@ -1387,7 +1480,7 @@ function inicializaTiempoDedicado() {
 		    min: 0,
 		    max: 59
 		  },
-		  classname: 'form-control',
+		  //classname: 'form-control',
 		  type: 'number',
 		  responsive: true
 	});
@@ -1420,10 +1513,155 @@ function consultaEstadoDocumentoFirmado(idInstanciaDeTarea) {
 	setTimeout(stopInterval, 60000, intervalID);
 }
 
+function seguir(idInstanciaDeProceso) {
+    var contextPath = "${pageContext.request.contextPath}"
+    var InstanciaDeProceso = {}
+    var urlSessionValida = $("#urlSessionValida").val();
+	var raizURL = $("#raizURL").val();
+    InstanciaDeProceso["idInstanciaDeProceso"] = idInstanciaDeProceso;    
+    $.get(urlSessionValida, function(haySession) {
+	    console.log("haySession: " + haySession);
+	    if(haySession) {
+	    	$.ajax({
+	            type: "POST",
+	            contentType: "application/json",
+	            url: contextPath + "/" + "guardarSeguimiento",
+	            data: JSON.stringify(InstanciaDeProceso),
+	            dataType: 'json',
+	            timeout: 100000,
+	            success: function(data) {
+	                if (data.mensaje == "ERROR") {
+	                    $.notify({
+	                        message: 'Error al seguir'
+	                    }, {
+	                        type: 'danger'
+	                    });
+	                }
+	            },
+	            error: function(e) {
+	                console.log("ERROR: ", e);
+	            },
+	            complete: function(e) {
+	                cargaDetalleDeTarea("${instanciaDeTareaDTO.nombreExpediente}", "${instanciaDeTareaDTO.idInstanciaDeTarea}", "true", "${instanciaDeTareaDTO.idExpediente}", "${instanciaDeTareaDTO.urlControl}", "${instanciaDeTareaDTO.idEstadoTarea}");
+
+	            },
+
+	        });	    		
+	    }	else {
+	            bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acci&oacute;n y hemos caducado tu sesi&oacute;n por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+	                          , function(){
+	                                window.open(raizURL, '_self');
+	                          }
+	             );
+	     }	      
+	}); 
+}
+
+function dejarSeguir(idInstanciaDeProceso) {
+	var urlSessionValida = $("#urlSessionValida").val();
+	var raizURL = $("#raizURL").val();	
+	$.get(urlSessionValida, function(haySession) {
+	    console.log("haySession: " + haySession);
+	    if(haySession) {		
+	    	bootbox.confirm({
+	            message: "�Dejar de seguir el proceso?",
+	            buttons: {
+	                confirm: {
+	                    label: 'Si',
+	                    className: 'btn-success'
+	                },
+	                cancel: {
+	                    label: 'No',
+	                    className: 'btn-danger'
+	                }
+	            },
+	            callback: function(result) {
+	                if (result) {
+
+	                    var contextPath = "${pageContext.request.contextPath}"
+
+	                    var InstanciaDeProceso = {}
+	                    InstanciaDeProceso["idInstanciaDeProceso"] = idInstanciaDeProceso;
+
+	                    $.ajax({
+	                        type: "POST",
+	                        contentType: "application/json",
+	                        url: contextPath + "/" + "dejarDeSeguimiento",
+	                        data: JSON.stringify(InstanciaDeProceso),
+	                        dataType: 'json',
+	                        timeout: 100000,
+	                        success: function(data) {
+
+	                            if (data.mensaje == "ERROR") {
+	                                $.notify({
+	                                    message: 'Error al dejar de seguir'
+	                                }, {
+	                                    type: 'danger'
+	                                });
+	                            }
+	                        },
+	                        error: function(e) {
+	                            console.log("ERROR: ", e);
+	                        },
+	                        complete: function(e) {
+
+	                            cargaDetalleDeTarea("${instanciaDeTareaDTO.nombreExpediente}", "${instanciaDeTareaDTO.idInstanciaDeTarea}", "true", "${instanciaDeTareaDTO.idExpediente}", "${instanciaDeTareaDTO.urlControl}", "${instanciaDeTareaDTO.idEstadoTarea}");
+
+	                        },
+
+	                    });
+	                }
+	            }
+	        });	    	
+	    }	else {
+            bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acci&oacute;n y hemos caducado tu sesi&oacute;n por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+                          , function(){
+                                window.open(raizURL, '_self');
+                          }
+             );
+	    }	      
+	});    
+}
+
+
+//MIG
+var inicializaSelect2UnidadOpe = function() {
+		$(".select2-unidadop-doc").select2({
+			theme : "bootstrap",
+			dropdownParent : $("#divUnidadOperativa"),
+			language : "es"
+		});
+	};
+
+
+	
+	$('.select2-unidadop-doc').on('change', function() {
+		//$("#detalleDeExpedienteEnDistribucionModal").css("position", "relative").prepend($("<div />").addClass("cargando"));
+		  var unidadOpInstan = this.value;
+		  console.log("idUnidadOperativa + InstanciaTarea: "+ unidadOpInstan)
+		  var arrayDeCadenas = unidadOpInstan.split(",");
+		  var idUnidadOperativa = arrayDeCadenas[0];
+		  var instanciaTarea = arrayDeCadenas[1];
+		   
+		  
+		  
+		   console.log("idUnidadOperativa: "+ idUnidadOperativa)
+		    console.log("instanciaTarea: "+ instanciaTarea)
+		  $("#usuariosDiv"+instanciaTarea).load("${pageContext.request.contextPath}"+"/getUsuariosPorUnidadOperativa/"+ idUnidadOperativa +"/"+ instanciaTarea);//, function() {
+		//	$("#detalleDeExpedienteEnDistribucionModal").find(".cargando").remove();
+			//});
+		  
+		 // $("#divUauriosEntidades").load("${pageContext.request.contextPath}"+"/getUsuariosEntidades/"+idEntidad);
+		  
+	});
+		  
+//MIG
+
 $(document).ready(function() {		
 	if( $('#botonDevolverTarea').length != 0 ) {
 		new Tippy('#botonDevolverTarea');
 	}
+	$(inicializaSelect2UnidadOpe);
 	$(seteaBotonCargaCondicionesDeSatisfaccion);
 	$(inicializaDatePlazoSiguienteTarea);
 	$(inicializaBotonEnviarTarea);	

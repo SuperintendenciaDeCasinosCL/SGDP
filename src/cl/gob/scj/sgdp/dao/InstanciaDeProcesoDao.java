@@ -4,6 +4,7 @@ import java.util.List;
 
 import cl.gob.scj.sgdp.auth.user.Usuario;
 import cl.gob.scj.sgdp.dto.FechaEstadoInstanciaProcesoDTO;
+import cl.gob.scj.sgdp.dto.InfoProcesoExternoDTO;
 import cl.gob.scj.sgdp.dto.rest.ConsultaEstadoProceso;
 import cl.gob.scj.sgdp.dto.rest.MensajeJson;
 import cl.gob.scj.sgdp.dto.rest.RespuestaConsultaAvanzadaEstadoProceso;
@@ -37,5 +38,7 @@ public interface InstanciaDeProcesoDao {
 	FechaEstadoInstanciaProcesoDTO getFechaEstadoInstanciaDeProcesoPorIdExpediente(String idExpediente);
 	
 	InstanciaDeProceso getInstanciaDeProcesoPorNombreExpediente(String nombreExpediente);
+
+	Object getInstanciaDeProcesoPorNombreExpedienteAPI(String nombreExpediente);
 	
 }

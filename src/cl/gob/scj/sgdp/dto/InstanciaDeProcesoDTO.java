@@ -23,6 +23,7 @@ public class InstanciaDeProcesoDTO implements Serializable {
 	private String comentarioSolicitudCreacionExpediente;
 	private boolean tieneParametroPorTarea;
 	private long idProceso;
+	private String nombreUnidad;
 	
 	public long getIdInstanciaDeProceso() {
 		return idInstanciaDeProceso;
@@ -126,7 +127,12 @@ public class InstanciaDeProcesoDTO implements Serializable {
 	public void setIdProceso(long idProceso) {
 		this.idProceso = idProceso;
 	}
-		
+	public String getNombreUnidad() {
+		return nombreUnidad;
+	}
+	public void setNombreUnidad(String nombreUnidad) {
+		this.nombreUnidad = nombreUnidad;
+	}
 	@Override
 	public String toString() {
 		return "InstanciaDeProcesoDTO [idInstanciaDeProceso=" + idInstanciaDeProceso + ", nombreExpediente="
@@ -140,6 +146,7 @@ public class InstanciaDeProcesoDTO implements Serializable {
 				+ ", comentarioSolicitudCreacionExpediente=" + comentarioSolicitudCreacionExpediente 
 				+ ", tieneParametroPorTarea=" + tieneParametroPorTarea
 				+ ", idProceso=" + idProceso
+				+ ", nombreUnidad=" + nombreUnidad
 				+ "]";
 	}
 }

@@ -99,7 +99,7 @@ import cl.gob.scj.sgdp.config.Constantes;
 			+ "SELECT MAX(h2.fechaMovimiento) from HistoricoDeInstDeTarea h2 "
 			+ "WHERE h2.instanciaDeTareaDeDestino.idInstanciaDeTarea = :idInstanciaDeTarea "
 			+ "AND h2.accionHistInstDeTarea.idAccionHistoricoInstDeTarea in (2, 3, 4) "
-			+ ") AND h.accionHistInstDeTarea.idAccionHistoricoInstDeTarea in (2, 3, 4) ) "),
+			+ ") AND h.accionHistInstDeTarea.idAccionHistoricoInstDeTarea in (2, 3, 4) "),
 	
 	@NamedQuery(name="HistoricoDeInstDeTarea.getHistoricoDeInstDeTareaPorIdInstanciaDeTareaDeDestinoMaxFechaMovEnviaODevuelveMenFech",	
 	query="SELECT h "			
@@ -110,7 +110,7 @@ import cl.gob.scj.sgdp.config.Constantes;
 			+ "WHERE h2.instanciaDeTareaDeDestino.idInstanciaDeTarea = :idInstanciaDeTarea "
 			+ "AND h2.fechaMovimiento < :fechaMovimiento "
 			+ "AND h2.accionHistInstDeTarea.idAccionHistoricoInstDeTarea in (2, 3) "
-			+ ") AND h.accionHistInstDeTarea.idAccionHistoricoInstDeTarea in (2, 3) ) "),
+			+ ") AND h.accionHistInstDeTarea.idAccionHistoricoInstDeTarea in (2, 3) "),
 	
 	@NamedQuery(name="HistoricoDeInstDeTarea.getTodosEnviaDevuelveReasignaHistoricoDeInstDeTareaPorIdInstanciaDeProceso",	
 	query="SELECT h "			

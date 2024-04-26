@@ -187,15 +187,25 @@ function validaFechaMenor(idFecha1, idFecha2, mensajeError) {
 	}
 }
 
-function descargaArchivo(urlDescarga) {
+function descargaArchivo(urlDescarga, moduloLogDocumento) {
+	urlDescarga = urlDescarga + "/" + "DESCARGA" + "/" + moduloLogDocumento
 	console.log("urlDescarga: " + urlDescarga);
+	var ar = urlDescarga.split("/");
 	var urlSessionValida = $("#urlSessionValida").val();
 	var raizURL = $("#raizURL").val();
+	var urlPuedeVerDocumento = raizURL + "confidencialidadDocumento/puedeVerDocumento/" + ar[1];
 	console.log("urlSessionValida: " + urlSessionValida);
 	$.get(urlSessionValida, function(haySession) {
 	      console.log("haySession: " + haySession);
 	      if(haySession) {
-	    	  window.location.href = urlDescarga;
+	    	  $.get(urlPuedeVerDocumento, function(puedeVerDocumento) {
+	    		  console.log("puedeVerDocumento: " + puedeVerDocumento);
+	    		  if (puedeVerDocumento == true) {
+	    			  window.location.href = urlDescarga;
+	    		  } else {
+	    			  bootbox.alert("Lo sentimos, no tiene acceso al documento.");
+	    		  }
+	    	  });
 	      }	else {
 	            bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acci&oacute;n y hemos caducado tu sesi&oacute;n por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
 	                          , function(){
@@ -206,23 +216,34 @@ function descargaArchivo(urlDescarga) {
 	});  
 }
 
-function descargaArchivoPorIdYVersion(urlDescargaPorIdYVersion, idArchivo, versionLabel, versionMimeType) {
+function descargaArchivoPorIdYVersion(urlDescargaPorIdYVersion, idArchivo, versionLabel, versionMimeType, moduloLogDocumento) {
 	console.log("urlDescargaPorIdYVersion: " + urlDescargaPorIdYVersion);	
 	console.log("idArchivo: " + idArchivo);
 	console.log("versionLabel: " + versionLabel);
 	console.log("versionMimeType: " + versionMimeType);
+	console.log("moduloLogDocumento: " + moduloLogDocumento);
 	var urlSessionValida = $("#urlSessionValida").val();
 	var raizURL = $("#raizURL").val();
+	var urlPuedeVerDocumento = raizURL + "confidencialidadDocumento/puedeVerDocumento/" + idArchivo;
 	var urlDescargaPorIdYVersionV = urlDescargaPorIdYVersion
 									+"?idArchivo="+encodeURIComponent(idArchivo)
 									+"&versionLabel="+encodeURIComponent(versionLabel)
-									+"&versionMimeType="+encodeURIComponent(versionMimeType);	
+									+"&versionMimeType="+encodeURIComponent(versionMimeType)
+									+"&tipoOperacion="+encodeURIComponent("DESCARGA")
+									+"&modulo="+encodeURIComponent(moduloLogDocumento);	
 	console.log("urlDescargaPorIdYVersionV: " + urlDescargaPorIdYVersionV);
 	console.log("urlSessionValida: " + urlSessionValida);
 	$.get(urlSessionValida, function(haySession) {
 	      console.log("haySession: " + haySession);
 	      if(haySession) {
-	    	  window.location.href = urlDescargaPorIdYVersionV;
+	    	  $.get(urlPuedeVerDocumento, function(puedeVerDocumento) {
+	    		  console.log("puedeVerDocumento: " + puedeVerDocumento);
+	    		  if (puedeVerDocumento == true) {
+	    			  window.location.href = urlDescargaPorIdYVersionV;
+	    		  } else {
+	    			  bootbox.alert("Lo sentimos, no tiene acceso al documento.");
+	    		  }
+	    	  });
 	      }	else {
 	            bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acci&oacute;n y hemos caducado tu sesi&oacute;n por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
 	                          , function(){
@@ -232,6 +253,7 @@ function descargaArchivoPorIdYVersion(urlDescargaPorIdYVersion, idArchivo, versi
 	      }
 	});  
 }
+
 
 function levenshteinDistance (s, t) {
     if (!s.length) return t.length;
@@ -256,7 +278,7 @@ function cargaTareasEnEjecucion() {
 	      }	else {
 	            bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acci&oacute;n y hemos caducado tu sesi&oacute;n por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
 	                          , function(){
-	                                window.open(raizURL, '_blank');
+	                                window.open(raizURL, '_self');
 	                          }
 	             );
 	      }

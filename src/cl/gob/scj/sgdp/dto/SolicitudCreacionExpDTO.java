@@ -26,13 +26,15 @@ public class SolicitudCreacionExpDTO extends RespuestaDTO {
 	private String asuntoMateria;
 	private List<AutorDTO> autoresDTO;
 	private List<String> idsUsuariosDestinatarios;
-	private long idAutor;	
+	private long idAutor;
 	private String nombreExpediente;
 	private int pagina;
 	private int tamanoPagina;
 	private String fechaAtencionS;
 	private String fechaSolicitudS;
-		
+	private String idCMSCarpeta;
+	private Long idCarpeta;
+
 	public long getIdSolicitudCreacionExp() {
 		return idSolicitudCreacionExp;
 	}
@@ -50,18 +52,18 @@ public class SolicitudCreacionExpDTO extends RespuestaDTO {
 	}
 	public void setFechaAtencion(Date fechaAtencion) {
 		this.fechaAtencion = fechaAtencion;
-		if (fechaAtencion!=null) {			
-			this.fechaAtencionS = FechaUtil.simpleDateFormatForm.format(fechaAtencion);			
+		if (fechaAtencion!=null) {
+			this.fechaAtencionS = FechaUtil.simpleDateFormatForm.format(fechaAtencion);
 		}
 	}
 	public Date getFechaSolicitud() {
 		return fechaSolicitud;
 	}
 	public void setFechaSolicitud(Date fechaSolicitud) {
-		this.fechaSolicitud = fechaSolicitud;		
-		if (fechaSolicitud!=null) {			
-			this.fechaSolicitudS = FechaUtil.simpleDateFormatForm.format(fechaSolicitud);			
-		}		
+		this.fechaSolicitud = fechaSolicitud;
+		if (fechaSolicitud!=null) {
+			this.fechaSolicitudS = FechaUtil.simpleDateFormatForm.format(fechaSolicitud);
+		}
 	}
 	public String getIdUsuarioCreadorExpediente() {
 		return idUsuarioCreadorExpediente;
@@ -80,19 +82,19 @@ public class SolicitudCreacionExpDTO extends RespuestaDTO {
 	}
 	public void setIdUsuarioSolicitante(String idUsuarioSolicitante) {
 		this.idUsuarioSolicitante = idUsuarioSolicitante;
-	}	
+	}
 	public long getIdEstadoSolicitudCreacionExp() {
 		return idEstadoSolicitudCreacionExp;
 	}
 	public void setIdEstadoSolicitudCreacionExp(long idEstadoSolicitudCreacionExp) {
 		this.idEstadoSolicitudCreacionExp = idEstadoSolicitudCreacionExp;
-	}	
+	}
 	public String getNombreEstadoSolicitudCreacionExp() {
 		return nombreEstadoSolicitudCreacionExp;
 	}
 	public void setNombreEstadoSolicitudCreacionExp(String nombreEstadoSolicitudCreacionExp) {
 		this.nombreEstadoSolicitudCreacionExp = nombreEstadoSolicitudCreacionExp;
-	}	
+	}
 	public String getNombreSubProceso() {
 		return nombreSubProceso;
 	}
@@ -110,7 +112,7 @@ public class SolicitudCreacionExpDTO extends RespuestaDTO {
 	}
 	public void setAsuntoMateria(String asuntoMateria) {
 		this.asuntoMateria = asuntoMateria;
-	}			
+	}
 	public List<AutorDTO> getAutoresDTO() {
 		return autoresDTO;
 	}
@@ -122,25 +124,25 @@ public class SolicitudCreacionExpDTO extends RespuestaDTO {
 	}
 	public void setIdsUsuariosDestinatarios(List<String> idsUsuariosDestinatarios) {
 		this.idsUsuariosDestinatarios = idsUsuariosDestinatarios;
-	}	
+	}
 	public long getIdProceso() {
 		return idProceso;
 	}
 	public void setIdProceso(long idProceso) {
 		this.idProceso = idProceso;
-	}	
+	}
 	public long getIdAutor() {
 		return idAutor;
 	}
 	public void setIdAutor(long idAutor) {
 		this.idAutor = idAutor;
-	}	
+	}
 	public String getNombreExpediente() {
 		return nombreExpediente;
 	}
 	public void setNombreExpediente(String nombreExpediente) {
 		this.nombreExpediente = nombreExpediente;
-	}	
+	}
 	public int getPagina() {
 		return pagina;
 	}
@@ -152,7 +154,7 @@ public class SolicitudCreacionExpDTO extends RespuestaDTO {
 	}
 	public void setTamanoPagina(int tamanoPagina) {
 		this.tamanoPagina = tamanoPagina;
-	}	
+	}
 	public String getFechaAtencionS() {
 		return fechaAtencionS;
 	}
@@ -179,25 +181,39 @@ public class SolicitudCreacionExpDTO extends RespuestaDTO {
 			throw new SgdpException("ERROR: se requiere usuario destinatario", Level.WARN, false);
 		}
 	}
+	public String getIdCMSCarpeta() {
+		return idCMSCarpeta;
+	}
+	public void setIdCMSCarpeta(String idCMSCarpeta) {
+		this.idCMSCarpeta = idCMSCarpeta;
+	}
+	public Long getIdCarpeta() {
+		return idCarpeta;
+	}
+	public void setIdCarpeta(Long idCarpeta) {
+		this.idCarpeta = idCarpeta;
+	}
 	@Override
 	public String toString() {
 		return "SolicitudCreacionExpDTO [idSolicitudCreacionExp=" + idSolicitudCreacionExp + ", comentario="
 				+ comentario + ", fechaAtencion=" + fechaAtencion + ", fechaSolicitud=" + fechaSolicitud
-				+ ", idUsuarioCreadorExpediente=" + idUsuarioCreadorExpediente 
-				+ ", idUsuarioDestinatario="+ idUsuarioDestinatario 
-				+ ", idUsuarioSolicitante=" + idUsuarioSolicitante 
+				+ ", idUsuarioCreadorExpediente=" + idUsuarioCreadorExpediente
+				+ ", idUsuarioDestinatario="+ idUsuarioDestinatario
+				+ ", idUsuarioSolicitante=" + idUsuarioSolicitante
 				+ ", idEstadoSolicitudCreacionExp=" + idEstadoSolicitudCreacionExp
 				+ ", nombreEstadoSolicitudCreacionExp=" + nombreEstadoSolicitudCreacionExp
-				+ ", idProceso=" + idProceso	
-				+ ", nombreSubProceso=" + nombreSubProceso				
-				+ ", asuntoMateria=" + asuntoMateria				
+				+ ", idProceso=" + idProceso
+				+ ", nombreSubProceso=" + nombreSubProceso
+				+ ", asuntoMateria=" + asuntoMateria
 				+ ", idAutor=" + idAutor
 				+ ", nombreExpediente=" + nombreExpediente
 				+ ", pagina=" + pagina
 				+ ", tamanoPagina=" + tamanoPagina
 				+ ", fechaAtencionS=" + fechaAtencionS
 				+ ", fechaSolicitudS=" + fechaSolicitudS
+				+ ", idCMSCarpeta=" + idCMSCarpeta
+				+ ", idCarpeta=" + idCarpeta
 				+ "]";
 	}
-	
+
 }

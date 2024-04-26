@@ -85,11 +85,13 @@ public class IndicadorServiceImpl implements IndicadorService {
 			
 			for (SubprocesoIndicadoresDTO subprocesoIndicadoresDTOInicio : listaSubprocesoIndicadoresDTOInicio) {
 				
+				//String expDuplicado = subprocesoIndicadoresDTOFin.getNombreExpediente();
+				
 				for (SubprocesoIndicadoresDTO subprocesoIndicadoresDTOFin : listaSubprocesoIndicadoresDTOFin) {
 					
 					if (subprocesoIndicadoresDTOInicio.getNombreExpediente().equals(subprocesoIndicadoresDTOFin.getNombreExpediente())){
 							
-
+						
 						
 						String fechaInicio = "";
 						String fechaFin = "";
@@ -219,6 +221,17 @@ public class IndicadorServiceImpl implements IndicadorService {
 						
 						subprocesoIndicadoresSalidaDTO.setMarcaDuracion(marcaDuracion);
 						
+						//MIG
+//						SubprocesoIndicadoresSalidaDTO subprocesoIndicadoresSalidaDTOAUX =   new  SubprocesoIndicadoresSalidaDTO();
+//						for (SubprocesoIndicadoresDTO subprocesoIndicadoresDTOFinAux : listaSubprocesoIndicadoresDTOFin) {
+//							if(subprocesoIndicadoresSalidaDTO.getNumeroExpediente().equalsIgnoreCase(subprocesoIndicadoresDTOFinAux.getNombreExpediente())){
+//								if(subprocesoIndicadoresSalidaDTO.getDuracionProgramadaProceso() >= subprocesoIndicadoresDTOFinAux.getDuracionEsperada() ) {
+//									//listaSubprocesoIndicadoresSalidaDTO.add(subprocesoIndicadoresSalidaDTO);
+//									subprocesoIndicadoresSalidaDTOAUX = subprocesoIndicadoresSalidaDTO;
+//								}
+//							}
+//						}
+					
 						listaSubprocesoIndicadoresSalidaDTO.add(subprocesoIndicadoresSalidaDTO);
 						
 						
@@ -230,15 +243,56 @@ public class IndicadorServiceImpl implements IndicadorService {
 
 			}
 			
+			log.info("listaSubprocesoIndicadoresSalidaDTO: "+listaSubprocesoIndicadoresSalidaDTO);
+			List<SubprocesoIndicadoresSalidaDTO> listaSubprocesoIndicadoresSalidaDTOReponse=new ArrayList<SubprocesoIndicadoresSalidaDTO>();
 			
+			if(!listaSubprocesoIndicadoresSalidaDTO.isEmpty() && listaSubprocesoIndicadoresSalidaDTO != null) {			
 			
+				List<SubprocesoIndicadoresSalidaDTO> listaSubprocesoIndicadoresSalidaDTOSalida=new ArrayList<SubprocesoIndicadoresSalidaDTO>();
+				
+				
+				for (SubprocesoIndicadoresSalidaDTO subprocesoIndicadoresSalidaDTOAUX : listaSubprocesoIndicadoresSalidaDTO) {
+					SubprocesoIndicadoresSalidaDTO subprocesoIndicadoresSalidaParaLista =   new  SubprocesoIndicadoresSalidaDTO();
+					subprocesoIndicadoresSalidaParaLista.setDuracion("-10000");
+					
+						if(!subprocesoIndicadoresSalidaDTOAUX.getDuracion().equalsIgnoreCase("No se puede definir")) {						
+						
+							for (SubprocesoIndicadoresSalidaDTO subprocesoIndicadoresSalidaDTOAUX2 : listaSubprocesoIndicadoresSalidaDTO) {	
+								if(!subprocesoIndicadoresSalidaDTOAUX2.getDuracion().equalsIgnoreCase("No se puede definir")) {
+									if(subprocesoIndicadoresSalidaDTOAUX.getNumeroExpediente().equalsIgnoreCase(subprocesoIndicadoresSalidaDTOAUX2.getNumeroExpediente())){
+										
+										if(Integer.parseInt(subprocesoIndicadoresSalidaDTOAUX.getDuracion()) >= Integer.parseInt(subprocesoIndicadoresSalidaDTOAUX2.getDuracion())
+												&& Integer.parseInt(subprocesoIndicadoresSalidaDTOAUX.getDuracion()) > Integer.parseInt(subprocesoIndicadoresSalidaParaLista.getDuracion())) {							
+											subprocesoIndicadoresSalidaParaLista = subprocesoIndicadoresSalidaDTOAUX;
+											
+										}else if (Integer.parseInt(subprocesoIndicadoresSalidaDTOAUX2.getDuracion()) > Integer.parseInt(subprocesoIndicadoresSalidaParaLista.getDuracion()) ){
+											subprocesoIndicadoresSalidaParaLista = subprocesoIndicadoresSalidaDTOAUX2;
+										}
+									}							
+								}
+							}
+						}else {
+							subprocesoIndicadoresSalidaParaLista = subprocesoIndicadoresSalidaDTOAUX;
+						}
+					listaSubprocesoIndicadoresSalidaDTOSalida.add(subprocesoIndicadoresSalidaParaLista);
+				}
+				
+				
+				
+				for(SubprocesoIndicadoresSalidaDTO list : listaSubprocesoIndicadoresSalidaDTOSalida) {
+					if ( !listaSubprocesoIndicadoresSalidaDTOReponse.contains(list)) {
+						listaSubprocesoIndicadoresSalidaDTOReponse.add(list);
+					}
+				}
+
+			}
 
 			salidaSubprocesoIndicadoresDTO.setTotal(total);
 			salidaSubprocesoIndicadoresDTO.setNumeroElementosDentroDelPlazo(numeroElementosDentroDelPlazo);
 			salidaSubprocesoIndicadoresDTO.setNumeroElementosfueraDelPlazo(numeroElementosfueraDelPlazo);
 			
 			
-			salidaSubprocesoIndicadoresDTO.setSubprocesoIndicadoresSalidaDTO(listaSubprocesoIndicadoresSalidaDTO);
+			salidaSubprocesoIndicadoresDTO.setSubprocesoIndicadoresSalidaDTO(listaSubprocesoIndicadoresSalidaDTOReponse);
 			salidaSubprocesoIndicadoresDTO.setRespuesta("OK");
 			return salidaSubprocesoIndicadoresDTO;
 		} catch (Exception e) {

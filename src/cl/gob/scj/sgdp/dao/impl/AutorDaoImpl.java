@@ -12,7 +12,7 @@ import cl.gob.scj.sgdp.dao.AutorDao;
 import cl.gob.scj.sgdp.model.Autor;
 
 @Repository
-public class AutorDaoImpl implements AutorDao {
+public class AutorDaoImpl extends GenericDaoImpl<Autor> implements AutorDao {
 
 	@Autowired
 	private SessionFactory sessionFactory;

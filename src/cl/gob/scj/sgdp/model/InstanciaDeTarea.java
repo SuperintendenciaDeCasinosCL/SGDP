@@ -329,7 +329,43 @@ import cl.gob.scj.sgdp.config.Constantes;
 	@NamedQuery(name="InstanciaDeTarea.getInstanciaDeTareaPorIdDiagramaTareaNombreExpediente",	
 	query="SELECT it FROM InstanciaDeTarea it "
 			+ "WHERE it.tarea.idDiagrama = :idDiagramaTarea "
-			+ "AND it.instanciaDeProceso.nombreExpediente = :nombreExpediente ")
+			+ "AND it.instanciaDeProceso.nombreExpediente = :nombreExpediente "),
+	
+	@NamedQuery(name="InstanciaDeTarea.getTotalInstanciasDeTareasEnEjecucion", 
+	query="SELECT count(i) from InstanciaDeTarea i, UsuarioAsignado u "
+			+ " where i.idInstanciaDeTarea = u.id.instanciaDeTarea.idInstanciaDeTarea "
+			+ " and i.estadoDeTarea.idEstadoDeTarea <>:idEstadoFinalizada "
+			+ " and u.id.idUsuario <>:idUsuario "
+			+ " and i in ("
+			+ " select h.instanciaDeTareaDeDestino from HistoricoDeInstDeTarea h  "
+			+ " where h.idUsuarioOrigen =:idUsuario "
+			+ " ) "),
+			
+	@NamedQuery(name="InstanciaDeTarea.getInstanciaDeTareaPorIdInstanciaDeProcesoNombreTarea", 
+	query="SELECT i FROM InstanciaDeTarea i "
+			+ "WHERE i.instanciaDeProceso.idInstanciaDeProceso =:idInstanciaDeProceso "
+			+ "AND upper(replace(i.tarea.nombreTarea, ' ', '')) = upper(replace(:nombreTarea, ' ', '')) "
+			+ "AND i.fechaFinalizacion is not null "
+			+ "AND TO_CHAR(i.fechaFinalizacion, 'DD/MM/YYYY HH:MI:SS MS') = "
+			+ "( "
+			+ " SELECT MIN(TO_CHAR(i2.fechaFinalizacion, 'DD/MM/YYYY HH:MI:SS MS')) FROM InstanciaDeTarea i2 "
+			+ " WHERE i2.instanciaDeProceso.idInstanciaDeProceso =:idInstanciaDeProceso "
+			+ " AND upper(replace(i2.tarea.nombreTarea, ' ', '')) = upper(replace(:nombreTarea, ' ', '')) "
+			+ " AND i2.fechaFinalizacion is not null "			
+			+ ") "),			
+	
+	@NamedQuery(name="InstanciaDeTarea.getInstanciaDeTareaDistribuyePorIdInstanciaDeProceso", 
+	query="SELECT i FROM InstanciaDeTarea i "
+			+ "WHERE i.instanciaDeProceso.idInstanciaDeProceso =:idInstanciaDeProceso "			
+			+ "AND i.tarea.distribuye = true "
+			+ "AND i.fechaFinalizacion is not null "
+			+ "AND TO_CHAR(i.fechaFinalizacion, 'DD/MM/YYYY HH:MI:SS MS') = "
+			+ "( "
+			+ " SELECT MIN(TO_CHAR(i2.fechaFinalizacion, 'DD/MM/YYYY HH:MI:SS MS')) FROM InstanciaDeTarea i2 "
+			+ " WHERE i2.instanciaDeProceso.idInstanciaDeProceso =:idInstanciaDeProceso "
+			+ " AND i.fechaFinalizacion is not null "
+			+ " AND i.tarea.distribuye = true "
+			+ ") ")	
 	
 })
 public class InstanciaDeTarea implements Serializable {

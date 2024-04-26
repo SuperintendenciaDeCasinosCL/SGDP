@@ -100,9 +100,8 @@ public class BandejaDeEntradaServiceImpl implements BandejaDeEntradaService {
 			InstanciaDeTareaDTO instanciaDeTareaDTO = new InstanciaDeTareaDTO();
 			instanciaDeTareaDTO.cargaInstanciaDeTareaDTO(instanciaDeTarea);
 			instanciaDeTareaDTO.cargaUsuariosAsignadosString(configProps.getProperty("caracterSeparadorDeUsuarios"));
-			instanciaDeTareaDTO.cargaAdvertenciaDePlazo(
-					parametroService.getParametroPorID(Constantes.ID_PARAM_PORCENTAJE_ADVERTENCIA_TAREA).getValorParametroNumerico(),
-					instanciaDeTarea.getTarea().getDiasHabilesMaxDuracion());
+			instanciaDeTareaDTO.cargaAdvertenciaDePlazo(parametroService.getParametroPorID(Constantes.ID_PARAM_PORCENTAJE_ADVERTENCIA_TAREA).getValorParametroNumerico());
+			//instanciaDeTareaDTO.cargaAdvertenciaPlazoProceso(parametroService.getParametroPorID(Constantes.ID_PARAM_PORCENTAJE_ADVERTENCIA_TAREA).getValorParametroNumerico());
 			//log.debug(instanciaDeTarea.toString());
 			//log.debug(instanciaDeTareaDTO.toString());
 			instanciasDeTareasDTO.add(instanciaDeTareaDTO);			
@@ -198,8 +197,7 @@ public class BandejaDeEntradaServiceImpl implements BandejaDeEntradaService {
 			instanciaDeTareaDTO.cargaInstanciaDeTareaDTO(instanciaDeTarea);
 			instanciaDeTareaDTO.cargaUsuariosAsignadosString(configProps.getProperty("caracterSeparadorDeUsuarios"));
 			instanciaDeTareaDTO.cargaAdvertenciaDePlazo(
-			parametroService.getParametroPorID(Constantes.ID_PARAM_PORCENTAJE_ADVERTENCIA_TAREA).getValorParametroNumerico(),
-			instanciaDeTarea.getTarea().getDiasHabilesMaxDuracion());
+			parametroService.getParametroPorID(Constantes.ID_PARAM_PORCENTAJE_ADVERTENCIA_TAREA).getValorParametroNumerico()/*,	instanciaDeTarea.getTarea().getDiasHabilesMaxDuracion()*/);
 			log.debug(instanciaDeTarea.toString());
 			log.debug(instanciaDeTareaDTO.toString());
 			instanciasDeTareasDTOEnEjecucion.add(instanciaDeTareaDTO);			
@@ -219,8 +217,8 @@ public class BandejaDeEntradaServiceImpl implements BandejaDeEntradaService {
 			instanciaDeTareaDTO.cargaInstanciaDeTareaDTO(instanciaDeTarea);
 			instanciaDeTareaDTO.cargaUsuariosAsignadosString(configProps.getProperty("caracterSeparadorDeUsuarios"));			
 			instanciaDeTareaDTO.cargaAdvertenciaDePlazo(
-					parametroService.getParametroPorID(Constantes.ID_PARAM_PORCENTAJE_ADVERTENCIA_TAREA).getValorParametroNumerico(),
-					instanciaDeTarea.getTarea().getDiasHabilesMaxDuracion());		
+					parametroService.getParametroPorID(Constantes.ID_PARAM_PORCENTAJE_ADVERTENCIA_TAREA).getValorParametroNumerico()/*,
+					instanciaDeTarea.getTarea().getDiasHabilesMaxDuracion()*/);		
 			instanciasDeTareasDTOEnEjecucion.add(instanciaDeTareaDTO);			
 		}
 		
@@ -241,8 +239,8 @@ public class BandejaDeEntradaServiceImpl implements BandejaDeEntradaService {
 			instanciaDeTareaDTO.cargaInstanciaDeTareaDTO(instanciaDeTarea);
 			instanciaDeTareaDTO.cargaUsuariosAsignadosString(configProps.getProperty("caracterSeparadorDeUsuarios"));
 			instanciaDeTareaDTO.cargaAdvertenciaDePlazo(
-					parametroService.getParametroPorID(Constantes.ID_PARAM_PORCENTAJE_ADVERTENCIA_TAREA).getValorParametroNumerico(),
-					instanciaDeTarea.getTarea().getDiasHabilesMaxDuracion());		
+					parametroService.getParametroPorID(Constantes.ID_PARAM_PORCENTAJE_ADVERTENCIA_TAREA).getValorParametroNumerico()/*,
+					instanciaDeTarea.getTarea().getDiasHabilesMaxDuracion()*/);		
 			instanciasDeTareasDTOEnEjecucion.add(instanciaDeTareaDTO);			
 		}
 		
@@ -262,8 +260,8 @@ public class BandejaDeEntradaServiceImpl implements BandejaDeEntradaService {
 			instanciaDeTareaDTO.cargaInstanciaDeTareaDTO(instanciaDeTarea);
 			instanciaDeTareaDTO.cargaUsuariosAsignadosString(configProps.getProperty("caracterSeparadorDeUsuarios"));
 			instanciaDeTareaDTO.cargaAdvertenciaDePlazo(
-					parametroService.getParametroPorID(Constantes.ID_PARAM_PORCENTAJE_ADVERTENCIA_TAREA).getValorParametroNumerico(),
-					instanciaDeTarea.getTarea().getDiasHabilesMaxDuracion());		
+					parametroService.getParametroPorID(Constantes.ID_PARAM_PORCENTAJE_ADVERTENCIA_TAREA).getValorParametroNumerico()/*,
+					instanciaDeTarea.getTarea().getDiasHabilesMaxDuracion()*/);		
 			instanciasDeTareasDTOEnEjecucion.add(instanciaDeTareaDTO);			
 		}		
 		return instanciasDeTareasDTOEnEjecucion;		
@@ -280,8 +278,8 @@ public class BandejaDeEntradaServiceImpl implements BandejaDeEntradaService {
 				instanciaDeTareaDTO.cargaInstanciaDeTareaDTO(instanciaDeTarea);
 				instanciaDeTareaDTO.cargaUsuariosAsignadosString(configProps.getProperty("caracterSeparadorDeUsuarios"));
 				instanciaDeTareaDTO.cargaAdvertenciaDePlazo(
-						parametroService.getParametroPorID(Constantes.ID_PARAM_PORCENTAJE_ADVERTENCIA_TAREA).getValorParametroNumerico(),
-						instanciaDeTarea.getTarea().getDiasHabilesMaxDuracion());		
+						parametroService.getParametroPorID(Constantes.ID_PARAM_PORCENTAJE_ADVERTENCIA_TAREA).getValorParametroNumerico()/*,
+						instanciaDeTarea.getTarea().getDiasHabilesMaxDuracion()*/);		
 				instanciasDeTareasDTOEnEjecucion.add(instanciaDeTareaDTO);			
 			}	
 		}
@@ -341,8 +339,10 @@ public class BandejaDeEntradaServiceImpl implements BandejaDeEntradaService {
 			instanciaDeTareaDTO.cargaInstanciaDeTareaDTO(instanciaDeTarea);
 			instanciaDeTareaDTO.setNombreEstadoHomologadoDeInstProceso(estadoInstaProcMap.get(instanciaDeTarea.getIdInstanciaDeTarea()));
 			instanciaDeTareaDTO.cargaUsuariosAsignadosString(configProps.getProperty("caracterSeparadorDeUsuarios"));
-			instanciaDeTareaDTO.cargaAdvertenciaDePlazo(parametroService.getParametroPorID(Constantes.ID_PARAM_PORCENTAJE_ADVERTENCIA_TAREA).getValorParametroNumerico(),
-							instanciaDeTarea.getTarea().getDiasHabilesMaxDuracion());		
+			instanciaDeTareaDTO.cargaAdvertenciaDePlazo(parametroService.getParametroPorID(Constantes.ID_PARAM_PORCENTAJE_ADVERTENCIA_TAREA).getValorParametroNumerico(/*,
+							instanciaDeTarea.getTarea().getDiasHabilesMaxDuracion(*/));
+			instanciaDeTareaDTO.cargaAdvertenciaPlazoProceso(parametroService.getParametroPorID(Constantes.ID_PARAM_PORCENTAJE_ADVERTENCIA_TAREA).getValorParametroNumerico(/*,
+					instanciaDeTarea.getTarea().getDiasHabilesMaxDuracion(*/));
 			/*List<ParametroRelacionTarea> parametrosRelacionTarea = parametroRelacionTareaDao.getParamTareaPorIdProc(instanciaDeTareaDTO.getIdProceso());
 			if (parametrosRelacionTarea!=null && parametrosRelacionTarea.size()>0) {
 				instanciaDeTareaDTO.setProcesoTieneRdsSnc(true);

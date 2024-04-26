@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import cl.gob.scj.sgdp.dto.TareaYTipoDeDocumentoDTO;
 import cl.gob.scj.sgdp.dto.TipoDeDocumentoDTO;
 import cl.gob.scj.sgdp.model.TipoDeDocumento;
 
@@ -27,4 +28,6 @@ public interface TipoDeDocumentoService {
 	List<TipoDeDocumentoDTO> getTiposDeDocumentosPorNombreExpediente(String nombreExpediente);
 	
 	List<TipoDeDocumentoDTO> getTiposDeDocumentosPorIdExpediente(String idExpediente);
+
+	List<TareaYTipoDeDocumentoDTO> getTiposDeDocumentosPorIdProceso(Long idProceso);
 }

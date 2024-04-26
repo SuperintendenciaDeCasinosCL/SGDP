@@ -1,8 +1,8 @@
 package cl.gob.scj.sgdp.model;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -24,24 +25,40 @@ import cl.gob.scj.sgdp.config.Constantes;
 
 /**
  * The persistent class for the "SGDP_SOLICITUD_CREACION_EXP" database table.
- * 
+ *
  */
 @Entity
 @Table(name="\"SGDP_SOLICITUD_CREACION_EXP\"")
 @NamedQueries({
-	@NamedQuery(name="SolicitudCreacionExp.findAll", query="SELECT s FROM SolicitudCreacionExp s"),
-	@NamedQuery(name="SolicitudCreacionExp.getSolicitudesCreaExpSolicitadasPorOAsignadasA", 
-	query="SELECT s FROM SolicitudCreacionExp s "
-			+ "WHERE ( (s.idUsuarioSolicitante = :idUsuarioSolicitante OR s.idUsuarioCreadorExpediente = :idUsuarioCreadorExpediente) "
-			+ "AND s.estadoSolicitudCreacionExp.idEstadoSolicitudCreacionExp = :idEstadoSolicitudCreacionExp ) OR ( s.estadoSolicitudCreacionExp.idEstadoSolicitudCreacionExp = 5 ) "),
-	@NamedQuery(name="SolicitudCreacionExp.getSolicitudesCreaExpFinalizadas", 
-	query="SELECT s FROM SolicitudCreacionExp s "
-			+ "WHERE ( (s.idUsuarioSolicitante = :idUsuarioSolicitante OR s.idUsuarioCreadorExpediente = :idUsuarioCreadorExpediente) "
-			+ "AND s.estadoSolicitudCreacionExp.idEstadoSolicitudCreacionExp in (3, 4) ) ORDER BY s.idSolicitudCreacionExp desc "),	
-	@NamedQuery(name="SolicitudCreacionExp.getTotalSolicitudesCreaExpFinalizadas", 
-	query="SELECT count(*) FROM SolicitudCreacionExp s "
-			+ "WHERE ( (s.idUsuarioSolicitante = :idUsuarioSolicitante OR s.idUsuarioCreadorExpediente = :idUsuarioCreadorExpediente) "
-			+ "AND s.estadoSolicitudCreacionExp.idEstadoSolicitudCreacionExp in (3, 4) )  ")	
+		@NamedQuery(name="SolicitudCreacionExp.findAll", query="SELECT s FROM SolicitudCreacionExp s"),
+
+		@NamedQuery(name="SolicitudCreacionExp.getSolicitudesCreaExpSolicitadasPorOAsignadasA",
+				query="SELECT s FROM SolicitudCreacionExp s "
+						+ "WHERE ( (s.idUsuarioSolicitante = :idUsuarioSolicitante OR s.idUsuarioCreadorExpediente = :idUsuarioCreadorExpediente) "
+						+ "AND s.estadoSolicitudCreacionExp.idEstadoSolicitudCreacionExp = :idEstadoSolicitudCreacionExp ) "
+						+ "OR ( s.estadoSolicitudCreacionExp.idEstadoSolicitudCreacionExp = 5 ) "),
+
+		@NamedQuery(name="SolicitudCreacionExp.getSolicitudesCreaExpFinalizadas",
+				query="SELECT s FROM SolicitudCreacionExp s "
+						+ "WHERE ( (s.idUsuarioSolicitante = :idUsuarioSolicitante OR s.idUsuarioCreadorExpediente = :idUsuarioCreadorExpediente) "
+						+ "AND s.estadoSolicitudCreacionExp.idEstadoSolicitudCreacionExp in (3, 4) ) ORDER BY s.idSolicitudCreacionExp desc "),
+
+		@NamedQuery(name="SolicitudCreacionExp.getTotalSolicitudesCreaExpFinalizadas",
+				query="SELECT count(*) FROM SolicitudCreacionExp s "
+						+ "WHERE ( (s.idUsuarioSolicitante = :idUsuarioSolicitante OR s.idUsuarioCreadorExpediente = :idUsuarioCreadorExpediente) "
+						+ "AND s.estadoSolicitudCreacionExp.idEstadoSolicitudCreacionExp in (3, 4) )  "),
+
+		@NamedQuery(name="SolicitudCreacionExp.getSolicitudesCreaExpSolicitadasPorOAsignadasAMultiOficina",
+				query="SELECT s FROM SolicitudCreacionExp s "
+						+ "WHERE ( (s.idUsuarioSolicitante = :idUsuarioSolicitante OR s.idUsuarioCreadorExpediente = :idUsuarioCreadorExpediente) "
+						+ "AND s.estadoSolicitudCreacionExp.idEstadoSolicitudCreacionExp = :idEstadoSolicitudCreacionExp ) "
+						+ "OR ( s.estadoSolicitudCreacionExp.idEstadoSolicitudCreacionExp = 5 AND s.unidadOperativa.idUnidadOperativa is null ) "
+						+ "OR ( s.estadoSolicitudCreacionExp.idEstadoSolicitudCreacionExp = 5 AND s.unidadOperativa.idUnidadOperativa <> null "
+						+ "		AND s.unidadOperativa.idUnidadOperativa in ( SELECT uo.idUnidadOperativa "
+						+ "														FROM UsuarioRol ur, Unidad u, UnidadOperativa uo  "
+						+ "														WHERE ur.unidad.idUnidad = u.idUnidad "
+						+ "														AND u.unidadOperativa.idUnidadOperativa = uo.idUnidadOperativa "
+						+ "														AND ur.idUsuario = :idUsuario ) )")
 })
 public class SolicitudCreacionExp implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -74,29 +91,65 @@ public class SolicitudCreacionExp implements Serializable {
 
 	//bi-directional many-to-one association to EstadoSolicitudCreacionExp
 	@ManyToOne
-	@JoinColumn(name="\"ID_ESTADO_SOLICITUD_CREACION_EXP\"")	
+	@JoinColumn(name="\"ID_ESTADO_SOLICITUD_CREACION_EXP\"")
 	private EstadoSolicitudCreacionExp estadoSolicitudCreacionExp;
 
 	//bi-directional one-to-one association to InstanciasDeProceso
 	@OneToOne
-	@JoinColumn(name="\"ID_INSTANCIA_DE_PROCESO\"")	
+	@JoinColumn(name="\"ID_INSTANCIA_DE_PROCESO\"")
 	private InstanciaDeProceso instanciaDeProceso;
 
 	//bi-directional many-to-one association to Proceso
 	@ManyToOne
-	@JoinColumn(name="\"ID_PROCESO\"")	
+	@JoinColumn(name="\"ID_PROCESO\"")
 	private Proceso proceso;
-	
+
 	//bi-directional many-to-one association to Autor
 	@ManyToOne
 	@JoinColumn(name="\"ID_AUTOR\"")
-	private Autor autor;	
-	
+	private Autor autor;
+
 	@Column(name="\"A_ASUNTO_MATERIA\"")
 	private String asuntoMateria;
 
+	@Column(name="\"ID_CMS_CARPETA\"")
+	private String idCMSCarpeta;
+
+	@Column(name="\"ID_CARPETA\"")
+	private Long idCarpeta;
+
+	//bi-directional many-to-one association to ArchivosSolCreaExp
+	@OneToMany(mappedBy="solicitudCreacionExp")
+	private List<ArchivosSolCreaExp> archivosSolCreaExps;
+
+	//bi-directional one-to-one association to UnidadOperativa
+	@ManyToOne
+	@JoinColumn(name="\"ID_UNIDAD_OPERATIVA\"")
+	private UnidadOperativa unidadOperativa;
+
+	//bi-directional many-to-one association to LogDocumento
+	@OneToMany(mappedBy="solicitudCreacionExp")
+	private List<LogDocumento> logDocumentos;
+
 	public SolicitudCreacionExp() {
 	}
+
+
+	public List<ArchivosSolCreaExp> getArchivosSolCreaExps() {
+		return this.archivosSolCreaExps;
+	}
+
+	public void setArchivosSolCreaExps(List<ArchivosSolCreaExp> archivosSolCreaExps) {
+		this.archivosSolCreaExps = archivosSolCreaExps;
+	}
+
+	public ArchivosSolCreaExp addArchivosSolCreaExp(ArchivosSolCreaExp archivosSolCreaExp) {
+
+		getArchivosSolCreaExps().add(archivosSolCreaExp);
+		archivosSolCreaExp.setSolicitudCreacionExp(this);
+		return archivosSolCreaExp;
+	}
+
 
 	public Long getIdSolicitudCreacionExp() {
 		return this.idSolicitudCreacionExp;
@@ -177,7 +230,7 @@ public class SolicitudCreacionExp implements Serializable {
 	public void setProceso(Proceso proceso) {
 		this.proceso = proceso;
 	}
-	
+
 	public Autor getAutor() {
 		return autor;
 	}
@@ -193,5 +246,43 @@ public class SolicitudCreacionExp implements Serializable {
 	public void setAsuntoMateria(String asuntoMateria) {
 		this.asuntoMateria = asuntoMateria;
 	}
-	
+
+	public UnidadOperativa getUnidadOperativa() {
+		return unidadOperativa;
+	}
+
+	public void setUnidadOperativa(UnidadOperativa unidadOperativa) {
+		this.unidadOperativa = unidadOperativa;
+	}
+
+
+	public String getIdCMSCarpeta() {
+		return idCMSCarpeta;
+	}
+
+
+	public void setIdCMSCarpeta(String idCMSCarpeta) {
+		this.idCMSCarpeta = idCMSCarpeta;
+	}
+
+
+	public Long getIdCarpeta() {
+		return idCarpeta;
+	}
+
+
+	public void setIdCarpeta(Long idCarpeta) {
+		this.idCarpeta = idCarpeta;
+	}
+
+
+	public List<LogDocumento> getLogDocumentos() {
+		return logDocumentos;
+	}
+
+
+	public void setLogDocumentos(List<LogDocumento> logDocumentos) {
+		this.logDocumentos = logDocumentos;
+	}
+
 }

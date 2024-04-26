@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-//import org.keycloak.KeycloakSecurityContext;
+import org.keycloak.KeycloakSecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -40,6 +40,8 @@ public class UserDataHandlerInterceptor extends HandlerInterceptorAdapter {
 			throws Exception {
 		
 		log.debug("preHandle");
+		
+		//KeyCloack Inicio
 
 		Usuario usuario = (Usuario)request.getSession().getAttribute("usuario");
 	
@@ -50,15 +52,15 @@ public class UserDataHandlerInterceptor extends HandlerInterceptorAdapter {
         
         if(!usuario.isEstaAutenticado()) {
         	
-        	//KeycloakSecurityContext context = (KeycloakSecurityContext) request.getSession().getAttribute(KeycloakSecurityContext.class.getName());
+        	KeycloakSecurityContext context = (KeycloakSecurityContext) request.getSession().getAttribute(KeycloakSecurityContext.class.getName());
         	
-        	//String idUsuario = context.getToken().getPreferredUsername();
+        	String idUsuario = context.getToken().getPreferredUsername();
         	
-        	//usuario.setIdUsuario(idUsuario);
+        	usuario.setIdUsuario(idUsuario);
     				
-    		//List<UsuarioRol> usuarioRoles = usuarioRolService.getUsuarioRolesPorIdUsuario(idUsuario);		
+    		List<UsuarioRol> usuarioRoles = usuarioRolService.getUsuarioRolesPorIdUsuario(idUsuario);		
     		
-    		//cargaUsuario(request, usuarioRoles, usuario);
+    		cargaUsuario(request, usuarioRoles, usuario);
     		 
     		cargarTags(request);
     		
@@ -67,11 +69,14 @@ public class UserDataHandlerInterceptor extends HandlerInterceptorAdapter {
     		usuario.setEstaAutenticado(true);
         	
         }
+		
+		//KeyCloack Fin
 
 		return super.preHandle(request, response, handler);
 		
 	}
 	
+	//KeyCloack Inicio
 	private void cargaUsuario(HttpServletRequest request, List<UsuarioRol> usuarioRoles, Usuario usuario) throws SgdpException {		
 		
 		String alfTicket;
@@ -120,6 +125,8 @@ public class UserDataHandlerInterceptor extends HandlerInterceptorAdapter {
 		request.getSession().setAttribute("todosLosTags", todosLosTags);
 		
 	}
+	
+	//KeyCloack Fin
 	
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView)	{

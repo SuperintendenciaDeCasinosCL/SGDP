@@ -5,12 +5,14 @@
 
 <%@ page import="cl.gob.scj.sgdp.tipos.NombreObjetoEnBusquedaType"%>
 <%@ page import= "cl.gob.scj.sgdp.config.Constantes" %>
-<%@ page import= "cl.gob.scj.sgdp.tipos.PermisoType" %>  
+<%@ page import= "cl.gob.scj.sgdp.tipos.PermisoType" %>
+<%@ page import= "cl.gob.scj.sgdp.tipos.ModuloType" %>  
 
 <c:url value="http://${urlFuncPhp}/proceso/bpm/notificar.php?idproc=" var="urlNotificarInstanciaDeProcesoDesdeBusqueda" />
 
 <c:set var="nombreTipoDocumento" value="<%=NombreObjetoEnBusquedaType.DOCUMENTO.getNombreNombreObjetoEnBusquedaType()%>" />
 <c:set var="nombreTipoExpediente" value="<%=NombreObjetoEnBusquedaType.EXPEDIENTE.getNombreNombreObjetoEnBusquedaType()%>" />
+<c:set var="permisoIngresarComplejidad" value="<%=PermisoType.PUEDE_INGRESAR_COMPLEJIDAD.getNombrePermiso()%>"/>
 <c:set var="tipoDocumentoOficial" value="OFICIALES" />
 
 <c:set var="FORMATO_FECHA_FORM_HH_MM" value="<%=Constantes.FORMATO_FECHA_FORM_HH_MM%>" />
@@ -398,7 +400,7 @@
 							<th>Fecha Inicio</th>
 							<th>Fecha Fin</th>
 							<th>Estado</th>
-							
+							<th>Complejidad</th>
 							<th></th>
 						</tr>
 					</thead>
@@ -433,9 +435,10 @@
 										<c:when
 											test="${elementoResultadoBusquedaDTO.tipoObjeto == nombreTipoDocumento}">
 											<a href='#'
-												onclick='descargaArchivo("<c:url value='getArchivoPorId/${elementoResultadoBusquedaDTO.idObjeto}'/>")'>
+												onclick='descargaArchivo("<c:url value='getArchivoPorId/${elementoResultadoBusquedaDTO.idObjeto}'/>"
+												, "<%=ModuloType.RESULTADO_DE_BUSQUEDA.getNombreModulo()%>" )'>
 													${elementoResultadoBusquedaDTO.nombreDeObjeto}
-												</a>								
+												</a>									
 										</c:when>
 										<c:otherwise>
 					    					${elementoResultadoBusquedaDTO.nombreDeObjeto}
@@ -503,6 +506,7 @@
 								
 								
 								<td>${elementoResultadoBusquedaDTO.nombreEstadoDeProceso}</td>
+								<td>${elementoResultadoBusquedaDTO.complejidad}</td>
 								
 								<td><c:choose>
 										<c:when test="${elementoResultadoBusquedaDTO.tipoObjeto == nombreTipoDocumento}">
@@ -639,7 +643,20 @@
 														RDS/SNC
 										        	</a>
 												</p>
-											</div>									      	
+											</div>		
+											
+						      				<c:if test = "${permisos[permisoIngresarComplejidad] eq permisoIngresarComplejidad}"> 
+											
+												<div>
+													<p>
+														<a href="#" class="btn btn-primary btn-sm boton-cerrar-expediente" title="Complejidad"		
+															onclick="cargarModalComplejidad('${elementoResultadoBusquedaDTO.nombreDeObjeto}', true)">
+															<span class="glyphicon glyphicon-equalizer"></span>
+											        	</a>
+													</p>
+												</div>	
+											
+											</c:if>	
 																						
 										</c:when>
 									</c:choose></td>
@@ -686,21 +703,36 @@
 	<script>
 
 	  function buscarDiagramaSubproceso(idExpediente){
-
-   		var contextPath = "${pageContext.request.contextPath}"
-
-   			$('#infoDeProcesoModal2').modal('show');   
-   			
- 			$("#informacionDelProcesoDiv2").css("position",
- 				"relative").css("min-height", "200px").prepend(
- 			$("<div />").addClass("cargando"));
- 			
- 			$("#informacionDelProcesoDiv2").load(
- 					contextPath + "/diagramaProceso2/"+idExpediente ,
- 					function() {
- 						$("#informacionDelProcesoDiv2").find(
- 								".cargando").remove();
- 	 				});
+		  
+		  var contextPath = "${pageContext.request.contextPath}";
+		  
+		  $.get("${sessionURL}", function(haySession){ 
+			  
+			  if(haySession) {
+				  
+				  $('#infoDeProcesoModal2').modal('show');   
+		   			
+		 			$("#informacionDelProcesoDiv2").css("position",
+		 				"relative").css("min-height", "200px").prepend(
+		 			$("<div />").addClass("cargando"));
+		 			
+		 			$("#informacionDelProcesoDiv2").load(
+		 					contextPath + "/diagramaProceso2/"+idExpediente ,
+		 					function() {
+		 						$("#informacionDelProcesoDiv2").find(
+		 								".cargando").remove();
+		 	 				});
+		          
+		        } else {
+		              bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acción y hemos caducado tu sesión por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+		                            , function(){
+		                                  window.open('${raizURL}', '_self');
+		                            }
+		               );
+		        }
+			  
+			  
+		  });
 				
  		       	
 	  }
@@ -1345,7 +1377,7 @@ function notificarInstanciaDeProcesoDesdeBusqqueda(nombreExpediente) {
         } else {
               bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acción y hemos caducado tu sesión por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
                             , function(){
-                                  window.open('${raizURL}', '_blank');
+                                  window.open('${raizURL}', '_self');
                             }
                );
         }
@@ -1584,7 +1616,7 @@ function busquedaInformacionConListaDeFiltro(listaSubproceso,listaMateria,listaA
 			} else {
 				  bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acción y hemos caducado tu sesión por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
 								, function(){
-									  window.open('${raizURL}', '_blank');
+									  window.open('${raizURL}', '_self');
 								}
 				   );
 			}

@@ -2,6 +2,8 @@ package cl.gob.scj.sgdp.control;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -30,11 +32,17 @@ import cl.gob.scj.sgdp.auth.user.Usuario;
 import cl.gob.scj.sgdp.config.Constantes;
 import cl.gob.scj.sgdp.dto.BuscarDTO;
 import cl.gob.scj.sgdp.dto.CargaFacetDTO;
+import cl.gob.scj.sgdp.dto.ConfidencialidadDocumentoDTO;
+import cl.gob.scj.sgdp.dto.ConfidencialidadDocumentoRolDTO;
+import cl.gob.scj.sgdp.dto.ConfidencialidadDocumentoUsuarioDTO;
+import cl.gob.scj.sgdp.dto.ElementoResultadoBusquedaDTO;
 import cl.gob.scj.sgdp.dto.MensajeVistaDTO;
 import cl.gob.scj.sgdp.dto.ParametroPorContextoDTO;
 import cl.gob.scj.sgdp.dto.ResultadoBusquedaDTO;
+import cl.gob.scj.sgdp.dto.RolDTO;
 import cl.gob.scj.sgdp.exception.SgdpException;
 import cl.gob.scj.sgdp.service.BusquedaService;
+import cl.gob.scj.sgdp.service.ConfidencialidadDocumentoService;
 import cl.gob.scj.sgdp.service.InstanciaDeProcesoService;
 import cl.gob.scj.sgdp.service.ParametroPorContextoService;
 import cl.gob.scj.sgdp.service.ParametroService;
@@ -61,6 +69,9 @@ public class BuscadorControl {
 
 	@Autowired
 	private InstanciaDeProcesoService instanciaDeProcesoService;
+	
+	@Autowired
+	private ConfidencialidadDocumentoService confidencialidadService;
 	
 	private PermisoType permisoNoFiltraPorConfidencialidadType = PermisoType.NO_FILTRA_POR_CONFIDENCIALIDAD;
 	
@@ -164,7 +175,6 @@ public class BuscadorControl {
 			///--------------------------------------------------------------------------------------////
 			// ----- Se tiene que comentar esto para volver al paginado
 			
-			ResultadoBusquedaDTO resultadoBusquedaDTO = new ResultadoBusquedaDTO();
             // Buscar informacion datatable
 			DataTableRequestDTO dataTableInput = new DataTableRequestDTO();
 	
@@ -172,7 +182,7 @@ public class BuscadorControl {
 			
 			buscarDTO.setFlagExportaExcel("SI");	
 			buscarDTO.setFlagTipoBusqueda("1"); // Servicios busqueda general
-			resultadoBusquedaDTO = busquedaService.buscarRegistrosPaginados(dataTableInput, buscarDTO, usuario);
+			ResultadoBusquedaDTO resultadoBusquedaDTO = busquedaService.buscarRegistrosPaginados(dataTableInput, buscarDTO, usuario);
 			instanciaDeProcesoService.buscaInstanciaDeProcesoDTOPorIdExpediente(resultadoBusquedaDTO);
 			
 			// Carga los datos del face en los datos cargados en memoria
@@ -182,6 +192,54 @@ public class BuscadorControl {
 			//busquedaService.cargaFacet(resultadoBusquedaDTO, cargaFacetDTO, usuario);
 
 			log.debug(resultadoBusquedaDTO.toString());
+			
+			List<ElementoResultadoBusquedaDTO> newList = new ArrayList<ElementoResultadoBusquedaDTO>();
+			List<String> ids = new ArrayList<>();
+			
+			for (ElementoResultadoBusquedaDTO elementoResultadoBusquedaDTO : resultadoBusquedaDTO.getElementosResultadoBusquedaDTO()) {	
+				ids.add(elementoResultadoBusquedaDTO.getIdObjeto());
+			}
+			
+			List<ConfidencialidadDocumentoDTO> confs = confidencialidadService.getByIdTipoDocumento(ids);
+			ids = new ArrayList<>();
+			
+			for (ConfidencialidadDocumentoDTO conf : confs) {
+				log.info("***********************************INICIO********************************************************");
+				List<String> roles = new ArrayList<>();
+							
+				for(ConfidencialidadDocumentoRolDTO cdr : conf.getRolesAsignados()) {
+					roles.add(cdr.getId() + "");
+				}
+				
+				boolean enRol = false;
+				for(RolDTO r: usuario.getTodosLosRoles()) {
+					enRol = roles.contains(r.getIdRol() + "");
+					if(enRol) {
+						break;
+					}
+				}
+				
+				boolean porUsuario = conf.getUsuariosAsignados().size() == 0 || conf.getUsuariosAsignados().contains(usuario.getIdUsuario());
+				boolean porRol = conf.getRolesAsignados().size() == 0 || enRol;
+				
+				log.info("por usuario " + porUsuario);
+				log.info("por rol " + porRol);
+				
+				if(porRol && porUsuario) {
+					ids.add(conf.getId());
+				}
+				
+				log.info("***********************************FIN********************************************************");
+			}
+			
+			for (ElementoResultadoBusquedaDTO elementoResultadoBusquedaDTO : resultadoBusquedaDTO.getElementosResultadoBusquedaDTO()) {	
+				if(ids.contains(elementoResultadoBusquedaDTO.getIdObjeto())) {
+					newList.add(elementoResultadoBusquedaDTO);
+				}
+			}
+			
+			resultadoBusquedaDTO.setElementosResultadoBusquedaDTO(newList);
+			
 			model.addAttribute("permisos", usuario.getPermisos());
 			model.addAttribute("resultadoBusquedaDTO", resultadoBusquedaDTO);
 			// /////////////////////////////////////////////////////////////////////////////////////////

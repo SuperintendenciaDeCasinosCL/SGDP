@@ -27,6 +27,7 @@ import cl.gob.scj.sgdp.dto.ArchivosInstDeTareaDTO;
 import cl.gob.scj.sgdp.dto.AutorDTO;
 import cl.gob.scj.sgdp.dto.DetalleDeArchivoDTO;
 import cl.gob.scj.sgdp.dto.InstanciaDeTareaDTO;
+import cl.gob.scj.sgdp.dto.LogDocumentoDTO;
 import cl.gob.scj.sgdp.dto.ParametroDTO;
 import cl.gob.scj.sgdp.dto.ParametroPorContextoDTO;
 import cl.gob.scj.sgdp.dto.RespuestaActualizaMetadataDeDocumento;
@@ -34,15 +35,20 @@ import cl.gob.scj.sgdp.dto.TipoDeDocumentoDTO;
 import cl.gob.scj.sgdp.exception.SgdpException;
 import cl.gob.scj.sgdp.service.ArchivosInstDeTareaService;
 import cl.gob.scj.sgdp.service.BandejaDeEntradaService;
+import cl.gob.scj.sgdp.service.ConfidencialidadDocumentoService;
 import cl.gob.scj.sgdp.service.GestorDeDocumentosService;
 import cl.gob.scj.sgdp.service.GestorMetadataService;
 import cl.gob.scj.sgdp.service.HistoricoFirmaService;
 import cl.gob.scj.sgdp.service.InstanciaDeTareaService;
+import cl.gob.scj.sgdp.service.LogDocumentoService;
 import cl.gob.scj.sgdp.service.ObtenerArchivosExpedienteService;
 import cl.gob.scj.sgdp.service.ObtenerDetalleDeArchivoService;
 import cl.gob.scj.sgdp.service.ParametroPorContextoService;
 import cl.gob.scj.sgdp.service.ParametroService;
 import cl.gob.scj.sgdp.service.TipoDeDocumentoService;
+import cl.gob.scj.sgdp.tipos.AccionType;
+import cl.gob.scj.sgdp.tipos.ModuloType;
+import cl.gob.scj.sgdp.util.SGDPUtil;
 
 @Controller
 public class DetalleDeDocumentoControl {
@@ -81,6 +87,12 @@ public class DetalleDeDocumentoControl {
 	
 	@Autowired
 	private HistoricoFirmaService historicoFirmaService;
+
+	@Autowired
+	private ConfidencialidadDocumentoService confidencialidadDocumentoService;
+	
+	@Autowired
+	private LogDocumentoService logDocumentoService;
 	
 	@Resource(name = "configProps")
 	private Properties configProps;
@@ -108,13 +120,18 @@ public class DetalleDeDocumentoControl {
 			List<ArchivoInfoDTO> listaArchivoInfoDTOAdjuntos = obtenerArchivosExpedienteService.getListaArchivoInfoDTOAdjuntos(usuario, detalleDeArchivoDTO.getNombre(), listaArchivoInfoDTO);
 			log.debug(detalleDeArchivoDTO.toString());
 			detalleDeArchivoDTO.setResultadoObtenerDetalleDeArchivo(configProps.getProperty("obtenerDetalleDeArchivoExito"));
-			//new ArrayList<AutorDTO>
 			List<AutorDTO> autoresDTO = bandejaDeEntradaService.getTodosLosAutores();
-			//List<TipoDeDocumentoDTO> tiposDeDocumentosDTO = AppContextControl.getTiposDeDocumentosDTO();
 			List<TipoDeDocumentoDTO> tiposDeDocumentosDTO = tipoDeDocumentoService.getTodosLosTiposDeDocumentos();
 			log.debug(detalleDeArchivoDTO.toString());
 			detalleDeArchivoDTO.setEsEditable(obtenerArchivosExpedienteService.archivoEsEditable(detalleDeArchivoDTO.getMimeType()));
-			detalleDeArchivoDTO.setCodigoMimeType(obtenerArchivosExpedienteService.archivoCodigoMineType(detalleDeArchivoDTO.getMimeType()));			
+			detalleDeArchivoDTO.setCodigoMimeType(obtenerArchivosExpedienteService.archivoCodigoMineType(detalleDeArchivoDTO.getMimeType()));
+			LogDocumentoDTO logDocumentoDTO = new LogDocumentoDTO();
+			logDocumentoDTO.setIpLogDocumento(SGDPUtil.getClientIpAddress(request));
+			logDocumentoDTO.setIdDocumentoLogDocumento(idArchivo);
+			logDocumentoDTO.setTipoOperacionLogDocumento(AccionType.REVISA_DETALLE_DE_DOCUMENTO.getNombreAccion());
+			logDocumentoDTO.setModuloLogDocumento(ModuloType.DETALLE_DE_DOCUMENTO.getNombreModulo());
+			logDocumentoService.insertLogDocumento(usuario, logDocumentoDTO);
+			model.addAttribute("detalleDeArchivoDTO", detalleDeArchivoDTO);
 			model.addAttribute("detalleDeArchivoDTO", detalleDeArchivoDTO);	
 			model.addAttribute("autoresDTO", autoresDTO);
 			model.addAttribute("tiposDeDocumentosDTO", tiposDeDocumentosDTO);
@@ -219,12 +236,10 @@ public class DetalleDeDocumentoControl {
 		List<DetalleDeArchivoDTO> detalleDeArchivosDTOPorIdExpedienteIdUsuarioIdTipoDeDocumento = new ArrayList<DetalleDeArchivoDTO>();	
 		Usuario usuario = (Usuario)request.getSession().getAttribute("usuario");		
 		try {
-			/*obtenerArchivosExpedienteService.cargaDetalleDeArchivosDTOPorIdExpedienteIdUsuarioIdTipoDeDocumento(
-					idExpediente, usuario, idTipoDeDocumento, detalleDeArchivosDTOPorIdExpedienteIdUsuarioIdTipoDeDocumento,
-					puedeVisarDocumentos, puedeAplicarFEA, idInstanciaDeTarea);*/	
 			obtenerArchivosExpedienteService.cargaDetalleDeArchivosDTO(
 					idExpediente, usuario, idTipoDeDocumento, detalleDeArchivosDTOPorIdExpedienteIdUsuarioIdTipoDeDocumento,
 					puedeVisarDocumentos, puedeAplicarFEA, idInstanciaDeTarea);
+			confidencialidadDocumentoService.eliminaConfidenciales(detalleDeArchivosDTOPorIdExpedienteIdUsuarioIdTipoDeDocumento, usuario);
 			log.debug("retornando");
 		} catch (Exception e) {
 			StringWriter sw = new StringWriter();

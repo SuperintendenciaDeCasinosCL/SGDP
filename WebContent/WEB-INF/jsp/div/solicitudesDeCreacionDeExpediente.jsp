@@ -1,6 +1,7 @@
-<%@ page import= "cl.gob.scj.sgdp.config.Constantes" %> 
-<%@ page import= "cl.gob.scj.sgdp.tipos.PermisoType" %>  
-<%@ page import= "cl.gob.scj.sgdp.tipos.EstadoSolicitudCreacionExpType" %>  
+<%@ page import= "cl.gob.scj.sgdp.config.Constantes" %>
+<%@ page import= "cl.gob.scj.sgdp.tipos.PermisoType" %>
+<%@ page import= "cl.gob.scj.sgdp.tipos.EstadoSolicitudCreacionExpType" %>
+<%@ page import= "cl.gob.scj.sgdp.tipos.ModuloType" %>
 
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -14,29 +15,29 @@
 <div class="container">
 
 	<div class="row">
-	
+
 		<div class="col-sm-4">
 			<button type="button" class="btn btn-primary btn-lg btn-block" onclick="abreModalNuevaSolicitudDeCreacExp()"><span class="glyphicon glyphicon-plus"></span> Nueva solicitud</button>
-				<br>				
+				<br>
 		</div>
-	
+
 		<div class="col-sm-4">
-			
+
 		</div>
-		
+
 		<div class="col-sm-4">
 			<button type="button" class="btn btn-warning btn-lg btn-block" onclick="abreModalVerSolicitudesFinalizadas()">Ver solicitudes finalizadas</button>
-				<br>	
+				<br>
 		</div>
-	
+
 	</div>
-	
-	
+
+
 	<div class="row">
-	
+
 		<div class="table-responsive col-sm-12">
-				  		
-			<table id="tablaSolicitudesDeCreacionDeExpediente" class="table table-striped table-bordered table-fixed">											
+
+			<table id="tablaSolicitudesDeCreacionDeExpediente" class="table table-striped table-bordered table-fixed">
 			    <thead>
 			        <tr>
 			            <th>ID</th>
@@ -44,123 +45,136 @@
 			            <th>Usuario que solicita crear expediente</th>
 			            <th>Usuario creador de expediente</th>
 			            <th>Destinatario</th>
-			            <th style="display: none;">Destinatario</th>			            
+			            <th style="display: none;">Destinatario</th>
 			            <th>Fecha de la solicitud</th>
 			            <th style="display: none;">Fecha de la solicitud</th>
 			            <th>Asunto o Materia</th>
-			            <th style="display: none;">Asunto o Materia</th>	
+			            <th style="display: none;">Asunto o Materia</th>
 			            <th>Autor</th>
-			            <th style="display: none;">Autor</th>		         
-			            <th>Acciones</th>			            		       
+			            <th style="display: none;">Autor</th>
+			            <th>Acciones</th>
 			        </tr>
 			    </thead>
-			    <tbody>	    
-			    	<c:forEach var="solicitudCreacionExpDTO" items="${solicitudesCreacionExpDTO}">	    	
-			    		<tr>   			    		
+			    <tbody>
+			    	<c:forEach var="solicitudCreacionExpDTO" items="${solicitudesCreacionExpDTO}">
+			    		<tr>
 				    		<td class="view-message">${solicitudCreacionExpDTO.idSolicitudCreacionExp}</td>
 				    		<td class="view-message">
-				    			<c:choose>				    			
+				    			<c:choose>
 									<c:when test="${solicitudCreacionExpDTO.nombreSubProceso ne null and !empty solicitudCreacionExpDTO.nombreSubProceso}">
 										<input type="hidden" id="idProceso${solicitudCreacionExpDTO.idSolicitudCreacionExp}" value="${solicitudCreacionExpDTO.idProceso}" />
-										${solicitudCreacionExpDTO.nombreSubProceso}		
-									</c:when>									
+										${solicitudCreacionExpDTO.nombreSubProceso}
+									</c:when>
 									<c:when test="${solicitudCreacionExpDTO.idEstadoSolicitudCreacionExp eq idEstadoSolicitudCreacionExpExt}">
-										<select data-id-solicitud-crea-exp="${solicitudCreacionExpDTO.idSolicitudCreacionExp}" style="width: 100%" class="form-control id-proceso" name="idProceso${solicitudCreacionExpDTO.idSolicitudCreacionExp}" id="idProceso${solicitudCreacionExpDTO.idSolicitudCreacionExp}">									
+										<select data-id-solicitud-crea-exp="${solicitudCreacionExpDTO.idSolicitudCreacionExp}" style="width: 100%" class="form-control id-proceso" name="idProceso${solicitudCreacionExpDTO.idSolicitudCreacionExp}" id="idProceso${solicitudCreacionExpDTO.idSolicitudCreacionExp}">
 											<option value="">Seleccione Subproceso</option>
 											<c:forEach items="${listaProcesoDto}" var="procesoDTO">
 												<option value="${procesoDTO.idProceso}">${procesoDTO.nombreProceso}</option>
 											</c:forEach>
-										</select>	
-									</c:when>	
+										</select>
+									</c:when>
 									<c:otherwise>
-										<select data-id-solicitud-crea-exp="${solicitudCreacionExpDTO.idSolicitudCreacionExp}" style="width: 100%" class="form-control id-proceso" name="idProceso${solicitudCreacionExpDTO.idSolicitudCreacionExp}" id="idProceso${solicitudCreacionExpDTO.idSolicitudCreacionExp}">									
+										<select data-id-solicitud-crea-exp="${solicitudCreacionExpDTO.idSolicitudCreacionExp}" style="width: 100%" class="form-control id-proceso" name="idProceso${solicitudCreacionExpDTO.idSolicitudCreacionExp}" id="idProceso${solicitudCreacionExpDTO.idSolicitudCreacionExp}">
 											<option value="">Seleccione Subproceso</option>
 											<c:forEach items="${todosProcesoFormCreaExpDTO}" var="procesoFormCreaExpDTO">
 												<option value="${procesoFormCreaExpDTO.idProceso}">${procesoFormCreaExpDTO.nombreProceso}</option>
 											</c:forEach>
-										</select>						
+										</select>
 									</c:otherwise>
 								</c:choose>
 							</td>
-				    		<td class="view-message">${solicitudCreacionExpDTO.idUsuarioSolicitante}</td>		    		
-				    		<td class="view-message">${solicitudCreacionExpDTO.idUsuarioCreadorExpediente}</td>				    		
-				    		<td class="view-message">				    		
-				    			<c:choose>				    			
+				    		<td class="view-message">${solicitudCreacionExpDTO.idUsuarioSolicitante}</td>
+				    		<td class="view-message">${solicitudCreacionExpDTO.idUsuarioCreadorExpediente}</td>
+				    		<td class="view-message">
+				    			<c:choose>
 									<c:when test="${(permisos[permisoCrearExpediente] eq permisoCrearExpediente and solicitudCreacionExpDTO.idUsuarioCreadorExpediente eq usuario.idUsuario)
-											or 
+											or
 											(permisos[permisoCrearExpediente] eq permisoCrearExpediente and empty solicitudCreacionExpDTO.idUsuarioCreadorExpediente)}">
 
-                                        <select style="width: 100%" class="form-control" name="idUsuarioDestinatario${solicitudCreacionExpDTO.idSolicitudCreacionExp}" id="idUsuarioDestinatario${solicitudCreacionExpDTO.idSolicitudCreacionExp}">									
+                                        <select style="width: 100%" class="form-control" name="idUsuarioDestinatario${solicitudCreacionExpDTO.idSolicitudCreacionExp}" id="idUsuarioDestinatario${solicitudCreacionExpDTO.idSolicitudCreacionExp}">
                                             <c:if test="${solicitudCreacionExpDTO.idsUsuariosDestinatarios ne null and !empty solicitudCreacionExpDTO.idsUsuariosDestinatarios}">
                                                 <c:forEach items="${solicitudCreacionExpDTO.idsUsuariosDestinatarios}" var="idUsuarioDestinatario">
                                                     <option value="${idUsuarioDestinatario}">${idUsuarioDestinatario}</option>
                                                 </c:forEach>
-                                            </c:if>									
+                                            </c:if>
                                         </select>
-									</c:when>	
+									</c:when>
 									<c:otherwise>
-                                        ${solicitudCreacionExpDTO.idUsuarioDestinatario}																
+                                        ${solicitudCreacionExpDTO.idUsuarioDestinatario}
 									</c:otherwise>
 								</c:choose>
 				    		</td>
 				    		<td style="display: none;">${solicitudCreacionExpDTO.idUsuarioDestinatario}</td>
 							<td>
 				    			<span style="display: none;" >
-					    		  <fmt:formatDate value="${solicitudCreacionExpDTO.fechaSolicitud}" pattern="yyyy-MM-dd HH:mm:ss" /> 
+					    		  <fmt:formatDate value="${solicitudCreacionExpDTO.fechaSolicitud}" pattern="yyyy-MM-dd HH:mm:ss" />
 					    		</span>
 					    		<fmt:formatDate pattern="${FORMATO_FECHA_FORM_HH_MM}" value="${solicitudCreacionExpDTO.fechaSolicitud}" />
 					    	</td>
 					    	<td style="display: none;"><fmt:formatDate pattern="${FORMATO_FECHA_FORM_HH_MM}" value="${solicitudCreacionExpDTO.fechaSolicitud}" /></td>
-					    	<td class="view-message">					    		
-					    		<c:choose>				    			
+					    	<td class="view-message">
+					    		<c:choose>
 									<c:when test="${(permisos[permisoCrearExpediente] eq permisoCrearExpediente and solicitudCreacionExpDTO.idUsuarioCreadorExpediente eq usuario.idUsuario)
-											or 
+											or
 											(permisos[permisoCrearExpediente] eq permisoCrearExpediente and empty solicitudCreacionExpDTO.idUsuarioCreadorExpediente)}">
-                                        <input style="width: 100%" type="text" class="form-control" id="asuntoMateria${solicitudCreacionExpDTO.idSolicitudCreacionExp}" 
+                                        <input style="width: 100%" type="text" class="form-control" id="asuntoMateria${solicitudCreacionExpDTO.idSolicitudCreacionExp}"
                                         value='<c:out value="${solicitudCreacionExpDTO.asuntoMateria}"/>  '>
-									</c:when>	
+									</c:when>
 									<c:otherwise>
-                                        ${solicitudCreacionExpDTO.asuntoMateria}																
+                                        ${solicitudCreacionExpDTO.asuntoMateria}
 									</c:otherwise>
-								</c:choose>	
+								</c:choose>
 					    	</td>
 					    	<td style="display: none;">${solicitudCreacionExpDTO.asuntoMateria}</td>
-							<td class="view-message">								
-								<c:choose>				    			
+							<td class="view-message">
+								<c:choose>
 									<c:when test="${(permisos[permisoCrearExpediente] eq permisoCrearExpediente and solicitudCreacionExpDTO.idUsuarioCreadorExpediente eq usuario.idUsuario)
-											or 
+											or
 											(permisos[permisoCrearExpediente] eq permisoCrearExpediente and empty solicitudCreacionExpDTO.idUsuarioCreadorExpediente)}">
 
-                                        <select style="width: 100%" class="form-control" name="idAutorSolicitudExp${solicitudCreacionExpDTO.idSolicitudCreacionExp}" id="idAutorSolicitudExp${solicitudCreacionExpDTO.idSolicitudCreacionExp}">									
+                                        <select style="width: 100%" class="form-control" name="idAutorSolicitudExp${solicitudCreacionExpDTO.idSolicitudCreacionExp}" id="idAutorSolicitudExp${solicitudCreacionExpDTO.idSolicitudCreacionExp}">
 											<c:if test="${solicitudCreacionExpDTO.idEstadoSolicitudCreacionExp eq idEstadoSolicitudCreacionExpExt}">
 												<option value="">Seleccione autor</option>
-											</c:if>									
+											</c:if>
 											<c:forEach items="${solicitudCreacionExpDTO.autoresDTO}" var="autorDTO">
 												<option value="${autorDTO.idAutor}">${autorDTO.nombreAutor}</option>
 											</c:forEach>
 										</select>
-									</c:when>	
+									</c:when>
 									<c:otherwise>
-                                        ${solicitudCreacionExpDTO.autorDTO.nombreAutor}																
+                                        ${solicitudCreacionExpDTO.autorDTO.nombreAutor}
 									</c:otherwise>
-								</c:choose>								
+								</c:choose>
 							</td>
-							<td style="display: none;">${solicitudCreacionExpDTO.autorDTO.nombreAutor}</td>	
-							<td class="view-message">														
+							<td style="display: none;">${solicitudCreacionExpDTO.autorDTO.nombreAutor}</td>
+							<td class="view-message">
 								<c:if test="${(permisos[permisoCrearExpediente] eq permisoCrearExpediente and solicitudCreacionExpDTO.idUsuarioCreadorExpediente eq usuario.idUsuario)
-											or 
-											(permisos[permisoCrearExpediente] eq permisoCrearExpediente and empty solicitudCreacionExpDTO.idUsuarioCreadorExpediente)}">								
-									<a href="#" id="botonRechazaCreacionExp" title="Rechazar solicitud" onclick="rechazaCreacionExp(${solicitudCreacionExpDTO.idSolicitudCreacionExp});" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-remove font-icon-2"></span></a>								
-									<a href="#" id="botonCreaExp" title="Crea expediente" onclick="creaExp(${solicitudCreacionExpDTO.idSolicitudCreacionExp});" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-ok font-icon-2"></span></a>								
-								</c:if>							
-							</td>			            							
+											or
+											(permisos[permisoCrearExpediente] eq permisoCrearExpediente and empty solicitudCreacionExpDTO.idUsuarioCreadorExpediente)}">
+
+										<a href="#" id="botonRechazaCreacionExp" title="Rechazar solicitud" onclick="rechazaCreacionExp(${solicitudCreacionExpDTO.idSolicitudCreacionExp});" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-remove font-icon-2"></span></a>
+
+										<c:if test="${solicitudCreacionExpDTO.idEstadoSolicitudCreacionExp eq '5'}" >
+                                            <a href="#" id="botonVerEnvioDocDigital" title="Revisar env&iacute;o DocDigital" onclick="abreModalDocDigital(${solicitudCreacionExpDTO.idSolicitudCreacionExp})" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-flag font-icon-2"></span></a>
+                                        </c:if>
+
+										<c:if test="${solicitudCreacionExpDTO.idEstadoSolicitudCreacionExp eq '5'}" >
+											<a href="#" id="botonSubirArch" title="Subir archivo" onclick="abreModalArchivo(${solicitudCreacionExpDTO.idSolicitudCreacionExp})" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-paperclip font-icon-2"></span></a>
+									    </c:if>
+
+										<c:if test="${solicitudCreacionExpDTO.idEstadoSolicitudCreacionExp ne '5'}" >
+											<a href="#" id="botonCreaExp" title="Crea expediente" onclick="creaExp(${solicitudCreacionExpDTO.idSolicitudCreacionExp});" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-ok font-icon-2"></span></a>
+										</c:if>
+
+								</c:if>
+							</td>
 			    		</tr>
-			    	</c:forEach> 
+			    	</c:forEach>
 			    </tbody>
 			</table>
-		 	
+
 		</div>
-	
+
 	</div>
 
 </div>
@@ -177,18 +191,18 @@ function creaExp(idSolicitudCreacionExp) {
 	    	$(".formError").remove();
 	    	var validaForm = true;
 	    	var idElemntIdProceso = "#idProceso"+idSolicitudCreacionExp;
-	    	var idElementIdUsuarioDestinatario = "#idUsuarioDestinatario"+idSolicitudCreacionExp;	
+	    	var idElementIdUsuarioDestinatario = "#idUsuarioDestinatario"+idSolicitudCreacionExp;
 	    	var idElementAsuntoMateria = "#asuntoMateria"+idSolicitudCreacionExp;
-	    	var idElementIdAutorSolicitudExp = "#idAutorSolicitudExp"+idSolicitudCreacionExp; 
-	        var idProceso = $(idElemntIdProceso).val();			
+	    	var idElementIdAutorSolicitudExp = "#idAutorSolicitudExp"+idSolicitudCreacionExp;
+	        var idProceso = $(idElemntIdProceso).val();
 			var idUsuarioDestinatario = $(idElementIdUsuarioDestinatario).val();
 			var asuntoMateria = $(idElementAsuntoMateria).val();
 			var idAutor = $(idElementIdAutorSolicitudExp).val();
 			console.log("idSolicitudCreacionExp: " + idSolicitudCreacionExp);
-	    	console.log("idProceso: " + idProceso);	    	
+	    	console.log("idProceso: " + idProceso);
 	    	console.log("idUsuarioDestinatario: " + idUsuarioDestinatario);
 	    	console.log("idElementAsuntoMateria: " + idElementAsuntoMateria);
-	    	console.log("idAutor: " + idAutor);	    	
+	    	console.log("idAutor: " + idAutor);
 	    	if (idProceso == "" || idProceso == undefined  || idProceso == null || idProceso == 'null' || idProceso == 'undefined') {
 	    		validaForm = false;
 	    		$(idElemntIdProceso).validationEngine('showPrompt', '* Por favor seleccione el SubProceso', 'error');
@@ -204,7 +218,7 @@ function creaExp(idSolicitudCreacionExp) {
 	    	if (idAutor == "" || idAutor == undefined  || idAutor == null || idAutor == 'null' || idAutor == 'undefined') {
 	    		validaForm = false;
 	    		$(idElementIdAutorSolicitudExp).validationEngine('showPrompt', '* Por favor seleccione el autor', 'error');
-		    }	    	
+		    }
 	    	if (validaForm == true) {
 	    		bootbox.confirm({
 	                title: "Creaci&oacute;n de expediente",
@@ -219,32 +233,32 @@ function creaExp(idSolicitudCreacionExp) {
 	                        className: 'btn-danger'
 	                    }
 	                },
-	                callback: function (result) {	                  
+	                callback: function (result) {
 	                    if (result == true) {
-	                    	var urlCreaExpedienteSolicitudCreacionExp = "${pageContext.request.contextPath}/creaExpedienteSolicitudCreacionExp";    
-	                    	var urlGetSolicitudesDeCreacionDeExpediente = "${pageContext.request.contextPath}"+"/getSolicitudesDeCreacionDeExpediente";	                    	   		    	
-	                        var solicitudCreacionExpDTO = {};	
-	                        solicitudCreacionExpDTO["idSolicitudCreacionExp"] = idSolicitudCreacionExp;		        
+	                    	var urlCreaExpedienteSolicitudCreacionExp = "${pageContext.request.contextPath}/creaExpedienteSolicitudCreacionExp";
+	                    	var urlGetSolicitudesDeCreacionDeExpediente = "${pageContext.request.contextPath}"+"/getSolicitudesDeCreacionDeExpediente";
+	                        var solicitudCreacionExpDTO = {};
+	                        solicitudCreacionExpDTO["idSolicitudCreacionExp"] = idSolicitudCreacionExp;
 	                        solicitudCreacionExpDTO["idProceso"] = idProceso;
 	                        solicitudCreacionExpDTO["idUsuarioDestinatario"] = idUsuarioDestinatario;
-	                        solicitudCreacionExpDTO["asuntoMateria"] = asuntoMateria;	
-	                        solicitudCreacionExpDTO["idAutor"] = idAutor; 	                        			      			       
+	                        solicitudCreacionExpDTO["asuntoMateria"] = asuntoMateria;
+	                        solicitudCreacionExpDTO["idAutor"] = idAutor;
 	                        $.ajax( {
 	                            url: urlCreaExpedienteSolicitudCreacionExp,
 	                            type: 'POST',
 	                            data: JSON.stringify(solicitudCreacionExpDTO),
 	                            dataType: 'json',
-	                            contentType: "application/json",                	    
+	                            contentType: "application/json",
 	                            beforeSend: function(xhr) {
 	                                $("#solicitudesCreacionExp").css("position", "relative").css("min-height", "200px").prepend($("<div />").addClass("cargando"));
 	                            },
 	                            success: function (returnData) {
-	                                console.log("SUCCESS -- crea registro: ", returnData);	    	
+	                                console.log("SUCCESS -- crea registro: ", returnData);
 	                            },
 	                            error : function(e) {
 	                                console.log("ERROR: ", e);
-	                                $("#solicitudesCreacionExp").find(".cargando").remove();	
-	                                $("#solicitudesCreacionExp").css("position", "");		
+	                                $("#solicitudesCreacionExp").find(".cargando").remove();
+	                                $("#solicitudesCreacionExp").css("position", "");
 	                            },
 	                            done : function(e) {
 	                                console.log("DONE");
@@ -262,21 +276,21 @@ function creaExp(idSolicitudCreacionExp) {
 	                                    },{
 	                                        type: 'danger'
 	                                    });
-	                                }     			
-	                                $("#solicitudesCreacionExp").load(urlGetSolicitudesDeCreacionDeExpediente,	    	                                
+	                                }
+	                                $("#solicitudesCreacionExp").load(urlGetSolicitudesDeCreacionDeExpediente,
 	                                        function() {
-	                                            $("#solicitudesCreacionExp").find(".cargando").remove();                			                       
-	                                });	
+	                                            $("#solicitudesCreacionExp").find(".cargando").remove();
+	                                });
 	                                $('#solicitudesCreacionExp').modal('hide');
-	                                $("#solicitudesCreacionExp").css("position", ""); 	            					
-	                            }                		
+	                                $("#solicitudesCreacionExp").css("position", "");
+	                            }
 	                        });
-	                    } 
+	                    }
 	                }
 	            });
-	    	}		       	   
+	    	}
 	    } else {
-	          bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu última acción y hemos caducado tu sesión por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+	          bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
 	                        , function(){
 	                              window.open('${raizURL}', '_blank');
 	                        }
@@ -289,7 +303,7 @@ function rechazaCreacionExp(idSolicitudCreacionExp) {
 	$.get("${sessionURL}", function(haySession){
 	    console.log("haySession: " + haySession);
 	    if(haySession) {
-	    	bootbox.prompt({	    	
+	    	bootbox.prompt({
 	        	title: "Rechaza Solicitud",
 	        	message: "<p>Por favor confirmar el rechazo de la solicitud.</p>",
 	        	placeholder: "Ingrese motivo de rechazo",
@@ -305,11 +319,11 @@ function rechazaCreacionExp(idSolicitudCreacionExp) {
 	                }
 	            },
 	            callback: function (motivoRechazo) {
-	            	var urlRechazaSolicitudCreacionExp = "${pageContext.request.contextPath}"+"/rechazaSolicitudCreacionExp/"+idSolicitudCreacionExp;                    	                        	   			      			       
-                	var urlGetSolicitudesDeCreacionDeExpediente = "${pageContext.request.contextPath}"+"/getSolicitudesDeCreacionDeExpediente";		    			
-	            	var solicitudCreacionExpDTO = {};			        
+	            	var urlRechazaSolicitudCreacionExp = "${pageContext.request.contextPath}"+"/rechazaSolicitudCreacionExp/"+idSolicitudCreacionExp;
+                	var urlGetSolicitudesDeCreacionDeExpediente = "${pageContext.request.contextPath}"+"/getSolicitudesDeCreacionDeExpediente";
+	            	var solicitudCreacionExpDTO = {};
                     solicitudCreacionExpDTO["idSolicitudCreacionExp"] = idSolicitudCreacionExp;
-                    solicitudCreacionExpDTO["comentario"] = motivoRechazo;                   	
+                    solicitudCreacionExpDTO["comentario"] = motivoRechazo;
 	    			if (motivoRechazo!=null && motivoRechazo!="") {
 	    				$.ajax({
 	    					type : "POST",
@@ -322,12 +336,12 @@ function rechazaCreacionExp(idSolicitudCreacionExp) {
                                 $("#solicitudesCreacionExp").css("position", "relative").css("min-height", "200px").prepend($("<div />").addClass("cargando"));
                             },
                             success: function (returnData) {
-                                console.log("SUCCESS -- crea registro: ", returnData);	    	
+                                console.log("SUCCESS -- crea registro: ", returnData);
                             },
                             error : function(e) {
                                 console.log("ERROR: ", e);
-                                $("#solicitudesCreacionExp").find(".cargando").remove();	
-                                $("#solicitudesCreacionExp").css("position", "");		
+                                $("#solicitudesCreacionExp").find(".cargando").remove();
+                                $("#solicitudesCreacionExp").css("position", "");
                             },
                             done : function(e) {
                                 console.log("DONE");
@@ -345,25 +359,25 @@ function rechazaCreacionExp(idSolicitudCreacionExp) {
                                     },{
                                         type: 'danger'
                                     });
-                                }     			
-                                $("#solicitudesCreacionExp").load(urlGetSolicitudesDeCreacionDeExpediente,	    	                                
+                                }
+                                $("#solicitudesCreacionExp").load(urlGetSolicitudesDeCreacionDeExpediente,
                                         function() {
-                                            $("#solicitudesCreacionExp").find(".cargando").remove();                			                       
-                                });	
-                                $("#solicitudesCreacionExp").find(".cargando").remove();	
-                                $("#solicitudesCreacionExp").css("position", "");		            					
-                            }        		
-	    				});					
+                                            $("#solicitudesCreacionExp").find(".cargando").remove();
+                                });
+                                $("#solicitudesCreacionExp").find(".cargando").remove();
+                                $("#solicitudesCreacionExp").css("position", "");
+                            }
+	    				});
 	    			} else if (motivoRechazo==null) {
 						return true;
-            		} else {									            	    	
+            		} else {
             	    	$(".bootbox-input-text").validationEngine('showPrompt', 'Por favor ingrese un motivo', 'error');
             	    	return false;
-	            	}										
+	            	}
 	            }
-	        });		       	   
+	        });
 	    } else {
-	          bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu última acción y hemos caducado tu sesión por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+	          bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
 	                        , function(){
 	                              window.open('${raizURL}', '_blank');
 	                        }
@@ -379,50 +393,50 @@ $('.id-proceso').on('change', function() {
 		    console.log("haySession: " + haySession);
 		    if(haySession) {
 		    	if (idProceso != "") {
-		    		var getIdsUsuariosDestinatariosPorIdProceso = "${pageContext.request.contextPath}"+"/getIdsUsuariosDestinatariosPorIdProceso/"+idProceso;			    	   
+		    		var getIdsUsuariosDestinatariosPorIdProceso = "${pageContext.request.contextPath}"+"/getIdsUsuariosDestinatariosPorIdProceso/"+idProceso;
 			        $.get(getIdsUsuariosDestinatariosPorIdProceso, function(idsUsuariosDestinatariosPorIdProceso, status) {
 			            var create = '<option value="">Seleccione destinatario</option>';
 			            idsUsuariosDestinatariosPorIdProceso.forEach(function (idUsuarioDestinatario) {
-			                create += '<option value="'+idUsuarioDestinatario +'">'+ idUsuarioDestinatario +'</option>';                    
-			            }); 
+			                create += '<option value="'+idUsuarioDestinatario +'">'+ idUsuarioDestinatario +'</option>';
+			            });
 			            var idSelectOptIdUsrDest = "idUsuarioDestinatario"+idSolicitudCreacionExp;
-			            $('#'+idSelectOptIdUsrDest).html(""); 
+			            $('#'+idSelectOptIdUsrDest).html("");
 			            $('#'+idSelectOptIdUsrDest).append(create);
 			            console.log(create);
-			    	});		    		
-			    }			    
+			    	});
+			    }
 		    } else {
-		          bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu última acción y hemos caducado tu sesión por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+		          bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
 		                        , function(){
 		                              window.open('${raizURL}', '_blank');
 		                        }
 		           );
-		    }		    
+		    }
 		});
 });
 
 function abreModalNuevaSolicitudDeCreacExp() {
 	$.get("${sessionURL}", function(haySession){
         console.log("haySession: " + haySession);
-        if(haySession) {        	
+        if(haySession) {
         	$("#subprocesoMateriaFormCreacExp").val("").trigger("change");
 	    	$("#autorCreacExp").val("").trigger("change");
 	    	$("#asuntoMateriaFormCreacExp").val("").trigger("change");
             $("#destinatarioCreacExp").val("").trigger("change");
             $("#comentarioSolicitudCreaExp").val("").trigger("change");
-        	$('#nuevaSolicitudCreacExpModal').modal( {backdrop: 'static', keyboard: false}); 
+        	$('#nuevaSolicitudCreacExpModal').modal( {backdrop: 'static', keyboard: false});
         } else {
-              bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu última acción y hemos caducado tu sesión por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+              bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
                             , function(){
                                   window.open('${raizURL}', '_blank');
                             }
                );
         }
-  	});	
+  	});
 }
 
 function formatTablaSolicitudesDeCreacionDeExpediente() {
-	
+
 	var tablaSolicitudesDeCreacionDeExpediente = $('#tablaSolicitudesDeCreacionDeExpediente')
 	.DataTable(
 			{
@@ -434,11 +448,11 @@ function formatTablaSolicitudesDeCreacionDeExpediente() {
 					}
 				}],
 				"language" : lenguaje_es,
-				"pageLength": 6,	
+				"pageLength": 6,
 				"order": [[ 0, "asc" ]]
-				
+
 			});
-	
+
 	tablaSolicitudesDeCreacionDeExpediente.buttons().container().appendTo(
 	'#tablaSolicitudesDeCreacionDeExpediente_wrapper .row:eq(0)');
 }
@@ -449,20 +463,68 @@ function abreModalVerSolicitudesFinalizadas() {
         if(haySession) {
         	$('#tablaSolicitudesDeCreacionDeExpedienteFinalizadas').DataTable().destroy();;
         	inicializaTablaSolicitudesDeCreacionDeExpedienteFinalizadas();
-        	$('#solicitudesCreacExpFinalizadasModal').modal( {backdrop: 'static', keyboard: false}); 
+        	$('#solicitudesCreacExpFinalizadasModal').modal( {backdrop: 'static', keyboard: false});
         } else {
-              bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu última acción y hemos caducado tu sesión por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+              bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
                             , function(){
                                   window.open('${raizURL}', '_blank');
                             }
                );
         }
-  	});	
+  	});
+}
+
+function abreModalArchivo(idSolicitudCreacionExp) {
+    const nombreTabla = 'tablaObtenerArchivos';
+	console.log("idSolicitudCreacionExp: " + idSolicitudCreacionExp);
+	$.get("${pageContext.request.contextPath}"+"/verificarSession", function(haySession){
+        console.log("haySession: " + haySession);
+        if(haySession) {
+        	var validaForm = true;
+	    	var idElemntIdProceso = "#idProceso"+idSolicitudCreacionExp;
+	    	var idElementIdUsuarioDestinatario = "#idUsuarioDestinatario"+idSolicitudCreacionExp;
+	    	var idElementAsuntoMateria = "#asuntoMateria"+idSolicitudCreacionExp;
+	    	var idElementIdAutorSolicitudExp = "#idAutorSolicitudExp"+idSolicitudCreacionExp;
+        	var idProceso = $(idElemntIdProceso).val();
+			var idUsuarioDestinatario = $(idElementIdUsuarioDestinatario).val();
+			var asuntoMateria = $(idElementAsuntoMateria).val();
+			var idAutor = $(idElementIdAutorSolicitudExp).val();
+        	if (idProceso == "" || idProceso == undefined  || idProceso == null || idProceso == 'null' || idProceso == 'undefined') {
+	    		validaForm = false;
+	    		$(idElemntIdProceso).validationEngine('showPrompt', '* Por favor seleccione el SubProceso', 'error');
+		    }
+	    	if (idUsuarioDestinatario == "" || idUsuarioDestinatario == undefined  || idUsuarioDestinatario == null || idUsuarioDestinatario == 'null' || idUsuarioDestinatario == 'undefined') {
+	    		validaForm = false;
+	    		$(idElementIdUsuarioDestinatario).validationEngine('showPrompt', '* Por favor seleccione el usuario destinatario', 'error');
+		    }
+	    	if (asuntoMateria == "" || asuntoMateria == undefined  || asuntoMateria == null || asuntoMateria == 'null' || asuntoMateria == 'undefined') {
+	    		validaForm = false;
+	    		$(idElementAsuntoMateria).validationEngine('showPrompt', '* Por favor seleccione el aunto', 'error');
+		    }
+	    	if (idAutor == "" || idAutor == undefined  || idAutor == null || idAutor == 'null' || idAutor == 'undefined') {
+	    		validaForm = false;
+	    		$(idElementIdAutorSolicitudExp).validationEngine('showPrompt', '* Por favor seleccione el autor', 'error');
+		    }
+	    	if (validaForm == true){
+	    		$('#tablaObtenerArchivos').DataTable().destroy();
+	        	inicializaTablaObtenerArchivos(idSolicitudCreacionExp, nombreTabla);
+	        	$('#archivosSolicitudCrearExpModal').modal( {backdrop: 'static', keyboard: false});
+	        	$("#crearExpArc").attr('data-solcrear', idSolicitudCreacionExp);
+	    	}
+
+        } else {
+              bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+                            , function(){
+                                  window.open('${raizURL}', '_blank');
+                            }
+               );
+        }
+  	});
 }
 
 var inicializaTablaSolicitudesDeCreacionDeExpedienteFinalizadas = function() {
 
-	var urlGetSolicitudesCreaExpFinalizadas = "${pageContext.request.contextPath}"+"/getSolicitudesCreaExpFinalizadas";	
+	var urlGetSolicitudesCreaExpFinalizadas = "${pageContext.request.contextPath}"+"/getSolicitudesCreaExpFinalizadas";
 
 	$("#tablaSolicitudesDeCreacionDeExpedienteFinalizadas").dataTable({
 		"bProcessing" : true,
@@ -475,7 +537,7 @@ var inicializaTablaSolicitudesDeCreacionDeExpedienteFinalizadas = function() {
 		"iDisplayLength" : 8,
 		//We will use below variable to track page number on server side(For more information visit: http://legacy.datatables.net/usage/options#iDisplayStart)
 		"iDisplayStart" : 0,
-		"language" : lenguaje_es,	
+		"language" : lenguaje_es,
 		"fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
 			$.get("${sessionURL}", function(haySession){
 		        console.log("haySession: " + haySession);
@@ -486,16 +548,16 @@ var inicializaTablaSolicitudesDeCreacionDeExpedienteFinalizadas = function() {
 				        "url": sSource,
 				        "data": aoData,
 				        "success": fnCallback
-				      } );		        	
+				      } );
 		        } else {
-		              bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu última acción y hemos caducado tu sesión por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+		              bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
 		                            , function(){
 		                                  window.open('${raizURL}', '_blank');
 		                            }
-		              );		             
+		              );
 		        }
-		  	});		      
-		 },		 
+		  	});
+		 },
 		"sAjaxSource" : "getSolicitudesCreaExpFinalizadas",
 		"aoColumns" : [
 						{
@@ -531,6 +593,129 @@ var inicializaTablaSolicitudesDeCreacionDeExpedienteFinalizadas = function() {
 
 }
 
+var inicializaTablaObtenerArchivos = function(idSolicitudCreacionExp, nombreTabla) {
+
+
+	var urlGetObtenerArchivos = "${pageContext.request.contextPath}"+"/getArchivosCrearExp/"+idSolicitudCreacionExp;
+	console.log("idSolicitudCreacionExpINITabla: " + idSolicitudCreacionExp);
+	var tabla = $("#"+nombreTabla+"").DataTable({
+		"bProcessing" : true,
+		"bServerSide" : true,
+		//"sort" : "position",
+		"bSort" : false,
+		//bStateSave variable you can use to save state on client cookies: set value "true"
+		"bStateSave" : false,
+		//Default: Page display length
+		"iDisplayLength" : 8,
+		//We will use below variable to track page number on server side(For more information visit: http://legacy.datatables.net/usage/options#iDisplayStart)
+		"iDisplayStart" : 0,
+		"language" : lenguaje_es,
+		"fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
+			$.get("${sessionURL}", function(haySession){
+		        console.log("haySession: " + haySession);
+		        if(haySession) {
+		        	oSettings.jqXHR = $.ajax( {
+				        "dataType": 'json',
+				        "type": "GET",
+				        "url": sSource,
+				        "data": aoData,
+				        "success": fnCallback
+				      });
+		        } else {
+		              bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+		                            , function(){
+		                                  window.open('${raizURL}', '_blank');
+		                            }
+		              );
+		        }
+		  	});
+		 },
+		"sAjaxSource" : "getArchivosCrearExp/"+idSolicitudCreacionExp,
+
+		"aoColumns" : [
+						{
+							"mData" : "nombreDocumento"
+						},
+						{
+							"mData" : "fechaCreacionOrigen"
+						},
+						{
+							"mData" : "folioOrigen"
+						},
+						{
+							"mData" : "tipoOrigen"
+						},
+                        {
+                            "mData" : "reservado"
+                        },
+                        {
+                            "mData" : "usuariosConfidenciales"
+                        },
+						{
+							"defaultContent": "<button class='fa fa-download font-icon-2'></button>"
+						}
+
+		],
+
+		"createdRow": function (row, data, dataIndex) {
+            // Obtn el valor de "reservado" para la fila actual
+            var confidencialidadFinal = data.confidencialidadFinal;
+            var idArchivosSolCreaExp = data.idArchivosSolCreaExp;
+            var usuariosConfidenciales = data.usuariosConfidenciales;
+            console.log("confidencialidadFinal: " + confidencialidadFinal);
+            // Crea un checkbox con el valor segun "reservado"
+            var checkbox = '<label class="switch"> <input id="confidencialidadFinal' + idArchivosSolCreaExp + '" onclick="actualizaConfidencialidadArchivosSolicitud(' + idArchivosSolCreaExp + ')" class="check_switch" type="checkbox" value="' + confidencialidadFinal + '"';
+            // Marca el checkbox como "checked" si "reservado" no est vaco
+            if (confidencialidadFinal == 'true' || confidencialidadFinal == true) {
+                checkbox += ' checked';
+            }
+            if (usuariosConfidenciales.length === 0) {
+                checkbox += " disabled";
+            }
+            checkbox += '><span class="slider round"></span></label>';
+            // Agrega el checkbox a la celda de la columna "reservado"
+            $(row).find('td:eq(4)').html(checkbox);
+        }
+
+	});
+
+	var modulo = '<%=ModuloType.SOLICITUD_CREACION_EXPEDIENTE.getNombreModulo()%>';
+
+	$('#' + nombreTabla + ' tbody').on( 'click', 'button', function () {
+        var data = tabla.row( $(this).parents('tr') ).data();
+        descargaArchivoCrearExp("${pageContext.request.contextPath}"+"/getArchivoPorId/"+data['idArchivoCms'], modulo, idSolicitudCreacionExp);
+    } );
+
+}
+
+
+function descargaArchivoCrearExp(urlDescarga, modulo, idSolicitudCreacionExp) {
+	urlDescarga = urlDescarga + "/" + "DESCARGA" + "/" + modulo + "/" + idSolicitudCreacionExp
+	console.log("urlDescarga: " + urlDescarga);
+	console.log("modulo: " + modulo);
+	console.log("idSolicitudCreacionExp: " + idSolicitudCreacionExp);
+	var urlSessionValida = $("#urlSessionValida").val();
+	var raizURL = $("#raizURL").val();
+	var ar = urlDescarga.split("/");
+	console.log(ar[3]);
+	console.log("urlSessionValida: " + urlSessionValida);
+	$.get(urlSessionValida, function(haySession) {
+	      console.log("haySession: " + haySession);
+	      if(haySession) {
+	    	  window.location.href = urlDescarga;
+	      }	else {
+	            bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ultima acci&oacute;n y hemos caducado tu sesi&oacute;n por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+	                          , function(){
+	                                window.open(raizURL, '_blank');
+	                          }
+	             );
+	      }
+	});
+}
+
+
+
+
 jQuery.fn.dataTableExt.oApi.fnPagingInfo = function(objValues) {
 
 	return {
@@ -558,10 +743,66 @@ jQuery.fn.dataTableExt.oApi.fnPagingInfo = function(objValues) {
 
 };
 
+function abreModalDocDigital(idSolicitudCreacionExp) {
+    const nombreTabla = 'tablaArchivosDocDigital';
+	console.log("idSolicitudCreacionExp: " + idSolicitudCreacionExp);
+	$.get("${pageContext.request.contextPath}"+"/verificarSession", function(haySession){
+        console.log("haySession: " + haySession);
+        if(haySession) {
+            $('#tablaArchivosDocDigital').DataTable().destroy();
+            inicializaTablaObtenerArchivos(idSolicitudCreacionExp, nombreTabla);
+            $('#archivosDocDigitalModal').modal( {backdrop: 'static', keyboard: false});
+            //$("#crearExpArc").attr('data-solcrear', idSolicitudCreacionExp);
+        } else {
+              bootbox.alert("<div style=\"text-align:center;\"><i class=\"icon-emo-sleep don_sshi\"></i><p style=\"margin-top: 15px;\">Ha pasado algo de tiempo desde tu ltima accin y hemos caducado tu sesin por seguridad, por favor presiona aceptar y vuelve a hacer login. </p></div>"
+                            , function(){
+                                  window.open('${raizURL}', '_blank');
+                            }
+               );
+        }
+  	});
+}
+
+function actualizaConfidencialidadArchivosSolicitud (idArchivosSolCreaExp) {
+    var confidencialidadFinal = $("#confidencialidadFinal"+idArchivosSolCreaExp).is(":checked");
+    console.log("confidencialidadFinal: " + confidencialidadFinal);
+    $.ajax({
+        url: '${pageContext.request.contextPath}' + '/arhivoSolicitudCreacionExp/' + idArchivosSolCreaExp + '/' + confidencialidadFinal,
+        type: 'PUT',
+        contentType: 'application/json; charset=utf-8',
+        success: function(response) {
+            console.log('Solicitud exitosa:', response);
+            console.log(response.message);
+            if (response.message!="OK") {
+                $.notify({
+                    message: response.message
+                },{
+                    type: 'danger'
+                });
+            } else {
+                $.notify({
+                    message: "Registro actualizado"
+                },{
+                    type: 'success'
+                });
+            }
+
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.error('Error en la solicitud:', textStatus, errorThrown);
+            $.notify({
+                message: "Error al actualizar el registro"
+            },{
+                type: 'danger'
+            });
+        }
+    });
+}
+
 $(document).ready(function() {
-	formatTablaSolicitudesDeCreacionDeExpediente();	
+	formatTablaSolicitudesDeCreacionDeExpediente();
 	new Tippy('#botonRechazaCreacionExp');
-	new Tippy('#botonCreaExp');		
+	new Tippy('#botonCreaExp');
 });
 
 </script>

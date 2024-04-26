@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import cl.gob.scj.sgdp.auth.user.Usuario;
 import cl.gob.scj.sgdp.dao.AccionesHistInstDeTareaDao;
 import cl.gob.scj.sgdp.dao.AutorDao;
+import cl.gob.scj.sgdp.dao.ComplejidadExpedienteDao;
 import cl.gob.scj.sgdp.dao.EstadoDeProcesoDao;
 import cl.gob.scj.sgdp.dao.EstadoDeTareaDao;
 import cl.gob.scj.sgdp.dao.FechaFeriadoDao;
@@ -34,7 +35,9 @@ import cl.gob.scj.sgdp.dao.UsuarioResponsabilidadDao;
 import cl.gob.scj.sgdp.dto.ExpedienteDTO;
 import cl.gob.scj.sgdp.dto.MacroProcesoDTO;
 import cl.gob.scj.sgdp.dto.ProcesoDTO;
+import cl.gob.scj.sgdp.dto.rest.ExpedienteRestActMetaDTO;
 import cl.gob.scj.sgdp.exception.SgdpException;
+import cl.gob.scj.sgdp.model.ComplejidadExpediente;
 import cl.gob.scj.sgdp.model.EstadoDeProceso;
 import cl.gob.scj.sgdp.model.HistoricoDeInstDeTarea;
 import cl.gob.scj.sgdp.model.HistoricoUsuariosAsignadosATarea;
@@ -55,7 +58,9 @@ import cl.gob.scj.sgdp.tipos.EstadoDeProcesoType;
 import cl.gob.scj.sgdp.tipos.EstadoDeTareaType;
 import cl.gob.scj.sgdp.tipos.PermisoType;
 import cl.gob.scj.sgdp.util.FechaUtil;
+import cl.gob.scj.sgdp.util.SGDPUtil;
 import cl.gob.scj.sgdp.ws.alfresco.rest.client.CrearExpedienteCMSService;
+import cl.gob.scj.sgdp.ws.alfresco.rest.client.GestorMetadataCMSService;
 
 @Service
 @Transactional(rollbackFor = Throwable.class)
@@ -113,6 +118,12 @@ public class CrearExpedienteServiceImpl implements CrearExpedienteService {
 	
 	@Autowired
 	private GestorMetadataService gestorMetadataService;
+	
+	@Autowired
+	private ComplejidadExpedienteDao complejidadExpedienteDao;
+	
+	@Autowired
+	private GestorMetadataCMSService gestorMetadataCMSService;
 	
 	EstadoDeProcesoType estadoDeProcesoNuevoType = EstadoDeProcesoType.NUEVO;
 	EstadoDeProcesoType estadoDeProcesoAsignadoType = EstadoDeProcesoType.ASIGNADO;
@@ -347,12 +358,44 @@ public class CrearExpedienteServiceImpl implements CrearExpedienteService {
 			throw new SgdpException(configProps.getProperty("errorAlCrearExpEnCMS"));
 		}
 		
+		if (expedienteDTO.getIdComplejidad() != null 
+				&& usuario.getPermisos().get(PermisoType.PUEDE_INGRESAR_COMPLEJIDAD_AL_CREAR_EXPEDIENTE.getNombrePermiso()) !=null) {
+			insertarComplejidad(expedienteDTO, instanciaDeProceso, usuario);
+		}
+
 		log.debug("Fin crear expediente");
 		
 		return configProps.getProperty("respuestaOK");
 		
 	}
 	
+	
+	
+	private void insertarComplejidad(ExpedienteDTO expedienteDTO, InstanciaDeProceso instanciaDeProceso,
+			Usuario usuario) throws SgdpException {
+		try {
+			log.debug("Insertando Complejidad");
+			ComplejidadExpediente complejidadModel = new ComplejidadExpediente();
+			complejidadModel.setComplejidad(expedienteDTO.getIdComplejidad());
+			complejidadModel.setMotivoComplejidad(expedienteDTO.getMotivoComplejidad());
+			complejidadModel.setInstanciaDeProceso(instanciaDeProceso);
+			complejidadModel.setUsuario(usuario.getIdUsuario());
+			complejidadModel.setFecha(new Date());
+			complejidadExpedienteDao.insert(complejidadModel);
+			ExpedienteRestActMetaDTO expedienteRestActMetaDTO = new ExpedienteRestActMetaDTO();
+			expedienteRestActMetaDTO.setIdExpediente(instanciaDeProceso.getIdExpediente());
+			expedienteRestActMetaDTO.setComplejidad(expedienteDTO.getIdComplejidad());
+			gestorMetadataCMSService.actualizaMetaDataExpediente(usuario, expedienteRestActMetaDTO);
+		} catch (Exception e) {
+			log.error("Error al insertar complejidad al expediente: " + expedienteDTO.getNombreExpediente(), e);
+			log.error(SGDPUtil.getStackTrace(e));
+			throw new SgdpException(configProps.getProperty("errorAlCrearExpEnCMS"));
+		}
+	}
+
+
+
+
 	@Override
 	public List<ProcesoDTO> getProcesosPorIdMacroProceso(long idMacroProceso, List<ProcesoDTO> procesosDTO) {
 		List<Proceso> procesos = procesoDao.getProcesosPorIdMacroProceso(idMacroProceso, true);

@@ -154,8 +154,8 @@ public class InstanciaDeTareaServiceImpl implements InstanciaDeTareaService {
 			instanciaDeTareaDTO.cargaUsuariosAsignadosString(configProps.getProperty("caracterSeparadorDeUsuarios"));
 			try {
 				instanciaDeTareaDTO.cargaAdvertenciaDePlazo(
-				parametroService.getParametroPorID(Constantes.ID_PARAM_PORCENTAJE_ADVERTENCIA_TAREA).getValorParametroNumerico(),
-				instanciaDeTarea.getTarea().getDiasHabilesMaxDuracion());				
+				parametroService.getParametroPorID(Constantes.ID_PARAM_PORCENTAJE_ADVERTENCIA_TAREA).getValorParametroNumerico()/*,
+				instanciaDeTarea.getTarea().getDiasHabilesMaxDuracion()*/);				
 			} catch (IOException e) {
 				StringWriter sw = new StringWriter();
 				e.printStackTrace(new PrintWriter(sw));
@@ -406,5 +406,15 @@ public class InstanciaDeTareaServiceImpl implements InstanciaDeTareaService {
 		BeanUtils.copyProperties(instanciaDeTarea.getInstanciaDeProceso(), instanciaDeTareaDTO.getInstanciaDeProcesoDTO());
 	}*/
 	
+	public List<ArchivosInstDeTareaDTO> archivosInstanciaTarea(int idInstanciaDeTarea, List<ArchivosInstDeTareaDTO> todosLosDocSubidos) {
+		List<ArchivosInstDeTareaDTO> archivosInstDeTareaDTOList = archivosInstDeTareaDao.getTodosLosDocSubidosPorIdInstTarea(idInstanciaDeTarea);
+		for (ArchivosInstDeTareaDTO archivosInstDeTareaDTO : archivosInstDeTareaDTOList) {
+			if (archivosInstDeTareaDTO.getIdTipoDeDocumento() == 46 && archivosInstDeTareaDTO.getIdInstanciaDeTarea() == idInstanciaDeTarea) {
+				todosLosDocSubidos.add(archivosInstDeTareaDTO);
+			}
+
+		}
+		return todosLosDocSubidos;
+	}
 	
 }

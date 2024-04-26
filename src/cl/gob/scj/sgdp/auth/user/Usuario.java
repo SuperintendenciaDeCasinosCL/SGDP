@@ -93,9 +93,17 @@ public class Usuario implements Serializable{
 			if (usuarioRol.getRut()!=null && !usuarioRol.getRut().isEmpty()) {
 				this.setRut(usuarioRol.getRut()); 
 			}
-			todosLosRoles.add(new RolDTO(usuarioRol.getRol().getIdRol(), usuarioRol.getRol().getNombreRol()));
+			//MIG
+			todosLosRoles.add(new RolDTO(usuarioRol.getRol().getIdRol(), usuarioRol.getRol().getNombreRol(), usuarioRol.getRol().getUnidad().getIdUnidad(), usuarioRol.getRol().getUnidad().getNombreCompletoUnidad()));
 			if (unidadDTO == null) {
-				unidadDTO = new UnidadDTO(usuarioRol.getUnidad().getIdUnidad(), usuarioRol.getUnidad().getCodigoUnidad(), usuarioRol.getUnidad().getNombreCompletoUnidad());
+				if (usuarioRol.getUnidad().getUnidadOperativa()!=null) {
+					unidadDTO = new UnidadDTO(usuarioRol.getUnidad().getIdUnidad(), usuarioRol.getUnidad().getCodigoUnidad(), 
+							usuarioRol.getUnidad().getNombreCompletoUnidad(), usuarioRol.getUnidad().getUnidadOperativa().getIdUnidadOperativa(),
+							 usuarioRol.getUnidad().getUnidadOperativa().getLoginHeaderMultiOficinaB64());
+				} else {
+					unidadDTO = new UnidadDTO(usuarioRol.getUnidad().getIdUnidad(), usuarioRol.getUnidad().getCodigoUnidad(), 
+							usuarioRol.getUnidad().getNombreCompletoUnidad());
+				}
 			}
 			idUnidades.add(usuarioRol.getUnidad().getIdUnidad());
 			log.debug("Agregando id unidad: " + usuarioRol.getUnidad().getIdUnidad());

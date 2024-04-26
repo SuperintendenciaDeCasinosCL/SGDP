@@ -11,6 +11,7 @@ public class ExpedienteRestActMetaDTO extends ExpedienteRestDTO  {
 	private String proceso;
 	private String subproceso;
 	private String nombreExpediente;
+	private String complejidad;
 
 	public String getIdExpediente() {
 		return idExpediente;
@@ -79,10 +80,15 @@ public class ExpedienteRestActMetaDTO extends ExpedienteRestDTO  {
 	public String getNombreExpediente() {
 		return nombreExpediente;
 	}
-
-	public void setNombreExpediente(String nombreExpediente) {
-		this.nombreExpediente = nombreExpediente;
+	
+	public String getComplejidad() {
+		return complejidad;
 	}
+
+	public void setComplejidad(String complejidad) {
+		this.complejidad = complejidad;
+	}
+
 
 	@Override
 	public String toString() {
@@ -91,6 +97,7 @@ public class ExpedienteRestActMetaDTO extends ExpedienteRestDTO  {
 				+ ", esConfidencial=" + esConfidencial + ", perspectiva=" + perspectiva + ", proceso=" + proceso
 				+ ", subproceso=" + subproceso 
 				+ ", nombreExpediente=" + nombreExpediente 
+				+ ", complejidad=" + complejidad 
 				+ "]" + super.toString();
 	}
 

@@ -34,6 +34,7 @@ import cl.gob.scj.sgdp.model.TextoParametroDeTarea;
 import cl.gob.scj.sgdp.model.TipoParametroDeTarea;
 import cl.gob.scj.sgdp.model.ValorParametroDeTarea;
 import cl.gob.scj.sgdp.service.ParametroDeTareaService;
+import cl.gob.scj.sgdp.tipos.TipoParametroTareaType;
 
 @Service
 @Transactional(rollbackFor = Throwable.class)
@@ -61,13 +62,26 @@ public class ParametroDeTareaServiceImpl implements ParametroDeTareaService {
 
 	@Override
 	public void cargarParametrosDeTareaDTO(List<ParametroFormularioDTO> listParametroFormularioDTO, long idInstanciaDeTarea) {
+		boolean paramSet = false;
+		if (listParametroFormularioDTO!=null && listParametroFormularioDTO.size() == 0) {
+			log.debug("listParametroFormularioDTO!=null -- " + listParametroFormularioDTO.size());
+			paramSet = true;
+		}
 		List<ParametroDeTarea> listParamDeTarea = parametroDeTareaDao.getParametrosDeTareaPorIdInstanciaDeTarea(idInstanciaDeTarea);
 		for (ParametroDeTarea parametroDeTarea: listParamDeTarea) {
 			ParametroFormularioDTO parametroFormularioDTOEnLista = getParametroDTODeTareaEstaEnListaDeParametroDeTareaDTO(parametroDeTarea, listParametroFormularioDTO);
 			if (parametroFormularioDTOEnLista == null) {
 				ParametroFormularioDTO parametroFormularioDTO = new ParametroFormularioDTO();
 				parametroFormularioDTO.setName(parametroDeTarea.getIdParamTarea().toString() + "_" + parametroDeTarea.getNombreParamTarea());
-				parametroFormularioDTO.setValue(parametroDeTarea.getTipoParametroDeTarea().getValorParamNoSeteado());
+				log.debug("parametroDeTarea.getTipoParametroDeTarea().getNombreTipoParametroDeTarea(): " + parametroDeTarea.getTipoParametroDeTarea().getNombreTipoParametroDeTarea());
+				log.debug("TipoParametroTareaType.REQUISITO_DE_SATISFACCION.getNombreTipoDeRequisito(): " + TipoParametroTareaType.REQUISITO_DE_SATISFACCION.getNombreTipoDeRequisito());
+				if (paramSet && parametroDeTarea.getTipoParametroDeTarea().getNombreTipoParametroDeTarea().equals(TipoParametroTareaType.REQUISITO_DE_SATISFACCION.getNombreTipoDeRequisito()) ) {
+					log.debug("Parametro seteado");
+					parametroFormularioDTO.setValue(parametroDeTarea.getTipoParametroDeTarea().getValorParamSeteado());
+				} else {
+					log.debug("Parametro no seteado");
+					parametroFormularioDTO.setValue(parametroDeTarea.getTipoParametroDeTarea().getValorParamNoSeteado());
+				}				
 				listParametroFormularioDTO.add(parametroFormularioDTO);	
 			} else {
 				parametroFormularioDTOEnLista.setValue(parametroDeTarea.getTipoParametroDeTarea().getValorParamSeteado());

@@ -245,6 +245,10 @@ public class GestorMetadataCMSServiceImpl implements GestorMetadataCMSService {
 		if (expedienteRestActMetaDTO.getMateria()!=null && !expedienteRestActMetaDTO.getMateria().isEmpty()) {
 			mvm.add("materia", URLEncoder.encode(expedienteRestActMetaDTO.getMateria(), "UTF-8"));
 		}
+		
+		if (expedienteRestActMetaDTO.getComplejidad()!=null && !expedienteRestActMetaDTO.getComplejidad().isEmpty()) {
+			mvm.add("complejidad", expedienteRestActMetaDTO.getComplejidad());
+		}
 			
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.MULTIPART_FORM_DATA);

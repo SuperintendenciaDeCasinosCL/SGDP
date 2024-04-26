@@ -7,5 +7,5 @@ import cl.gob.scj.sgdp.model.ResponsabilidadTarea;
 public interface ResponsabilidadTareaDao {
 	
 	List<ResponsabilidadTarea> getResponsabilidadesTareasPorIdTarea(long idTarea);
-
+	List<ResponsabilidadTarea> getResponsabilidadesTareasPorIdProceso(long idProceso);
 }

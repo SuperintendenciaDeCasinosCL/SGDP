@@ -58,4 +58,10 @@ public class UsuarioResponsabilidadDTO implements Serializable {
 			return false;
 		return true;
 	}
+	@Override
+	public String toString() {
+		return "UsuarioResponsabilidadDTO [idUsuarioResponsabilidad=" + idUsuarioResponsabilidad + ", idUsuario="
+				+ idUsuario + ", orden=" + orden + "]";
+	}
+	
 }

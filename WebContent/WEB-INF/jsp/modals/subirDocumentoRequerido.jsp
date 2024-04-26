@@ -24,6 +24,11 @@
 				      </div>				     
 				    </div>
 				    
+				    <!-- ###################################################### -->
+				    <!-- Plantilla de documento-->
+				    <div id="divPlantillaDeDocumento" class="hide">
+
+				    </div>
 				    
 				    <!-- ###################################################### -->
 				    <!-- Subir Documento requerido sin asignar número de documento-->
@@ -271,7 +276,8 @@ var inicializaFileUploadDocumentoRequeridoModal = function(){
 	console.log("urlSubirArchivo: " + urlSubirArchivo);	
   	var notify = "";
   	var tipoDeArchivo;  
-  	var tamanoDeArchivo;	
+  	var tamanoDeArchivo;
+  	var nombreArchivoFileUpload;
   	$('#documentoRequeridoModal').fileupload({
   		dataType: 'json',
         url: urlSubirArchivo,
@@ -282,14 +288,17 @@ var inicializaFileUploadDocumentoRequeridoModal = function(){
                 $('#nombreArchivoSpanDocumentoRequeridoModal').text(file.name);      
                 tipoDeArchivo = file.type;
                 tamanoDeArchivo = file.size;
+                nombreArchivoFileUpload = file.name;
                 console.log("tipoDeArchivo: " + tipoDeArchivo); 
-                console.log("tamanoDeArchivo: " + tamanoDeArchivo);               
+                console.log("tamanoDeArchivo: " + tamanoDeArchivo);
+                console.log("nombreArchivoFileUpload: " + nombreArchivoFileUpload);
             });        	
         	$("#botonSubirDocumentoRequeridoModal").off('click').on('click', function () {
         		var validaInput = true;
         		var validaTamanoDeArchivo = true;
         		var x = $("#formSubirDocumentoRequeridoModal").validationEngine('hide');
         		var convertirAPDF = false;
+        		
 				if ($(this).attr('data-puedevisardocumentos') == "true") {
 					convertirAPDF = $(this).attr('data-aplicavisacionportipodedocumento') == "true"
 						 && $(this).attr('data-permisopuedevisardocumento') == $(this).attr('data-nombrepermisopuedevisardocumento')
@@ -315,7 +324,8 @@ var inicializaFileUploadDocumentoRequeridoModal = function(){
             			"tipoDeDocumento" : encodeURIComponent($('#idTipoDeDocumentoRequeridoModal :selected').text()),
             			"esRequerido" : true,
             			"asignarnumerodocumento" : $(this).attr("data-asignarnumerodocumento"),  
-            			"validaInstanciaDeTareaEnBE": true    			
+            			"validaInstanciaDeTareaEnBE": true   ,
+            			"nombreArchivoFileUpload": encodeURIComponent(nombreArchivoFileUpload)
             			};    			
         		var validaForm = $("#formSubirDocumentoRequeridoModal").validationEngine('validate');
         		console.log("validaForm: " + validaForm);

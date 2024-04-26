@@ -2,6 +2,8 @@ package cl.gob.scj.sgdp.dao;
 
 import java.util.List;
 
+import org.hibernate.Session;
+
 import cl.gob.scj.sgdp.dto.TipoDeDocumentoDTO;
 import cl.gob.scj.sgdp.model.TipoDeDocumento;
 
@@ -39,5 +41,11 @@ public interface TipoDeDocumentoDao {
 	List<TipoDeDocumento> getTiposDeDocumentosPorNombreExpediente(String nombreExpediente);
 	
 	List<TipoDeDocumento> getTiposDeDocumentosPorIdExpediente(String idExpediente);
+	
+	Long guardar(TipoDeDocumento td, Session session);
+
+	List<TipoDeDocumento> getTiposDeDocumentosPorIdProceso(Long idProceso);
+	
+	List<TipoDeDocumento> getTiposDeDocumentosPorCodigoPlantilla(String codigoPlantilla, boolean vigente);
 
 }
